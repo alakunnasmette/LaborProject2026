@@ -5,7 +5,8 @@ try:
     _USE_PILLOW = True
 except Exception:
     _USE_PILLOW = False
-import assessments  # jouw assessments.py
+import assessments  # assessments.py
+import prognosemodel # prognosemodel.py
  
 # --------- 1. HOOFDVENSTER ---------
 root = tk.Tk()
@@ -99,11 +100,6 @@ def hide_back_button():
     if btn_back.winfo_ismapped():
         btn_back.pack_forget()
 
-
-def open_prognose_model():
-  print("Prognose Model geopend (komt later)")
-
-
 def show_home():
     """Toon de startpagina met 2 knoppen in de rechterkant."""
     # Terug-knop hoort NIET op de homepagina
@@ -130,7 +126,7 @@ def show_home():
 
     btn_prognose = tk.Button(
         button_frame,
-        text="Prognose model",
+        text="Prognosemodel",
         width=BUTTON_WIDTH,
         height=BUTTON_HEIGHT,
         bg=BUTTON_BG,
@@ -143,7 +139,7 @@ def show_home():
 def open_loopbaanankers():
     """Toon de pagina Fase 2.0 – Loopbaanankers in de rechterkant."""
     show_back_button()
-    btn_back.config(command=open_assessments)   # ← HIER toegevoegd
+    btn_back.config(command=open_assessments)
 
     for w in content.winfo_children():
         w.destroy()
@@ -154,12 +150,22 @@ def open_loopbaanankers():
 def open_assessments():
     """Toon de assessmentspagina (Big Five) in dezelfde rechterkant."""
     show_back_button()
-    btn_back.config(command=show_home)   # ← HIER toegevoegd
+    btn_back.config(command=show_home)
 
     for w in content.winfo_children():
         w.destroy()
 
     assessments.build_assessments_page(content, open_loopbaanankers)
+
+def open_prognose_model():
+    """Toon de prognosemodel-pagina."""
+    show_back_button()
+    btn_back.config(command=show_home)
+
+    for w in content.winfo_children():
+        w.destroy()
+
+    prognosemodel.build_prognose_page(content)
 
 def open_carriereclusters():
     """Toon de pagina Fase 2.1 – Carrièreclusters in de rechterkant."""
@@ -173,8 +179,6 @@ def open_carriereclusters():
 
     frame_21 = assessments.create_carriere_clusters_frame(content)
     frame_21.pack(fill="both", expand=True)
-
-
 
 
 # --------- 6. START: HOME LADEN ---------
