@@ -6,35 +6,35 @@ try:
 except Exception:
     _USE_PILLOW = False
 import assessments  # assessments.py
-import prognosemodel # prognosemodel.py
+import prognosis_model # prognosis_model.py
  
-# --------- 1. HOOFDVENSTER ---------
+# --------- Start screen ---------
 root = tk.Tk()
 root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="white")
 
-# --------- 2. LINKER ZWARTE SIDEBAR ---------
+# --------- Sidebar ---------
 SIDEBAR_WIDTH = 180
 
 sidebar = tk.Frame(root, bg="black", width=SIDEBAR_WIDTH)
 sidebar.pack(side="left", fill="y")
 
-# voorkom dat pack de grootte van de sidebar aanpast
+# Prevent pack from resizing the sidebar
 sidebar.pack_propagate(False)
 
-#test
+# Test if Pillow is available
 
 logo_label = None
 if _USE_PILLOW: 
-    print("Pillow is beschikbaar voor afbeeldingsverwerking.")
+    print("Pillow is available for image processing.")
 else:
-    print("Pillow is NIET beschikbaar. Gebruik Tkinter's PhotoImage (beperkte formaten).")
+    print("Pillow is not availbable. Use Tkinter's PhotoImage.")
     aiter
  
-# --------- 3. LOGO ONDERIN ---------
+# --------- Sidebar logo ---------
 logo_label = None
-logo_path = os.path.join("images", "Labor-logo.png")
+logo_path = os.path.join("images", "labor-logo.png")
 try:
     if _USE_PILLOW:
         # Use Pillow for reliable loading and high-quality resizing
@@ -59,12 +59,13 @@ try:
     # Keep a reference to avoid garbage collection
     logo_label.image = logo
     logo_label.place(relx=0.5, rely=1.0, anchor="s", y=-20)
+
 except Exception as e:
-    print("Logo fout:", e)
+    print("Logo error:", e)
     logo_label = tk.Label(sidebar, text="LABOR LOGO", fg="white", bg="black")
     logo_label.place(relx=0.5, rely=1.0, anchor="s", y=-20)
 
-# ---------  4. HOOFDCONTENT RECHTS ---------
+# ---------  Page content ---------
 content = tk.Frame(root, bg="white")
 content.pack(side="right", expand=True, fill="both")
 
@@ -75,9 +76,9 @@ BUTTON_FONT = ("Segoe UI", 12)
 BUTTOMN_ACTIVEBG = "#c0c0c0"
 
 
-# --------- 5. PAGINA-FUNCTIES ---------
+# --------- Page functions ---------
 
-# Terug-knop: eerst maken, maar NOG NIET tonen en nog geen command
+# Back button
 btn_back = tk.Button(
     sidebar,
     text="← Terug",
@@ -91,21 +92,21 @@ btn_back = tk.Button(
 )
 
 def show_back_button():
-    """Laat de Terug-knop zien (alleen als hij nog niet zichtbaar is)."""
+    """Show the back button if it is not already visible."""
     if not btn_back.winfo_ismapped():
         btn_back.pack(anchor="nw", pady=20, padx=15)
 
 def hide_back_button():
-    """Verberg de Terug-knop als hij zichtbaar is."""
+    """Hide the back button if it is visible."""
     if btn_back.winfo_ismapped():
         btn_back.pack_forget()
 
 def show_home():
-    """Toon de startpagina met 2 knoppen in de rechterkant."""
-    # Terug-knop hoort NIET op de homepagina
+    """Show the start screen."""
+    # Hide back button on start screen
     hide_back_button()
 
-    # rechterkant leegmaken
+    # Empty content
     for w in content.winfo_children():
         w.destroy()
 
@@ -132,19 +133,19 @@ def show_home():
         bg=BUTTON_BG,
         relief="flat",
         font=BUTTON_FONT,
-        command=open_prognose_model,
+        command=open_prognosis_model,
     )
     btn_prognose.grid(row=0, column=1, padx=60, pady=20)
 
-def open_loopbaanankers():
-    """Toon de pagina Fase 2.0 – Loopbaanankers in de rechterkant."""
+def open_career_anchors():
+    """Show the Phase 2.0 – Career Anchors page within content."""
     show_back_button()
     btn_back.config(command=open_assessments)
 
     for w in content.winfo_children():
         w.destroy()
 
-    assessments.build_loopbaanankers_page(content)
+    assessments.build_career_anchors_page(content)
 
 
 def open_assessments():
@@ -155,9 +156,9 @@ def open_assessments():
     for w in content.winfo_children():
         w.destroy()
 
-    assessments.build_assessments_page(content, open_loopbaanankers)
+    assessments.build_assessments_page(content, open_career_anchors)
 
-def open_prognose_model():
+def open_prognosis_model():
     """Toon de prognosemodel-pagina."""
     show_back_button()
     btn_back.config(command=show_home)
@@ -165,15 +166,15 @@ def open_prognose_model():
     for w in content.winfo_children():
         w.destroy()
 
-    prognosemodel.build_prognose_page(content)
+    prognosis_model.build_prognose_page(content)
 
 def open_carriereclusters():
     """Toon de pagina Fase 2.1 – Carrièreclusters in de rechterkant."""
     show_back_button()
-    # Terug vanuit 2.1 moet naar 2.0
-    btn_back.config(command=open_loopbaanankers)
+    # Back button from Phase 2.1 goes to Phase 2.0
+    btn_back.config(command=open_career_anchors)
 
-    # rechterkant leegmaken
+    # Empty content
     for w in content.winfo_children():
         w.destroy()
 
@@ -181,7 +182,7 @@ def open_carriereclusters():
     frame_21.pack(fill="both", expand=True)
 
 
-# --------- 6. START: HOME LADEN ---------
+# --------- Load the start screen back ---------
 show_home()
 
 root.mainloop()

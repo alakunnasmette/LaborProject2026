@@ -11,7 +11,7 @@ DARK_GREY = "#727272"
 LIGHT_GREY = "#b3b3b3"
 TEXT_FONT = ("Segoe UI", 11)
 
-# --------- Likert-schaal: 1 t/m 5 ---------
+# --------- Likert scale: 1–5 ---------
 LIKERT_OPTIONS = [
     ("1", "Oneens"),
     ("2", "Deels oneens"),
@@ -20,7 +20,7 @@ LIKERT_OPTIONS = [
     ("5", "Volledig eens"),
 ]
 
-# --------- Big Five items (25 t/m 50) ---------
+# --------- Big Five items: 25–50 ---------
 BIG_FIVE_ITEMS = [
     (1, "Ik ben het middelpunt van het feest."),
     (2, "Ik voel me weinig bezorgd om anderen."),
@@ -74,40 +74,40 @@ BIG_FIVE_ITEMS = [
     (50, "Ik zit vol met ideeën."),
 ]
 
-# Test functie Opslaan/Verder
+# Test function save and continue
 def get_assessment_results(parent_frame: tk.Frame) -> dict:
     """
-    Haal alle ingevulde antwoorden op uit parent_frame.assessment_vars.
-    Geeft een dict terug: {nummer: int(waarde) of None als leeg}
+    Retrieve all entered answers from parent_frame.assessment_vars.
+    Returns a dict: {number: int(value) or "None" if empty}
     """
     results = {}
     vars_dict = getattr(parent_frame, "assessment_vars", {})
 
-    for nummer, var in vars_dict.items():
+    for number, var in vars_dict.items():
         value = var.get().strip()
-        results[nummer] = int(value) if value else None
+        results[number] = int(value) if value else None
 
     return results
 
 
 def clear_frame(frame: tk.Frame) -> None:
-    """Verwijder alle widgets uit een frame."""
+    """Remove all widgets from a frame."""
     for w in frame.winfo_children():
         w.destroy()
 
-def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.StringVar) -> None:
-    """Eén rij: nummer + stelling + 1..5 knoppen (rechts uitgelijnd)."""
+def make_likert_row(parent: tk.Frame, number: int, stelling: str, var: tk.StringVar) -> None:
+    """Creates a single Likert scale row with a number, statement, and 1 to 5 selection buttons."""
 
     row = tk.Frame(parent, bg=LIGHT_GREY)
     row.pack(fill="x", pady=1)
 
-    # zorg dat kolom 2 (stelling) meerekt, zodat kolom 3 altijd rechts zit
+    # Make sure that the position of column 2 stretches, so that column 3 is always on the right
     row.grid_columnconfigure(1, weight=1)
 
-    # --------- Nummer --------- (links, geel zoals in Excel)
+    # --------- Number ---------
     num_label = tk.Label(
         row,
-        text=str(nummer),
+        text=str(number),
         width=4,
         bg="#f1c40f",
         fg="black",
@@ -116,7 +116,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     )
     num_label.grid(row=0, column=0, padx=(10, 10), sticky="w")
 
-    # --------- Stelling---------
+    # --------- Statement ---------
     stmt_label = tk.Label(
         row,
         text=stelling,
@@ -129,14 +129,14 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     )
     stmt_label.grid(row=0, column=1, sticky="w", padx=10, pady=8)
 
-    # --------- Likert-knoppen 1..5 --------- (helemaal rechts)
+    # --------- Likert buttons 1..5 ---------
     likert_frame = tk.Frame(row, bg=LIGHT_GREY)
     likert_frame.grid(row=0, column=2, padx=20, pady=8, sticky="e")
 
     buttons = []
 
     def update_buttons():
-        """Zet visueel welke waarde gekozen is."""
+        """Visually display which value has been chosen."""
         current = var.get()
         for value, widget in buttons:
             if current == value:
@@ -164,7 +164,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
         btn.bind("<Button-1>", on_click)
         buttons.append((value, btn))
 
-    # start met alles "uit"
+    # Start with unselected buttons
     update_buttons()
 
 def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
@@ -172,7 +172,7 @@ def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
 
     clear_frame(parent_frame)
 
-    # ---------- scrollbare container ----------
+    # ---------- Scrollable container ----------
     container = tk.Frame(parent_frame, bg="white")
     container.pack(fill="both", expand=True)
 
@@ -200,7 +200,7 @@ def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
 
     canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-    # ---------- titel & uitleg ----------
+    # ---------- Title and explanation ----------
     title = tk.Label(
         scroll_frame,
         text="Fase 1.1 – Big Five persoonlijkheidsdimensies",
@@ -225,13 +225,13 @@ def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
     )
     subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
-    # ---------- kolomkoppen ----------
+    # ---------- Column headers ----------
     header = tk.Frame(scroll_frame, bg=DARK_GREY)
     header.pack(fill="x")
 
     tk.Label(
         header,
-        text="Nummer",
+        text="number",
         bg=DARK_GREY,
         fg="white",
         font=("Segoe UI", 10, "bold"),
@@ -259,25 +259,25 @@ def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
         padx=40,
     ).grid(row=0, column=2, sticky="e")
 
-    # ---------- alle items ----------
+    # ---------- Items ----------
     parent_frame.assessment_vars = {}
 
     questions_container = tk.Frame(scroll_frame, bg="white")
     questions_container.pack(fill="both", expand=True)
 
-    for nummer, tekst in BIG_FIVE_ITEMS:
+    for number, text in BIG_FIVE_ITEMS:
         var = tk.StringVar(value="")
-        parent_frame.assessment_vars[nummer] = var
-        make_likert_row(questions_container, nummer, tekst, var)
+        parent_frame.assessment_vars[number] = var
+        make_likert_row(questions_container, number, text, var)
 
-    # kleine spacer
+    # Small spacer
     tk.Frame(scroll_frame, bg="white", height=10).pack(fill="x")
 
-    # ---------- Opslaan en verder-knop ----------
+    # ---------- Save and continue button ----------
     def on_submit():
         results = get_assessment_results(parent_frame)
 
-        # check of er nog lege antwoorden zijn
+        # Check if there are any empty answers
         missing = [nr for nr, v in results.items() if v is None]
         if missing:
             messagebox.showwarning(
@@ -286,7 +286,7 @@ def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
             )
             return
 
-        # alles ingevuld → ga naar de volgende fase
+        # If everything is filled in, continue to the next page
         on_next_page()
 
 
@@ -305,22 +305,22 @@ def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
     )
     btn_submit.pack(side="right", padx=30)
 
-    # extra ruimte onderaan
+    # Extra space beneath
     tk.Frame(scroll_frame, bg="white", height=30).pack(fill="x")
 
 
 
-# ----------------------------- FASE 2.0 - Loopbaanankers -----------------------------
+# ----------------------------- Phase 2.0 - Career anchors -----------------------------
 
-# Kleuren voor de tabel
+# Table colors
 ROW_BG_1 = "#eeeeee"
 ROW_BG_2 = "#e0e0e0"
 
-# --------- Fase 2.0 – Loopbaanankers: data uit Excel ---------
-# Elke entry: (vraagnummer, anker-letter, stelling-tekst)
-# Ankers: V = Omhoog komen, W = Veilig voelen, X = Vrij zijn, Y = Balans vinden, Z = Uitdaging zoeken
+# --------- Fase 2.0 – Career anchors: fetch data from Excel ---------
+# Each entry: (question number, anchor letter, statement text)
+# Anchors: V = Moving upward, W = Feeling safe, X = Being free, Y = Finding balance, Z = Seeking challenge.
 
-LOOPBAAN_STELLINGEN = [
+CAREER_STATEMENTS = [
     (1, "V", "Graag wil ik het voor mezelf en voor anderen dusdanig regelen dat succes verzekerd is."),
     (1, "X", "Ik houd me binnen een werksituatie het liefst bezig met mijn eigen zaken."),
     (2, "Y", "Binnen het werk moet er tijd zijn voor zaken die jezelf belangrijk vindt en moet er gelegenheid zijn om zinvolle relaties te cultiveren."),
@@ -383,8 +383,8 @@ LOOPBAAN_STELLINGEN = [
     (30, "Z", "Ik geef de voorkeur aan een werksituatie die opwindend is en mij stimuleert."),
 ]
 
-# Beschrijvingen van de 5 loopbaanankers (onderste tabel in Excel)
-LOOPBAANANKER_BESCHRIJVINGEN = {
+# Descriptions of the 5 career anchors
+CAREER_ANCHOR_DESCRIPTIONS = {
     "Omhoog komen": "Deze op opwaartse mobiliteit gerichte loopbaanoriëntatie wordt gewoonlijk geassocieerd met het vooruitkomen in een hiërarchische en/of statusgevoelige organisatie. Het verwerven van steeds meer invloed speelt in deze kaders een grote rol. Prestige en beloning nemen bij iedere opwaartse beweging toe.",
     "Veilig voelen": "Sommige personen hebben behoefte aan een veilige baan in een duidelijke organisatie die vooral gekenmerkt wordt door orde en rust. Zij geven de voorkeur aan een lang en vast dienstverband, erkenning en appreciatie door de werkgever. In ruil daarvoor bieden ze een loyale en toegewijde instelling en zijn ze niet bang om hard te werken. Onderling respect, wederkerigheid en loyaliteit karakteriseren de werkhouding.",
     "Vrij zijn": "Personen met deze loopbaanoriëntatie zijn er op uit hun grenzen te verkennen. De nadruk ligt bij hen meer op het verwerven van persoonlijke autonomie, ruimte en verantwoordelijkheid voor het bereiken van resultaten dan op gebondenheid, zekerheid en vaste regels. Men is bereid zeer hard te werken als daar gunstige voorwaarden tegenover staan in de sfeer van onafhankelijkheid en zelfcontrole. Interessant werk is belangrijk maar individuele vrijheid is het uiteindelijke doel.",
@@ -393,12 +393,12 @@ LOOPBAANANKER_BESCHRIJVINGEN = {
 }
 
 
-def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
-    """Toon Fase 2.0 – Loopbaanankers in het rechterpaneel."""
+def build_career_anchors_page(parent_frame: tk.Frame) -> None:
+    """Show Phase 2.0 – Career Anchors in content."""
 
     clear_frame(parent_frame)
 
-    # =================== Scrollbare container ===================
+    # =================== Scrollable container ===================
     container = tk.Frame(parent_frame, bg="white")
     container.pack(fill="both", expand=True)
 
@@ -426,7 +426,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
 
     canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-    # =================== Koptekst ===================
+    # =================== Headers ===================
     title = tk.Label(
         scroll_frame,
         text="Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
@@ -451,19 +451,19 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
     )
     subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
-    # =================== Tabel (header + rijen) ===================
+    # =================== Table headers and rows ===================
     table = tk.Frame(scroll_frame, bg="white")
     table.pack(fill="both", expand=True, padx=20, pady=(0, 10))
 
-    # 7 kolommen voor de hele tabel
+    # Table columns
     for c in range(7):
         table.grid_columnconfigure(c, weight=0)
-    table.grid_columnconfigure(1, weight=1)  # stellingkolom rekt mee
+    table.grid_columnconfigure(1, weight=1)  # Statement column stretches
 
-    # Header-rij
+    # Header row
     header_bg = DARK_GREY
     headers = [
-        ("Nummer", 0),
+        ("number", 0),
         ("Stelling", 1),
         ("Omhoog | V", 2),
         ("Veilig | W", 3),
@@ -484,44 +484,44 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
         )
         lbl.grid(row=0, column=col, sticky="nsew")
 
-    ANKERS = ["V", "W", "X", "Y", "Z"]
+    ANCHORS = ["V", "W", "X", "Y", "Z"]
 
-    # één StringVar per rij (stelling)
-    vraag_vars: dict[int, tk.StringVar] = {}
-    vraag_buttons: dict[int, list[tuple[str, tk.Radiobutton]]] = {}
+    # One StringVar per row (statement)
+    question_vars: dict[int, tk.StringVar] = {}
+    question_buttons: dict[int, list[tuple[str, tk.Radiobutton]]] = {}
 
     def update_row(row_id: int) -> None:
-        """Laat alleen in het gekozen vakje van deze rij een 'X' zien."""
-        current = vraag_vars[row_id].get()
-        for code, btn in vraag_buttons[row_id]:
+        """Show an 'X' only in the selected box of this row."""
+        current = question_vars[row_id].get()
+        for code, btn in question_buttons[row_id]:
             if code == current:
                 btn.config(text="1", font=("Segoe UI", 11, "bold"))
             else:
                 btn.config(text="", font=("Segoe UI", 11))
 
-    # hoeveel regels horen bij elk vraagnummer (voor het rowspan van de gele blokken)
+    # Amount of lines corresponding to each question number
     question_counts: dict[int, int] = {}
-    for nummer, _anker, _tekst in LOOPBAAN_STELLINGEN:
-        question_counts[nummer] = question_counts.get(nummer, 0) + 1
+    for number, _anchor, _text in CAREER_STATEMENTS:
+        question_counts[number] = question_counts.get(number, 0) + 1
 
     shown_numbers: set[int] = set()
 
     # Bouw alle rijen
-    for row_index, (nummer, _anker, tekst) in enumerate(LOOPBAAN_STELLINGEN, start=1):
+    for row_index, (number, _anchor, text) in enumerate(CAREER_STATEMENTS, start=1):
         row_id = row_index
 
-        vraag_vars[row_id] = tk.StringVar(value="")
-        vraag_buttons[row_id] = []
+        question_vars[row_id] = tk.StringVar(value="")
+        question_buttons[row_id] = []
         row_bg = ROW_BG_1 if row_index % 2 == 1 else ROW_BG_2
 
         table.grid_rowconfigure(row_index, weight=0)
 
-        # Nummer: één geel blok per vraagnummer (rowspan 2)
-        if nummer not in shown_numbers:
-            rowspan = question_counts.get(nummer, 1)
+        # number: één geel blok per vraagnumber (rowspan 2)
+        if number not in shown_numbers:
+            rowspan = question_counts.get(number, 1)
             num_label = tk.Label(
                 table,
-                text=str(nummer),
+                text=str(number),
                 width=4,
                 bg="#f1c40f",
                 fg="black",
@@ -536,12 +536,12 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
                 pady=(2, 2),
                 sticky="nsw",
             )
-            shown_numbers.add(nummer)
+            shown_numbers.add(number)
 
         # Stellingtekst
         stmt_label = tk.Label(
             table,
-            text=tekst,
+            text=text,
             bg=row_bg,
             fg="black",
             font=("Segoe UI", 10),
@@ -560,8 +560,8 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
         )
 
         # Vijf vakjes (V..Z) in kolommen 2..6
-        var = vraag_vars[row_id]
-        for offset, code in enumerate(ANKERS):
+        var = question_vars[row_id]
+        for offset, code in enumerate(ANCHORS):
             col = 2 + offset
 
             cell = tk.Frame(
@@ -598,14 +598,14 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
                 cursor="hand2",
             )
             rb.pack(expand=True, fill="both")
-            vraag_buttons[row_id].append((code, rb))
+            question_buttons[row_id].append((code, rb))
 
     # init: alles leeg
-    for rid in vraag_vars.keys():
+    for rid in question_vars.keys():
         update_row(rid)
 
     # Bewaar alle keuzes voor latere scoreberekening
-    parent_frame.loopbaan_vars = vraag_vars
+    parent_frame.loopbaan_vars = question_vars
 
     # =================== Totaal-score rij (placeholders) ===================
     total_frame = tk.Frame(scroll_frame, bg="white")
@@ -693,7 +693,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
         anchor="w",
     ).pack(fill="x", pady=(0, 5))
 
-    for naam, tekst in LOOPBAANANKER_BESCHRIJVINGEN.items():
+    for naam, text in CAREER_ANCHOR_DESCRIPTIONS.items():
         box = tk.Frame(desc_frame, bg="#f5f5f5", bd=1, relief="solid")
         box.pack(fill="x", pady=4)
 
@@ -711,7 +711,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame) -> None:
 
         tk.Label(
             box,
-            text=tekst,
+            text=text,
             bg="#f5f5f5",
             fg="black",
             font=("Segoe UI", 10),
@@ -984,7 +984,7 @@ def create_carriere_clusters_frame(parent):
 
     # Rijen voor de 16 clusters
     for r, cluster in enumerate(CARRIERE_CLUSTERS, start=1):
-        # Label: cluster nummer
+        # Label: cluster number
         lbl_id = tk.Label(
             table,
             text=str(cluster["id"]),
