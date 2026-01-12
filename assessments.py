@@ -463,7 +463,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
     # Header row
     header_bg = DARK_GREY
     headers = [
-        ("number", 0),
+        ("Nummer", 0),
         ("Stelling", 1),
         ("Omhoog | V", 2),
         ("Veilig | W", 3),
@@ -506,7 +506,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
 
     shown_numbers: set[int] = set()
 
-    # Bouw alle rijen
+    # Build all rows
     for row_index, (number, _anchor, text) in enumerate(CAREER_STATEMENTS, start=1):
         row_id = row_index
 
@@ -516,7 +516,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
 
         table.grid_rowconfigure(row_index, weight=0)
 
-        # number: één geel blok per vraagnumber (rowspan 2)
+        # One yellow block per question number
         if number not in shown_numbers:
             rowspan = question_counts.get(number, 1)
             num_label = tk.Label(
@@ -538,7 +538,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
             )
             shown_numbers.add(number)
 
-        # Stellingtekst
+        # Statement text
         stmt_label = tk.Label(
             table,
             text=text,
@@ -559,7 +559,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
             pady=(2, 2),
         )
 
-        # Vijf vakjes (V..Z) in kolommen 2..6
+        # Five boxes in columns 2..6
         var = question_vars[row_id]
         for offset, code in enumerate(ANCHORS):
             col = 2 + offset
@@ -584,7 +584,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
                 variable=var,
                 value=code,
                 indicatoron=False,
-                text="",  # wordt "X" als gekozen
+                text="",  # Becomes an "X" when chosen
                 width=2,
                 font=("Segoe UI", 11),
                 bg=row_bg,
@@ -600,14 +600,14 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
             rb.pack(expand=True, fill="both")
             question_buttons[row_id].append((code, rb))
 
-    # init: alles leeg
+    # Empty content
     for rid in question_vars.keys():
         update_row(rid)
 
-    # Bewaar alle keuzes voor latere scoreberekening
-    parent_frame.loopbaan_vars = question_vars
+    # Save all choices for later score calculation
+    parent_frame.career_vars = question_vars
 
-    # =================== Totaal-score rij (placeholders) ===================
+    # =================== Total score row (placeholders) ===================
     total_frame = tk.Frame(scroll_frame, bg="white")
     total_frame.pack(fill="x", padx=20, pady=(15, 5))
 
@@ -658,7 +658,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
         lbl.grid(row=0, column=i, sticky="nsew", padx=1)
         parent_frame.total_labels[key] = lbl
 
-    # =================== Score-interpretatie ===================
+    # =================== Score interpretation ===================
     score_box = tk.Frame(scroll_frame, bg="white")
     score_box.pack(fill="x", padx=20, pady=(20, 10))
 
@@ -680,7 +680,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
         anchor="w",
     ).pack(fill="x")
 
-    # =================== Beschrijvingen loopbaanankers ===================
+    # =================== Career anchor descriptions ===================
     desc_frame = tk.Frame(scroll_frame, bg="white")
     desc_frame.pack(fill="x", padx=20, pady=(20, 20))
 
@@ -723,10 +723,10 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
         ).pack(side="left", fill="both", expand=True)
 
 
-    # =================== Opslaan en verder-knop ===================
+    # =================== Save and continue button ===================
     def on_submit_loopbaan():
-        # 1. Controle: elke rij moet een keuze hebben
-        missing = [row_id for row_id, v in parent_frame.loopbaan_vars.items() if not v.get()]
+        # Check if each row has a choice
+        missing = [row_id for row_id, v in parent_frame.career_vars.items() if not v.get()]
         if missing:
             messagebox.showwarning(
                 "Onvolledige vragenlijst",
@@ -734,16 +734,16 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
             )
             return
 
-        # 2. Resultaten bewaren op het parent_frame (handig voor later export)
-        parent_frame.loopbaan_results = {
-            row_id: v.get() for row_id, v in parent_frame.loopbaan_vars.items()
+        # Save results to the parent_frame
+        parent_frame.career_results = {
+            row_id: v.get() for row_id, v in parent_frame.career_vars.items()
         }
 
-        # 3. Rechterpaneel leegmaken
+        # Empty right panel
         clear_frame(parent_frame)
 
-        # 4. FASE 2.1 – Carrièreclusters laden in hetzelfde paneel
-        frame_21 = create_carriere_clusters_frame(parent_frame)
+        # Load Phase 2.1 Career Clusters in the same panel
+        frame_21 = create_career_clusters_frame(parent_frame)
         frame_21.pack(fill="both", expand=True)
 
     btn_frame = tk.Frame(scroll_frame, bg="white")
@@ -763,17 +763,15 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
 
 
 
-# ----------------------------- FASE 2.1 - Carriere Clusters  -----------------------------
+# ----------------------------- Phase 2.1 - Career Clusters  -----------------------------
 
 
-# ------------------------ FASE 2.1 - Carriere Clusters ------------------------
-
-# Data voor de 16 carrièreclusters (segment + korte omschrijving)
-CARRIERE_CLUSTERS = [
+# Data for the 16 career clusters
+CAREER_CLUSTERS = [
     {
         "id": 1,
         "segment": "Landbouw, voeding en natuurlijke grondstoffen",
-        "omschrijving": (
+        "description": (
             "Productie, verwerking en ontwikkeling van agrarische grondstoffen, "
             "voedsel en natuurlijke hulpbronnen."
         ),
@@ -781,14 +779,14 @@ CARRIERE_CLUSTERS = [
     {
         "id": 2,
         "segment": "Architectuur en constructie",
-        "omschrijving": (
+        "description": (
             "Ontwerpen, plannen, bouwen en onderhouden van de gebouwde omgeving."
         ),
     },
     {
         "id": 3,
         "segment": "Kunst, audio-visuele technologie en communicatie",
-        "omschrijving": (
+        "description": (
             "Ontwerpen, produceren en presenteren van multimedia, podiumkunsten "
             "en andere creatieve content."
         ),
@@ -796,7 +794,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 4,
         "segment": "Business Management en administratie",
-        "omschrijving": (
+        "description": (
             "Plannen, organiseren en aansturen van zakelijke processen en "
             "administratieve activiteiten."
         ),
@@ -804,7 +802,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 5,
         "segment": "Educatie en training",
-        "omschrijving": (
+        "description": (
             "Plannen, verzorgen en ondersteunen van onderwijs- en "
             "opleidingsactiviteiten."
         ),
@@ -812,7 +810,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 6,
         "segment": "Financiën",
-        "omschrijving": (
+        "description": (
             "Financiële planning, investeringen, bankwezen, verzekeringen en "
             "bedrijfseconomische dienstverlening."
         ),
@@ -820,7 +818,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 7,
         "segment": "Overheid en publieke administratie",
-        "omschrijving": (
+        "description": (
             "Uitvoering van overheidstaken zoals beleid, regelgeving, belastingen "
             "en publieke administratie."
         ),
@@ -828,7 +826,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 8,
         "segment": "Gezondheidswetenschappen",
-        "omschrijving": (
+        "description": (
             "Therapeutische, diagnostische en ondersteunende zorg, inclusief "
             "biotechnologisch onderzoek."
         ),
@@ -836,7 +834,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 9,
         "segment": "Hospitality en toerisme",
-        "omschrijving": (
+        "description": (
             "Management en uitvoering in horeca, logies, recreatie en toeristische "
             "diensten."
         ),
@@ -844,7 +842,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 10,
         "segment": "Humanitaire dienstverlening",
-        "omschrijving": (
+        "description": (
             "Ondersteunen van mensen en gezinnen via sociale, maatschappelijke en "
             "vrijwilligersdiensten."
         ),
@@ -852,7 +850,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 11,
         "segment": "ICT",
-        "omschrijving": (
+        "description": (
             "Ontwikkeling, beheer en ondersteuning van hardware, software, "
             "netwerken en digitale media."
         ),
@@ -860,7 +858,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 12,
         "segment": "Publieke veiligheid en zekerheid",
-        "omschrijving": (
+        "description": (
             "Handhaving, crisisbeheersing en bescherming van publieke orde en "
             "veiligheid."
         ),
@@ -868,7 +866,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 13,
         "segment": "Fabricage",
-        "omschrijving": (
+        "description": (
             "Verwerking van materialen tot producten, inclusief onderhoud en "
             "procesbeheersing."
         ),
@@ -876,7 +874,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 14,
         "segment": "Marketing, sales en service",
-        "omschrijving": (
+        "description": (
             "Marketingactiviteiten, verkoop en dienstverlening om "
             "organisatorische doelen te bereiken."
         ),
@@ -884,7 +882,7 @@ CARRIERE_CLUSTERS = [
     {
         "id": 15,
         "segment": "Wetenschap, technologie, engineering en mathematica",
-        "omschrijving": (
+        "description": (
             "Onderzoek, experimenten en technische ontwikkeling in natuur- en "
             "technische wetenschappen."
         ),
@@ -892,18 +890,18 @@ CARRIERE_CLUSTERS = [
     {
         "id": 16,
         "segment": "Transport, distributie en logistiek",
-        "omschrijving": (
+        "description": (
             "Planning en uitvoering van vervoer en distributie van mensen en goederen."
         ),
     },
 ]
 
-# Hierin bewaren we de IntVar’s zodat je ze later kunt uitlezen / opslaan
-carriere_cluster_vars = []  # wordt gevuld in create_carriere_clusters_frame()
+# Store IntVars to read and access them later.
+career_cluster_vars = []  # Will be filled in create_career_clusters_frame()
 
 
-def _maak_totaal_callback(var_act, var_comp, var_edu, var_tot):
-    """Interne helper: zorgt dat totaalscore automatisch wordt bijgewerkt."""
+def _create_total_score_callback(var_act, var_comp, var_edu, var_tot):
+    """Internal helper: ensures that the total score is updated automatically."""
     def _update(*_):
         try:
             totaal = var_act.get() + var_comp.get() + var_edu.get()
@@ -914,15 +912,15 @@ def _maak_totaal_callback(var_act, var_comp, var_edu, var_tot):
     return _update
 
 
-def create_carriere_clusters_frame(parent):
+def create_career_clusters_frame(parent):
     """
-    Maakt het formulier voor FASE 2.1 – Carrière Clusters.
+    Creates the form for Phase 2.1 – Career Clusters.
 
-    Gebruik in app.py bijvoorbeeld:
-        frame_fase21 = assessments.create_carriere_clusters_frame(main_container)
+    For example, use the following in app.py:
+    frame_fase21 = assessments.create_career_clusters_frame(main_container)
     """
-    global carriere_cluster_vars
-    carriere_cluster_vars = []
+    global career_cluster_vars
+    career_cluster_vars = []
 
     frame = tk.Frame(parent, bg="#ffffff")
 
@@ -953,7 +951,7 @@ def create_carriere_clusters_frame(parent):
     table = tk.Frame(frame, bg="#ffffff")
     table.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
-    # Kolomtitels
+    # Column titles
     headers = [
         "Cluster",
         "Segment",
@@ -978,12 +976,12 @@ def create_carriere_clusters_frame(parent):
         )
         lbl.grid(row=0, column=col, sticky="nsew")
 
-    # Zorg dat alle kolommen mee-resizen
+    # Make sure all columns resize
     for col in range(len(headers)):
         table.grid_columnconfigure(col, weight=1)
 
-    # Rijen voor de 16 clusters
-    for r, cluster in enumerate(CARRIERE_CLUSTERS, start=1):
+    # Columns for the 16 clusters
+    for r, cluster in enumerate(CAREER_CLUSTERS, start=1):
         # Label: cluster number
         lbl_id = tk.Label(
             table,
@@ -998,8 +996,8 @@ def create_carriere_clusters_frame(parent):
         )
         lbl_id.grid(row=r, column=0, sticky="nsew")
 
-        # Label: segment + korte omschrijving
-        seg_text = f"{cluster['segment']}\n\n{cluster['omschrijving']}"
+        # Label: segment and brief description
+        seg_text = f"{cluster['segment']}\n\n{cluster['description']}"
         lbl_seg = tk.Label(
             table,
             text=seg_text,
@@ -1015,13 +1013,13 @@ def create_carriere_clusters_frame(parent):
         )
         lbl_seg.grid(row=r, column=1, sticky="nsew")
 
-        # IntVar’s voor scores
+        # IntVars for scores
         var_act = tk.IntVar(value=0)
         var_comp = tk.IntVar(value=0)
         var_edu = tk.IntVar(value=0)
         var_tot = tk.IntVar(value=0)
 
-        # Spinboxen voor invoer
+        # Spinboxes for input
         spn_act = tk.Spinbox(
             table,
             from_=0,
@@ -1055,7 +1053,7 @@ def create_carriere_clusters_frame(parent):
         )
         spn_edu.grid(row=r, column=4, sticky="nsew")
 
-        # Totaalscore (alleen-lezen)
+        # Total score (read only)
         ent_tot = tk.Entry(
             table,
             textvariable=var_tot,
@@ -1065,43 +1063,43 @@ def create_carriere_clusters_frame(parent):
         )
         ent_tot.grid(row=r, column=5, sticky="nsew")
 
-        # Callback koppelen zodat de totaalscore steeds opnieuw berekend wordt
-        cb = _maak_totaal_callback(var_act, var_comp, var_edu, var_tot)
+        # Link callbacks so that the total score is recalculated each time
+        cb = _create_total_score_callback(var_act, var_comp, var_edu, var_tot)
         var_act.trace_add("write", cb)
         var_comp.trace_add("write", cb)
         var_edu.trace_add("write", cb)
 
-        # Bewaar alles zodat je het later kunt uitlezen
-        carriere_cluster_vars.append(
+        # Save data
+        career_cluster_vars.append(
             {
                 "id": cluster["id"],
                 "segment": cluster["segment"],
-                "var_activiteiten": var_act,
-                "var_competenties": var_comp,
-                "var_educatief": var_edu,
-                "var_totaal": var_tot,
+                "var_activities": var_act,
+                "var_competences": var_comp,
+                "var_educative": var_edu,
+                "var_total": var_tot,
             }
         )
 
     return frame
 
 
-def get_carriere_clusters_scores():
+def get_career_clusters_scores():
     """
-    Geeft de ingevulde scores terug als een lijst dicts.
-    Dit kun je bijv. aanroepen in je on_submit_loopbaan of een aparte
-    on_submit_fase21 functie om alles naar Excel / JSON te schrijven.
+    Returns the entered scores as a list of dicts.
+    You can call this, for example, in your on_submit_career or a separate
+    on_submit_phase21 function to write everything to Excel/JSON.
     """
-    resultaten = []
-    for item in carriere_cluster_vars:
-        resultaten.append(
+    results = []
+    for item in career_cluster_vars:
+        results.append(
             {
                 "cluster": item["id"],
                 "segment": item["segment"],
-                "score_activiteiten": item["var_activiteiten"].get(),
-                "score_competenties": item["var_competenties"].get(),
-                "score_educatieve_onderwerpen": item["var_educatief"].get(),
-                "totaal_score": item["var_totaal"].get(),
+                "score_activities": item["var_activities"].get(),
+                "score_competences": item["var_competences"].get(),
+                "score_educative_subjects": item["var_educative"].get(),
+                "total_score": item["var_total"].get(),
             }
         )
-    return resultaten
+    return results

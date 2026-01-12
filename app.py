@@ -168,7 +168,7 @@ def open_prognosis_model():
 
     prognosis_model.build_prognose_page(content)
 
-def open_carriereclusters():
+def open_career_clusters():
     """Toon de pagina Fase 2.1 – Carrièreclusters in de rechterkant."""
     show_back_button()
     # Back button from Phase 2.1 goes to Phase 2.0
@@ -178,7 +178,7 @@ def open_carriereclusters():
     for w in content.winfo_children():
         w.destroy()
 
-    frame_21 = assessments.create_carriere_clusters_frame(content)
+    frame_21 = assessments.create_career_clusters_frame(content)
     frame_21.pack(fill="both", expand=True)
 
 
