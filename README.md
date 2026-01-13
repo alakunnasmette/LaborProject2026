@@ -1,5 +1,5 @@
-# LABOR Arbeidsmarktintegratie - Modular program
-LABOR is a local Python/Tkinter application designed to streamline assessments and generate prognosis reports. The application allows users to complete various assessments automatically calculate scores, and produce a clear report with percentages, results, and conclusions. All data is stored locally.
+# LABOR Arbeidsmarktintegratie - Modular Program
+LABOR's modular program is a local Python/Tkinter application designed to streamline assessments and generate prognosis reports. The application allows users to complete various assessments, automatically calculate scores, and produce a clear report with percentages, results, and conclusions. All data is stored locally.
 
 ## Technologies
 - **Front-end:** Python Tkinter
@@ -10,7 +10,7 @@ LABOR is a local Python/Tkinter application designed to streamline assessments a
 
 ### Prerequisites
 
-Ensure [Python](https://www.python.org/downloads/) is installed on your system.
+Ensure that [Python](https://www.python.org/downloads/) is installed on your system.
 
 ### Installation
 
@@ -18,3 +18,12 @@ Ensure [Python](https://www.python.org/downloads/) is installed on your system.
     ```bash
     git clone https://github.com/FlyyLee/labor-project2026
     ```
+2. **Install dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
+3. **Start the application**
+    ```bash
+    python app.py
+    ```
+    The application will open in a new window.
