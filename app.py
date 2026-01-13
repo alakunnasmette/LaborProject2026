@@ -149,7 +149,7 @@ def open_career_anchors():
 
 
 def open_assessments():
-    """Toon de assessmentspagina (Big Five) in dezelfde rechterkant."""
+    """Show the assessments page (Big Five) within content."""
     show_back_button()
     btn_back.config(command=show_home)
 
@@ -159,7 +159,7 @@ def open_assessments():
     assessments.build_assessments_page(content, open_career_anchors)
 
 def open_prognosis_model():
-    """Toon de prognosemodel-pagina."""
+    """Show the prognosis model page."""
     show_back_button()
     btn_back.config(command=show_home)
 
@@ -169,7 +169,7 @@ def open_prognosis_model():
     prognosis_model.build_prognose_page(content)
 
 def open_career_clusters():
-    """Toon de pagina Fase 2.1 – Carrièreclusters in de rechterkant."""
+    """Show the Phase 2.1 – Career Clusters page within content."""
     show_back_button()
     # Back button from Phase 2.1 goes to Phase 2.0
     btn_back.config(command=open_career_anchors)
