@@ -1,19 +1,23 @@
 # ui_components.py
 import tkinter as tk
+from tkinter import ttk
+
+import ui_styles as ui_styles
 
 # --- Scrollable container ---
-def create_scrollable_container(parent, bg="white"):
+def create_scrollable_container(parent, bg=None):
     container = tk.Frame(parent, bg=bg)
     container.pack(fill="both", expand=True)
 
     canvas = tk.Canvas(container, bg=bg, highlightthickness=0)
-    scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
 
     canvas.pack(side="left", fill="both", expand=True)
     scrollbar.pack(side="right", fill="y")
 
-    scroll_frame= tk.Frame(canvas, bg=bg)
-    window_id = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+    content = tk.Frame(canvas, bg=bg)
+    window_id = canvas.create_window((0, 0), window=content, anchor="nw")
+
     canvas.configure(yscrollcommand=scrollbar.set)
 
     def on_frame_configure(event=None):
@@ -22,19 +26,16 @@ def create_scrollable_container(parent, bg="white"):
     def on_canvas_resize(event):
         canvas.itemconfig(window_id, width=event.width)
 
-    scroll_frame.bind("<Configure>", on_frame_configure)
+    content.bind("<Configure>", on_frame_configure)
     canvas.bind("<Configure>", on_canvas_resize)
 
     def on_mousewheel(event):
         canvas.yview_scroll(-int(event.delta / 120), "units")
 
-    canvas.bind_all("<MouseWheel>", on_mousewheel)
+    canvas.bind("<Enter>", lambda e: canvas.bind_all("<MouseWheel>", on_mousewheel))
+    canvas.bind("<Leave>", lambda e: canvas.unbind_all("<MouseWheel>"))
 
-    return {
-        "container": container,
-        "canvas": canvas,
-        "content": scroll_frame
-    }
+    return container, canvas, content
 
 # --- Title and subtitle ---
 def create_page_title(parent, title_text, subtitle_text):
@@ -42,78 +43,100 @@ def create_page_title(parent, title_text, subtitle_text):
     title = tk.Label(
         parent,
         text=title_text,
-        bg="white",
-        fg="black",
-        font=("Segoe UI", 14, "bold"),
+        bg=ui_styles.PAGE_BACKGROUND_COLOR,
+        fg=ui_styles.TEXT_PRIMARY_COLOR,
+        font=ui_styles.TITLE_FONT,
         anchor="w"
     )
-    title.pack(fill="x", padx=20, pady=(15, 5))
+    title.pack(fill="x", padx=ui_styles.TITLE_PADX, pady=(ui_styles.TITLE_PADY_TOP, ui_styles.TITLE_PADY_BOTTOM))
 
     # -- Subtitle label --
     subtitle = tk.Label(
         parent,
         text=subtitle_text,
-        bg="white",
-        fg="black",
-        font=("Segoe UI", 10),
+        bg=ui_styles.PAGE_BACKGROUND_COLOR,
+        fg=ui_styles.TEXT_PRIMARY_COLOR,
+        font=ui_styles.SUBTITLE_FONT,
         anchor="w",
         justify="left"
     )
-    subtitle.pack(fill="x", padx=20, pady=(0, 15))
+    subtitle.pack(fill="x", padx=ui_styles.SUBTITLE_PADX, pady=(ui_styles.SUBTITLE_PADY_TOP, ui_styles.SUBTITLE_PADY_BOTTOM))
 
     return title, subtitle
 
 # --- Column headers ---
-def create_column_headers(parent, labels, bg_color):
-    header = tk.Frame(parent, bg=bg_color)
+def create_column_headers(parent, labels):
+    header = tk.Frame(parent)
     header.pack(fill="x")
     for col, text in enumerate(labels):
         tk.Label(
             header,
             text=text,
-            bg=bg_color,
-            fg="white",
-            font=("Segoe UI", 10, "bold"),
+            bg=ui_styles.TABLE_HEADER_BACKGROUND_COLOR,
+            fg=ui_styles.TEXT_SECONDARY_COLOR,
+            font=ui_styles.TABLE_HEADER_FONT,
             anchor="w" if col < 2 else "e",
-            padx=10 if col < 2 else 40,
+            padx=ui_styles.TABLE_HEADER_PADX if col < 2 else 40,
             width=8 if col == 0 else None
         ).grid(row=0, column=col, sticky="w" if col < 2 else "e")
     
     return header
 
 # --- Column row ---
-def create_likert_row(parent, number, statement, var, options, styles):
-    row = tk.Frame(parent, bg=styles["row_bg"])
-    row.pack(fill="x", pady=1)
+def create_likert_row(parent, row_index, number, statement, var, options):
+    if row_index % 2 == 0:
+        row_bg = ui_styles.TABLE_ROW_PRIMARY_BACKGROUND_COLOR
+    else:
+        row_bg = ui_styles.TABLE_ROW_SECONDARY_BACKGROUND_COLOR
+
+    row = tk.Frame(parent, bg=row_bg)
+    row.pack(fill="x", pady=ui_styles.ROW_PADY)
     row.grid_columnconfigure(1, weight=1)
 
     # -- Number label --
     num_label = tk.Label(
         row,
         text=str(number),
-        width=4,
-        bg=styles["number_bg"],
-        fg="black",
-        font=styles["number_font"],
+        width=ui_styles.NUMBER_WIDTH,
+        bg=ui_styles.ACCENT_PRIMARY_COLOR,
+        fg=ui_styles.TEXT_PRIMARY_COLOR,
+        font=ui_styles.NUMBER_FONT,
         anchor="c"
     )
-    num_label.grid(row=0, column=0, padx=(10, 10), sticky="w")
+    num_label.grid(
+        row=0, column=0, 
+        padx=(
+            ui_styles.ROW_INNER_PADX, 
+            ui_styles.ROW_INNER_PADX), 
+            sticky="w"
+        )
 
     # -- Statement label --
     stmt_label = tk.Label(
         row,
         text=statement,
-        bg=styles["row_bg"],
-        fg="black",
-        font=styles["text_font"],
+        bg=row_bg,
+        fg=ui_styles.TEXT_PRIMARY_COLOR,
+        font=ui_styles.TEXT_FONT,
         anchor="w",
         justify="left",
-        wraplength=650
+        wraplength=ui_styles.STATEMENT_WRAP
     )
-    stmt_label.grid(row=0, column=1, sticky="w", padx=10, pady=8)
+    stmt_label.grid(
+        row=0, column=1, 
+        sticky="w", 
+        padx=ui_styles.STATEMENT_PADX, 
+        pady=ui_styles.STATEMENT_PADY
+    )
 
-    likert_frame = tk.Frame(row, bg=styles["row_bg"])
-    likert_frame.grid(row=0, column=2, padx=20, pady=8, sticky="e")
+    likert_frame = tk.Frame(row, bg=row_bg)
+    likert_frame.grid(
+        row=0, 
+        column=2, 
+        padx=20, 
+        pady=8, 
+        sticky="e"
+    )
 
     buttons = []
 
@@ -121,22 +144,22 @@ def create_likert_row(parent, number, statement, var, options, styles):
         current = var.get()
         for value, widget in buttons:
             if current == value:
-                widget.config(relief="sunken", bg=styles["active_bg"], fg="white")
+                widget.config(relief="sunken", bg=ui_styles.CONTROL_SECONDARY_BACKGROUND_ACTIVE_COLOR, fg=ui_styles.TEXT_SECONDARY_COLOR)
             else:
-                widget.config(relief="raised", bg=styles["inactive_bg"], fg="black")
+                widget.config(relief="raised", bg=ui_styles.CONTROL_PRIMARY_BACKGROUND_COLOR, fg=ui_styles.TEXT_PRIMARY_COLOR)
     
     for col, value in enumerate(options):
         btn = tk.Label(
             likert_frame,
             text=value,
-            width=3,
+            width=ui_styles.LIKERT_BUTTON_WIDTH,
             bd=1,
             relief="raised",
-            bg=styles["inactive_bg"],
-            fg="black",
-            font=styles["button_font"]
+            bg=ui_styles.CONTROL_PRIMARY_BACKGROUND_COLOR,
+            fg=ui_styles.TEXT_PRIMARY_COLOR,
+            font=ui_styles.BUTTON_FONT
         )
-        btn.grid(row=0, column=col, padx=4)
+        btn.grid(row=0, column=col, padx=ui_styles.LIKERT_BUTTON_PADX)
 
         def on_click(event, v=value):
             var.set(v)
