@@ -47,13 +47,13 @@ GROUPS = [
           ]),
 ]
 
-LIKERT = ["1", "2", "3", "4"]
+LIKERT = ["1", "2", "3", "4", "5"]
 
-# ---------- Styles ----------
+# Styles 
 S = {
     "bg": "#ffffff",
     "dark": "#727272",
-    "odd": "#eeeeee",
+    "odd": "#eeeeee",   
     "even": "#e0e0e0",
     "yellow": "#f1c40f",
     "btn": "#d9d9d9",
@@ -64,7 +64,7 @@ S = {
     "f_b": ("Segoe UI", 10, "bold"),
 }
 
-# ---------- Helpers ----------
+# Helpers 
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
     wrap = tk.Frame(parent, bg=S["bg"])
     wrap.pack(fill="both", expand=True)
@@ -111,7 +111,7 @@ def make_likert_buttons(parent: tk.Widget, var: tk.StringVar, bg: str) -> tk.Fra
     return f
 
 
-# ---------- Page ----------
+# Page 
 class App(tk.Frame):
     def __init__(self, parent: tk.Widget):
         super().__init__(parent, bg=S["bg"])
@@ -133,9 +133,9 @@ class App(tk.Frame):
     def build(self):
         _, _, inner = scrollable(self)
 
-        tk.Label(inner, text="Cultuur | Beoordeling van stellingen (1–4)",
+        tk.Label(inner, text="Cultuur | Beoordeling van stellingen (1–5)",
                  bg=S["bg"], font=S["f_title"], anchor="w").pack(fill="x", padx=20, pady=(15, 5))
-        tk.Label(inner, text="Beoordeel elke stelling: 1=oneens … 4=volledig eens.",
+        tk.Label(inner, text="Beoordeel elke stelling: 1=oneens … 5=volledig eens.",
                  bg=S["bg"], font=S["f_sub"], anchor="w").pack(fill="x", padx=20, pady=(0, 12))
 
         outer = tk.Frame(inner, bg=S["bg"])
