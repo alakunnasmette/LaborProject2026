@@ -256,5 +256,3 @@ def create_radio_question(parent, number, question_text, options, variable):
 
 
     return container
-
-sdfdsfsfsdfdsfds
