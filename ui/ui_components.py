@@ -1,4 +1,7 @@
-# ui_components.py
+"""
+Reusable Tkinter UI components for constructing pages, tables, and form elements.
+"""
+
 import tkinter as tk
 from tkinter import ttk
 import ui_styles as stylesheet # stylesheet
@@ -36,6 +39,19 @@ def create_scrollable_container(parent, bg=None):
 
     return container, canvas, content
 
+# --- Primary action button ---
+def create_start_screen_button(parent, text, command=None):
+    start_screen_button = tk.Button(
+        parent,
+        text=text,
+        font=stylesheet.BUTTON_FONT,
+        bg=stylesheet.CONTROL_PRIMARY_BACKGROUND_COLOR,
+        activebackground=stylesheet.CONTROL_PRIMARY_BACKGROUND_ACTIVE_COLOR,
+        fg=stylesheet.TEXT_PRIMARY_COLOR,
+        command=command
+    )
+    return start_screen_button
+
 # --- Page title ---
 def create_page_title(parent, title_text, subtitle_text):
     title = tk.Label(
@@ -67,7 +83,6 @@ def create_table_number_label(parent, number):
         width=stylesheet.NUMBER_WIDTH,
         bg=stylesheet.ACCENT_PRIMARY_COLOR,
         fg=stylesheet.TEXT_PRIMARY_COLOR,
-
     )
     return number_label
 
@@ -124,25 +139,25 @@ def create_table_scope_header(parent, text):
 
 # --- Likert question row ---
 def create_likert_row(parent, row_index, number, statement, var, options):
-    row_bg = (
+    likert_row_bg = (
         stylesheet.TABLE_ROW_PRIMARY_BACKGROUND_COLOR
         if row_index % 2 == 0
         else stylesheet.TABLE_ROW_SECONDARY_BACKGROUND_COLOR
     )
 
-    row = tk.Frame(parent, bg=row_bg)
-    row.pack(fill="x", pady=stylesheet.ROW_PADY)
-    row.grid_columnconfigure(1, weight=1)
+    likert_row = tk.Frame(parent, bg=likert_row_bg)
+    likert_row.pack(fill="x", pady=stylesheet.ROW_PADY)
+    likert_row.grid_columnconfigure(1, weight=1)
 
     # -- Number label --
-    number_label = create_table_number_label(row, number)
+    number_label = create_table_number_label(likert_row, number)
     number_label.grid(row=0, column=0, sticky="w", padx=stylesheet.ROW_INNER_PADX)
     
     # -- Statement label --
     statement_label = tk.Label(
-        row,
+        likert_row,
         text=statement,
-        bg=row_bg,
+        bg=likert_row_bg,
         fg=stylesheet.TEXT_PRIMARY_COLOR,
         font=stylesheet.TEXT_FONT,
         anchor="w",
@@ -151,7 +166,7 @@ def create_likert_row(parent, row_index, number, statement, var, options):
     )
     statement_label.grid(row=0, column=1, sticky="w", padx=stylesheet.STATEMENT_PADX, pady=stylesheet.STATEMENT_PADY)
 
-    likert_frame = tk.Frame(row, bg=row_bg)
+    likert_frame = tk.Frame(likert_row, bg=likert_row_bg)
     likert_frame.grid(row=0, column=2, padx=20, pady=8, sticky="e") # Add padx and pady values to ui_styles.py
 
     # -- Likert buttons --
@@ -198,7 +213,7 @@ def create_radio_question(parent, number, question_text, options, variable):
     question_row.pack(fill="x", padx=stylesheet.ROW_INNER_PADX, pady=stylesheet.ROW_INNER_PADY)
     
     # -- Number label --
-    number_label = create_table_number_label(parent, number)
+    number_label = create_table_number_label(question_row, number)
     number_label.grid(row=0, column=0, sticky="w", padx=stylesheet.ROW_INNER_PADX)
 
     # -- Question text --
@@ -241,4 +256,3 @@ def create_radio_question(parent, number, question_text, options, variable):
 
 
     return container
-

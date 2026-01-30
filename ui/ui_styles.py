@@ -1,4 +1,6 @@
-# ui_styles.py
+"""
+Centralized Tkinter UI constants for colors, fonts, spacing, and layout styling.
+"""
 
 # --- Colors ---
 # -- Base colors --
