@@ -1,6 +1,10 @@
 # assessments.py
 import tkinter as tk
 from tkinter import messagebox
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.write_assessments_to_excel import write_assessment_answers_to_excel
 
 ROW_BG_1 = "#eeeeee"
 ROW_BG_2 = "#e0e0e0"
@@ -289,8 +293,13 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
             )
             return
 
-        # (optioneel) bewaar resultaten voor later gebruik/export
+        # Save results and generate Excel file
         parent_frame.assessment_results = results
+        save_path = write_assessment_answers_to_excel(results)
+        if save_path:
+            messagebox.showinfo("Succes", f"Antwoorden opgeslagen naar:\n{save_path}")
+        else:
+            messagebox.showwarning("Waarschuwing", "Antwoorden opgeslagen maar Excel-bestand kon niet worden gegenereerd.")
 
         # -> ga naar Fase 2.0
         navigate("phase2.0")

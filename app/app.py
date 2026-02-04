@@ -1,11 +1,14 @@
 import tkinter as tk
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from PIL import Image, ImageTk
     _USE_PILLOW = True
 except Exception:
     _USE_PILLOW = False
-import phases.assessments as assessments  # assessments.py
+import phases.assessments_new as assessments_new  # assessments_new.py
+import phases.phase20 as phase20  # phase20.py
 import prognosis_model # prognosis_model.py
  
 # --------- Start screen ---------
@@ -30,7 +33,6 @@ if _USE_PILLOW:
     print("Pillow is available for image processing.")
 else:
     print("Pillow is not availbable. Use Tkinter's PhotoImage.")
-    aiter
  
 # --------- Sidebar logo ---------
 logo_label = None
@@ -145,7 +147,18 @@ def open_career_anchors():
     for w in content.winfo_children():
         w.destroy()
 
-    assessments.build_career_anchors_page(content)
+    phase20.build_career_anchors_page(content)
+
+
+def navigate_to(page: str):
+    """Router function to navigate to different pages based on string identifier."""
+    if page == "phase2.0":
+        open_career_anchors()
+    elif page == "assessments":
+        open_assessments()
+    elif page == "home":
+        show_home()
+    # Add other pages as needed
 
 
 def open_assessments():
@@ -156,7 +169,7 @@ def open_assessments():
     for w in content.winfo_children():
         w.destroy()
 
-    assessments.build_assessments_page(content, open_career_anchors)
+    assessments_new.build_assessments_page(content, navigate_to)
 
 def open_prognosis_model():
     """Show the prognosis model page."""
@@ -178,8 +191,9 @@ def open_career_clusters():
     for w in content.winfo_children():
         w.destroy()
 
-    frame_21 = assessments.create_career_clusters_frame(content)
-    frame_21.pack(fill="both", expand=True)
+    # TODO: Add phase21 implementation when available
+    # frame_21 = phase21.create_career_clusters_frame(content)
+    # frame_21.pack(fill="both", expand=True)
 
 
 # --------- Load the start screen back ---------

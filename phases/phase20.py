@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from ui import ui_components
 from ui.ui_components import clear_frame
-from phases.phase21 import create_career_clusters_frame, on_next_page
+# from phases.phase21 import create_career_clusters_frame, on_next_page  # TODO: Uncomment when phase21 is implemented
 
 # ----------------------------- Phase 2.0 - Career anchors -----------------------------
 
@@ -437,7 +437,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
         # Empty right panel
         clear_frame(parent_frame)
 
-        # Load Phase 2.1 Career Clusters in the same panel
+        #Load Phase 2.1 Career Clusters in the same panel
         frame_21 = create_career_clusters_frame(parent_frame)
         frame_21.pack(fill="both", expand=True)
 

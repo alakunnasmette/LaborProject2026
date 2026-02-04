@@ -1,7 +1,10 @@
 # assessments.py
 import tkinter as tk
 from tkinter import messagebox
-import write_assessments_to_excel
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.write_assessments_to_excel import write_assessment_answers_to_excel
 
 
 ROW_BG_1 = "#eeeeee"
@@ -289,7 +292,7 @@ def build_assessments_page(parent_frame: tk.Frame, on_next_page) -> None: #test#
 
         # If everything is filled in, continue to the next page
                 # Write answers to a copy of the Excel template
-        save_path = write_assessments_to_excel.write_assessment_answers_to_excel(results)
+        save_path = write_assessment_answers_to_excel(results)
         if save_path:
             messagebox.showinfo("Opgeslagen", f"Antwoorden opgeslagen in:\n{save_path}")
         else:

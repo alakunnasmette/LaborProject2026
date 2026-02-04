@@ -45,7 +45,7 @@ def write_assessment_answers_to_excel(
         print(f"Error writing to Excel: {e}")
         return False
 
-
+#could be removed
 def write_loopbaan_answers_to_excel(loopbaan_results: dict, excel_path: str = "Loopbaan onderzoek 5.0 template.xlsx") -> str | bool:
     """Copy template into `resultaten` and return the path; caller may write cells."""
     if not os.path.exists(excel_path):

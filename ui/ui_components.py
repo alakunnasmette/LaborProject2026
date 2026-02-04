@@ -4,7 +4,12 @@ Reusable Tkinter UI components for constructing pages, tables, and form elements
 
 import tkinter as tk
 from tkinter import ttk
-import ui_styles as stylesheet # stylesheet
+from . import ui_styles as stylesheet # stylesheet
+
+# --- Clear frame ---
+def clear_frame(frame: tk.Widget) -> None:
+    for w in frame.winfo_children():
+        w.destroy()
 
 # --- Scrollable container ---
 def create_scrollable_container(parent, bg=None):
