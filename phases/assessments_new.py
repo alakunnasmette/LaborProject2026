@@ -298,6 +298,21 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     btn_frame = tk.Frame(scroll_frame, bg="white")
     btn_frame.pack(fill="x", pady=(5, 20))
 
+    btn_skip = tk.Button(
+        btn_frame,
+        text="Overslaan",
+        bg="#b3b3b3",
+        fg="white",
+        font=("Segoe UI", 11, "bold"),
+        padx=20,
+        pady=5,
+        command=lambda: navigate("phase2.0"),
+    )
+    btn_skip.pack(side="left", padx=30)
+
+    btn_on_pressed = lambda e: navigate("phase2.0")
+    btn_skip.bind("<Return>", btn_on_pressed)
+
     btn_submit = tk.Button(
         btn_frame,
         text="Opslaan en verder",

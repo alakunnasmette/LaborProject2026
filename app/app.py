@@ -5,7 +5,7 @@ try:
     _USE_PILLOW = True
 except Exception:
     _USE_PILLOW = False
-import assessments  # assessments.py
+import phases.assessments as assessments  # assessments.py
 import prognosis_model # prognosis_model.py
  
 # --------- Start screen ---------

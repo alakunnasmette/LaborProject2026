@@ -19,7 +19,7 @@ def write_assessment_answers_to_excel(
             return False
 
         folder = os.path.dirname(excel_path) or "."
-        filled_dir = os.path.join(folder, "resultaten")
+        filled_dir = os.path.join(folder, "results")
         base_name = os.path.splitext(os.path.basename(excel_path))[0]
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         new_name = f"{base_name} - filled {timestamp}.xlsx"
