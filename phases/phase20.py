@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import messagebox
-from ui import ui_components
 from ui.ui_components import clear_frame
 # from phases.phase21 import create_career_clusters_frame, on_next_page  # TODO: Uncomment when phase21 is implemented
 
