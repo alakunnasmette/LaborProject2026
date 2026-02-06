@@ -1,376 +1,341 @@
-# career_anchors.py
+# career_clusters.py
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
+from utils.write_assessments_to_excel import add_career_clusters_to_excel
 
-# Colors for the table
-ROW_BG_1 = "#eeeeee"
-ROW_BG_2 = "#e0e0e0"
+# -------------------- STYLING --------------------
+MAIN_BG = "#ffffff"
+HEADER_BG = "#ffffff"
+TABLE_HEADER_BG = "#f2f2f2"
+ROW_ALT_BG = "#fafafa"
+SCORE_BG = "#efefef"
+BORDER = "#2b2b2b"
+TEXT = "#111111"
+MUTED = "#333333"
 
-# --------- Phase 2.0 - Career anchors ---------
-# Each entry: (question number, anchor letter, statement text)
-# Anchors: V = Up, W = Safe, X = Free, Y = Balance, Z = Challenge
+FONT_H1 = ("Segoe UI", 16, "bold")
+FONT_SUB = ("Segoe UI", 10)
+FONT_TH = ("Segoe UI", 10, "bold")
+FONT_SEG_TITLE = ("Segoe UI", 10, "bold")
+FONT_SEG_DESC = ("Segoe UI", 9)
+FONT_SCORE = ("Segoe UI", 10)
+FONT_TOTAL = ("Segoe UI", 10, "bold")
 
-CAREER_STATEMENTS = [
-    (1, "V", "Graag wil ik het voor mezelf en voor anderen dusdanig regelen dat succes verzekerd is."),
-    (1, "X", "Ik houd me binnen een werksituatie het liefst bezig met mijn eigen zaken."),
-    (2, "Y", "Binnen het werk moet er tijd zijn voor zaken die jezelf belangrijk vindt en moet er gelegenheid zijn om zinvolle relaties te cultiveren."),
-    (2, "V", "Vooruitkomen is voor mij belangrijker dan persoonlijke behoeften."),
-    (3, "W", "Ik werk graag in een omgeving waar hard werken, loyaliteit en toewijding gewaardeerd wordt."),
-    (3, "X", "Ik houd van een werksituatie waar ik mijn eigen doelen kan stellen en ze kan bereiken op mijn eigen manier en op mijn eigen tempo."),
-    (4, "V", "Ik ben strijdlustig, kan goed analyseren en met mensen omgaan."),
-    (4, "Y", "Ik kan goed mijn evenwicht bewaren tussen de eisen van mijn werk en die van mijn privé-leven."),
-    (5, "X", "Ik wil onafhankelijk werken."),
-    (5, "W", "Ik houd ervan me een vertegenwoordiger te voelen van een groter geheel."),
-    (6, "Z", "Ik houd ervan als consultant of probleemoplosser te werken en me dusdanig te profileren door middel van een opwindend project."),
-    (6, "V", "Ik houd ervan in een situatie te werken waarin ik de leiding heb en verantwoordelijk ben voor het bereiken van bepaalde doelen."),
-    (7, "Y", "Mijn echtgenoot/partner is net zo belangrijk voor mij als mijn loopbaan."),
-    (7, "Z", "Mijn echtgenoot/partner verdwijnt naar de achtergrond als ik midden in een zeer opwindend project zit."),
-    (8, "X", "Het allerbelangrijkst voor mij is vrijheid."),
-    (8, "Y", "Het allerbelangrijkst voor mij is een doel in mijn leven."),
-    (9, "W", "Ik ben bekwaam, loyaal, betrouwbaar en ik werk hard."),
-    (9, "Z", "Ik ben sociaal en in de omgang, een goede leider en een goede organisator."),
-    (10, "X", "Ik ben onafhankelijk."),
-    (10, "Y", "Ik ben evenwichtig."),
-    (11, "Z", "Ik ben iemand die in actie komt door opwindende projecten."),
-    (11, "Y", "Ik ben iemand die graag met anderen werkt."),
-    (12, "X", "Ik ben ambitieus en iemand die graag met anderen wedijvert."),
-    (12, "W", "Ik ben iemand die een medewerker zijn met wie men kan rekenen."),
-    (13, "Z", "Ik voel zelfvertrouwen en ben in staat mezelf te redden."),
-    (13, "V", "Ik heb veel fantasie en enthousiasme."),
-    (14, "W", "Ik ben stabiel en vasthoudend."),
-    (14, "X", "Ik ben onafhankelijk en in staat een eigen koers te bepalen."),
-    (15, "Y", "Ik ben iemand die goed kan plannen en coördineren."),
-    (15, "Z", "Ik ben iemand die situaties analyseert en creatieve, nieuwe oplossingen ontwikkelt."),
-    (16, "V", "Ik ben een expert op mijn terrein."),
-    (16, "W", "Ik ben een betrouwbare en degelijk persoon."),
-    (17, "Y", "Ik ben iemand die wil werken volgens vaststaande procedures."),
-    (17, "X", "Ik ben iemand die probeert de doelen in het werk in overeenstemming te brengen met het persoonlijk nastreven."),
-    (18, "Z", "Een persoonlijk doel is om mijn eigen lot te bepalen."),
-    (18, "Y", "Een persoonlijk doel is om mijn werk te verweven met mijn privé-leven."),
-    (19, "W", "Ik vind het belangrijk een veilige baan te hebben en het gevoel te hebben erbij te horen."),
-    (19, "X", "Ik vind het belangrijk om tijd te kunnen besteden aan mijn privé-leven en hobby’s."),
-    (20, "V", "Ik geef de voorkeur aan een carrière waarin veel promotiekansen voorhanden zijn."),
-    (20, "Z", "Ik geef de voorkeur aan om in staat gesteld te worden uitdagende problemen en taken aan te pakken."),
-    (21, "Y", "Ik ben graag in een werksituatie waar invloed uitgeoefend kan worden."),
-    (21, "W", "Ik waardeer een baan waar je langere tijd kunt blijven werken en waar je gewaardeerd en geaccepteerd wordt."),
-    (22, "V", "Ik denk dat de juiste mensen en goede vrienden maken belangrijk is om vooruit te komen."),
-    (22, "Z", "Ik denk dat het essentieel is om interessesgebieden te ontwikkelen."),
-    (23, "Y", "Voor mij geldt als basis het scheppen van een evenwicht tussen mijn privé-leven en mijn werk."),
-    (23, "W", "Voor mij geldt als basis stabiliteit, waardering en een veilige plaats binnen mijn werksituatie."),
-    (24, "X", "Ik denk dat ik graag een positie zou willen hebben met een maximum aan zelfstandigheid."),
-    (24, "V", "Ik denk dat ik graag tot \"de kring van ingewijden\" zou willen behoren."),
-    (25, "W", "Voor mij geldt als basis stabiliteit, waardering en een veilige plaats op het werk."),
-    (25, "V", "Als basis geldt voor mij dat ik vooruit wil komen in de werkomgeving."),
-    (26, "V", "Ik denk dat geld, macht en aanzien een belangrijke maatstaf zijn van een succesvolle loopbaan."),
-    (26, "Y", "Ik denk dat een loopbaan succesvol is als je evenveel tijd hebt voor het werk, het gezin en je eigen ontwikkeling."),
-    (27, "Z", "Ik wil liever uitblinken op mijn gebied."),
-    (27, "W", "Ik wil liever beschouwd worden als betrouwbaar en loyaal."),
-    (28, "W", "Ik geef de voorkeur aan het werken met een team op lange termijn en een hechte basis."),
-    (28, "Z", "Ik geef de voorkeur aan het werken met een taakgerichte of projectgroep op korte termijn basis en in een hoog tempo."),
-    (29, "Z", "Ik geef de voorkeur aan professionele ontwikkeling en permanente training."),
-    (29, "X", "Ik geef de voorkeur aan professionele ontwikkeling om een expert te worden en om meer flexibiliteit en onafhankelijkheid te verkrijgen."),
-    (30, "Y", "Ik geef de voorkeur aan een werksituatie die een evenwicht garandeert tussen mijn privé-leven en mijn werk."),
-    (30, "Z", "Ik geef de voorkeur aan een werksituatie die opwindend is en mij stimuleert."),
+# -------------------- DATA (16 CLUSTERS) --------------------
+CLUSTERS = [
+    (1, "Landbouw, voeding en natuurlijke grondstoffen",
+     "De productie, verwerking, marketing, distributie, financiering en ontwikkeling van agrarische grondstoffen en hulpbronnen waaronder voedsel, vezels, houtproducten, natuurlijke hulpbronnen, tuinbouw, en andere plantaardige en dierlijke producten cq. hulpbronnen."),
+    (2, "Architectuur en constructie",
+     "Carrières bij het ontwerpen, plannen, beheren, bouwen en behoud van de gebouwde omgeving."),
+    (3, "Kunst, audio- visuele technologie en communicatie",
+     "Ontwerpen, produceren, vertonen, uitvoeren, schrijven en publiceren van multimedia-inhoud waaronder visuele en podiumkunsten, design, journalistiek en entertainmentdiensten."),
+    (4, "Business Management en administratie",
+     "Business Management en administratie loopbaan omvatten het plannen, organiseren, leiden en evalueren van zakelijke functies essentieel voor efficiënte en productieve bedrijfsactiviteiten. Management en administratie carrièremogelijkheden zijn beschikbaar in elke sector van de economie."),
+    (5, "Educatie en training",
+     "Planning, beheer en verstrekking van onderwijs- en opleidingsdiensten en gerelateerde ondersteuningsdiensten."),
+    (6, "Financiën",
+     "Planning, services voor financiële en investeringsplanning, bankieren, verzekeringen en bedrijfsfinancieel beheer."),
+    (7, "Overheid en publieke administratie",
+     "Het uitvoeren van overheidsfuncties om governance op te nemen. Denkende aan nationale veiligheid, buitenlandse dienst, planning, inkomsten en belastingen, regulatie en beheer en administratie bij de lokale staat en federale niveaus."),
+    (8, "Gezondheidswetenschappen",
+     "Planning, beheer en levering van therapeutische diensten, diagnostische diensten, medische informatica, ondersteunende diensten en biotechnologie onderzoek en ontwikkeling."),
+    (9, "Hospitality en toerisme",
+     "Hospitality en toerisme omvat het management, marketing en activiteiten van restaurants en andere eetgelegenheden, logies, attracties en recreatie-evenementen en reisgerelateerde diensten."),
+    (10, "Humanitaire dienstverlening",
+     "Individuen voorbereiden op een baan in loopbaantrajecten en betrekking hebben op gezinnen en menselijke behoeften."),
+    (11, "ICT",
+     "Verbanden leggen in een IT-beroepskader voor instapniveau, technische en professionele loopbanen gerelateerd aan het ontwerp, ontwikkeling, ondersteuning en beheer van hardware, software, multimedia- en systeemintegratiediensten."),
+    (12, "Publieke veiligheid en zekerheid",
+     "Planning, beheer en verstrekking van wettelijke, openbare veiligheid, beschermende diensten en binnenlandse veiligheid inclusief professionele en technische ondersteuningsdiensten."),
+    (13, "Fabricage",
+     "Planning, beheer en uitvoering van de verwerking van materialen in tussentijdse of eindproducten en aanverwante professionele en technische ondersteuningsactiviteiten zoals productieplanning en controle, onderhoud en productie / procestechniek."),
+    (14, "Marketing, sales en service",
+     "Planning, beheer en uitvoering van marketingactiviteiten ten behoeve van het bereiken van organisatorische doelstellingen."),
+    (15, "Wetenschap, technologie, engineering en mathematica",
+     "Planning, beheer en bijdrage van wetenschappelijk onderzoek en professionele en technische diensten (bijv; wetenschap en techniek) inclusief laboratorium- en testdiensten en onderzoeks- en ontwikkelingsdiensten."),
+    (16, "Transport, distributie en logistiek",
+     "Planning, beheer en verplaatsing van mensen, materialen en goederen over de weg, pijpleiding, lucht, spoor en water en aanverwante professionele en technische ondersteuningsdiensten zoals transportinfrastructuur, planning en beheer, logistieke diensten, mobiele apparatuur en onderhoud van faciliteiten."),
 ]
 
-# Descriptions of the 5 career anchors
-CAREER_ANCHOR_STATEMENTS = {
-    "Omhoog komen": "Deze op opwaartse mobiliteit gerichte loopbaanoriëntatie wordt gewoonlijk geassocieerd met het vooruitkomen in een hiërarchische en/of statusgevoelige organisatie. Het verwerven van steeds meer invloed speelt in deze kaders een grote rol. Prestige en beloning nemen bij iedere opwaartse beweging toe.",
-    "Veilig voelen": "Sommige personen hebben behoefte aan een veilige baan in een duidelijke organisatie die vooral gekenmerkt wordt door orde en rust. Zij geven de voorkeur aan een lang en vast dienstverband, erkenning en appreciatie door de werkgever. In ruil daarvoor bieden ze een loyale en toegewijde instelling en zijn ze niet bang om hard te werken. Onderling respect, wederkerigheid en loyaliteit karakteriseren de werkhouding.",
-    "Vrij zijn": "Personen met deze loopbaanoriëntatie zijn er op uit hun grenzen te verkennen. De nadruk ligt bij hen meer op het verwerven van persoonlijke autonomie, ruimte en verantwoordelijkheid voor het bereiken van resultaten dan op gebondenheid, zekerheid en vaste regels. Men is bereid zeer hard te werken als daar gunstige voorwaarden tegenover staan in de sfeer van onafhankelijkheid en zelfcontrole. Interessant werk is belangrijk maar individuele vrijheid is het uiteindelijke doel.",
-    "Balans vinden": "Sommige mensen zoeken een optimaal evenwicht tussen werk, privé-leven en zelfontwikkeling. Het werk vormt voor hen slechts één dimensie van hun totale levensvervulling. De aandacht voor werk en privé-leven kan verschillen afhankelijk van de situatie.",
-    "Uitdaging zoeken": "Deze loopbaanoriëntatie wordt gekenmerkt door de behoefte aan opwinding en uitdaging en een sterke betrokkenheid bij het werk. Autonomie is belangrijk maar het belangrijkste is opwindend en uitdagend werk.",
-}
-
-
-# -------------------- Helpers --------------------
+# -------------------- HELPERS --------------------
 def clear_frame(frame: tk.Widget) -> None:
     for w in frame.winfo_children():
         w.destroy()
 
 
-# -------------------- Page builder --------------------
-def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
-    """Toon Fase 2.0 – Loopbaanankers in het rechterpaneel."""
+# -------------------- PAGE --------------------
+class CareerClusters21Page(tk.Frame):
+    def __init__(self, parent: tk.Widget, navigate):
+        super().__init__(parent, bg=MAIN_BG)
+        self.parent_frame = parent  # Store reference to parent for Excel access
+        self.navigate = navigate
 
-    clear_frame(parent_frame)
+        self.scores = {cid: {"act": 0, "comp": 0, "edu": 0} for cid, *_ in CLUSTERS}
+        self.score_labels = {}  # cid -> (act_lbl, comp_lbl, edu_lbl, total_lbl)
 
-    # =================== Scrollbare container ===================
-    container = tk.Frame(parent_frame, bg="white")
-    container.pack(fill="both", expand=True)
+        self._build()
 
-    canvas = tk.Canvas(container, bg="white", highlightthickness=0)
-    scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    # -------- UI builders --------
+    def _build(self):
+        # Titelblok
+        header = tk.Frame(self, bg=HEADER_BG)
+        header.pack(fill="x", padx=22, pady=(18, 10))
 
-    canvas.pack(side="left", fill="both", expand=True)
-    scrollbar.pack(side="right", fill="y")
+        tk.Label(header, text="FASE 2.1 – Carrièreclusters", bg=HEADER_BG, fg=TEXT, font=FONT_H1)\
+            .pack(anchor="w")
 
-    scroll_frame = tk.Frame(canvas, bg="white")
-    window_id = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
-    canvas.configure(yscrollcommand=scrollbar.set)
+        tk.Label(
+            header,
+            text="Per cluster: klik op 'Invullen' en selecteer de stellingen die passen. De scores worden automatisch berekend.",
+            bg=HEADER_BG, fg=MUTED, font=FONT_SUB
+        ).pack(anchor="w", pady=(6, 0))
 
-    def on_frame_configure(_event=None):
-        canvas.configure(scrollregion=canvas.bbox("all"))
+        # Wrapper voor tabel
+        table_wrap = tk.Frame(self, bg=MAIN_BG)
+        table_wrap.pack(fill="both", expand=True, padx=22, pady=(0, 10))  # iets minder onderruimte, want we hebben knop
 
-    def on_canvas_resize(event):
-        canvas.itemconfig(window_id, width=event.width)
+        # Kolombreedtes
+        self.col_w = {
+            "cluster": 70,
+            "segment": 560,
+            "act": 120,
+            "comp": 120,
+            "edu": 120,
+            "total": 80,
+            "btn": 170
+        }
 
-    scroll_frame.bind("<Configure>", on_frame_configure)
-    canvas.bind("<Configure>", on_canvas_resize)
+        # Header rij (fixed)
+        hdr = tk.Frame(table_wrap, bg=MAIN_BG)
+        hdr.pack(fill="x")
 
-    def on_mousewheel(event):
-        canvas.yview_scroll(-int(event.delta / 120), "units")
+        self._th(hdr, "Cluster", self.col_w["cluster"])
+        self._th(hdr, "Segment", self.col_w["segment"])
+        self._th(hdr, "Activiteiten\n(max. 7)", self.col_w["act"])
+        self._th(hdr, "Competenties\n(max. 5)", self.col_w["comp"])
+        self._th(hdr, "Educatief\n(max. 5)", self.col_w["edu"])
+        self._th(hdr, "Totaal", self.col_w["total"])
+        self._th(hdr, "", self.col_w["btn"])
 
-    canvas.bind_all("<MouseWheel>", on_mousewheel)
+        # Scrollbare body
+        body = tk.Frame(table_wrap, bg=MAIN_BG)
+        body.pack(fill="both", expand=True)
 
-    # =================== Header ===================
-    title = tk.Label(
-        scroll_frame,
-        text="Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
-        bg="white",
-        fg="black",
-        font=("Segoe UI", 14, "bold"),
-        anchor="w",
-    )
-    title.pack(fill="x", padx=20, pady=(20, 2))
+        self.canvas = tk.Canvas(body, bg=MAIN_BG, highlightthickness=0)
+        self.vsb = ttk.Scrollbar(body, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.vsb.set)
 
-    subtitle = tk.Label(
-        scroll_frame,
-        text=(
-            "Beoordeling van stelling a.h.v. onderstaande criteria:\n"
-            "Met welke stelling kan cliënt zich het sterkst identificeren?"
-        ),
-        bg="white",
-        fg="black",
-        font=("Segoe UI", 10),
-        anchor="w",
-        justify="left",
-    )
-    subtitle.pack(fill="x", padx=20, pady=(0, 15))
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.vsb.pack(side="right", fill="y")
 
-    # =================== Tabel ===================
-    table = tk.Frame(scroll_frame, bg="white")
-    table.pack(fill="both", expand=True, padx=20, pady=(0, 10))
+        self.inner = tk.Frame(self.canvas, bg=MAIN_BG)
+        self.inner_id = self.canvas.create_window((0, 0), window=self.inner, anchor="nw")
 
-    # 7 kolommen
-    for c in range(7):
-        table.grid_columnconfigure(c, weight=0)
-    table.grid_columnconfigure(1, weight=1)  # stellingkolom rekt mee
+        self.inner.bind("<Configure>", self._on_inner_configure)
+        self.canvas.bind("<Configure>", self._on_canvas_configure)
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
-    header_bg = "#807C7D"
-    headers = [
-        ("Nummer", 0),
-        ("Stelling", 1),
-        ("Omhoog | V", 2),
-        ("Veilig | W", 3),
-        ("Vrij | X", 4),
-        ("Balans | Y", 5),
-        ("Uitdaging | Z", 6),
-    ]
+        for idx, (cid, segment, oms) in enumerate(CLUSTERS, start=1):
+            self._row(self.inner, idx, cid, segment, oms)
 
-    for text, col in headers:
-        lbl = tk.Label(
-            table,
-            text=text,
-            bg=header_bg,
+        # ----- OPSLAAN EN VERDER -----
+        footer = tk.Frame(self, bg=MAIN_BG)
+        footer.pack(fill="x", padx=22, pady=(0, 18))
+
+        def on_submit_next():
+            # minimaal 1 cluster ingevuld (totaal > 0)
+            any_filled = any(
+                (v["act"] + v["comp"] + v["edu"]) > 0
+                for v in self.scores.values()
+            )
+            if not any_filled:
+                messagebox.showwarning(
+                    "Nog niets ingevuld",
+                    "Vul minimaal één cluster in voordat je verder gaat."
+                )
+                return
+
+            # Save cluster scores to Excel file if available
+            if hasattr(self.parent_frame, 'excel_file_path') and self.parent_frame.excel_file_path:
+                success = add_career_clusters_to_excel(self.parent_frame.excel_file_path, self.scores)
+                if success:
+                    messagebox.showinfo("Succes", "Carrièreclusters opgeslagen naar Excel-bestand.")
+                else:
+                    messagebox.showwarning("Waarschuwing", "Carrièreclusters konden niet naar Excel-bestand worden geschreven.")
+
+            # Hierna naar jouw volgende pagina:
+            # pas dit aan naar de volgende Fase Pagina
+            self.navigate("phase2.2")  # bijv. "phase3.0"
+
+        btn = tk.Button(
+            footer,
+            text="Opslaan en verder",
+            bg="#4d4d4d",
             fg="white",
-            font=("Segoe UI", 10, "bold"),
-            padx=10,
-            anchor="w" if col <= 1 else "center",
+            font=("Segoe UI", 11, "bold"),
+            padx=20,
+            pady=6,
+            relief="flat",
+            command=on_submit_next
         )
-        lbl.grid(row=0, column=col, sticky="nsew")
+        btn.pack(side="right")
 
-    ANKERS = ["V", "W", "X", "Y", "Z"]
+    def _th(self, parent, text, width):
+        f = tk.Frame(parent, bg=TABLE_HEADER_BG, highlightbackground=BORDER, highlightthickness=1)
+        f.pack(side="left", fill="y")
+        f.configure(width=width, height=48)
+        f.pack_propagate(False)
 
-    # één StringVar per rij (stelling)
-    vraag_vars: dict[int, tk.StringVar] = {}
-    vraag_buttons: dict[int, list[tuple[str, tk.Radiobutton]]] = {}
+        tk.Label(f, text=text, bg=TABLE_HEADER_BG, fg=TEXT, font=FONT_TH, justify="center")\
+            .pack(expand=True, fill="both")
 
-    def update_row(row_id: int) -> None:
-        """Laat alleen in het gekozen vakje van deze rij een '1' zien (zoals in jouw voorbeeld)."""
-        current = vraag_vars[row_id].get()
-        for code, btn in vraag_buttons[row_id]:
-            if code == current:
-                btn.config(text="1", font=("Segoe UI", 11, "bold"))
-            else:
-                btn.config(text="", font=("Segoe UI", 11))
+    def _cell(self, parent, width, height, bg):
+        f = tk.Frame(parent, bg=bg, highlightbackground=BORDER, highlightthickness=1)
+        f.configure(width=width, height=height)
+        f.pack_propagate(False)
+        f.pack(side="left", fill="y")
+        return f
 
-    # hoeveel regels horen bij elk vraagnummer (rowspan)
-    question_counts: dict[int, int] = {}
-    for nummer, _anker, _tekst in CAREER_STATEMENTS:
-        question_counts[nummer] = question_counts.get(nummer, 0) + 1
+    def _row(self, parent, idx, cid, segment, oms):
+        row_h = 110
+        row_bg = ROW_ALT_BG if idx % 2 == 0 else MAIN_BG
 
-    shown_numbers: set[int] = set()
+        r = tk.Frame(parent, bg=MAIN_BG)
+        r.pack(fill="x")
 
-    # Bouw rijen
-    for row_index, (nummer, _anker, tekst) in enumerate(CAREER_STATEMENTS, start=1):
-        row_id = row_index
-        vraag_vars[row_id] = tk.StringVar(value="")
-        vraag_buttons[row_id] = []
+        # Cluster
+        c1 = self._cell(r, self.col_w["cluster"], row_h, row_bg)
+        tk.Label(c1, text=str(cid), bg=row_bg, fg=TEXT, font=("Segoe UI", 10, "bold"))\
+            .pack(expand=True)
 
-        row_bg = ROW_BG_1 if row_index % 2 == 1 else ROW_BG_2
+        # Segment
+        c2 = self._cell(r, self.col_w["segment"], row_h, row_bg)
+        pad = tk.Frame(c2, bg=row_bg)
+        pad.pack(fill="both", expand=True, padx=12, pady=10)
 
-        # Nummer (één geel blok per vraagnummer)
-        if nummer not in shown_numbers:
-            rowspan = question_counts.get(nummer, 1)
-            num_label = tk.Label(
-                table,
-                text=str(nummer),
-                width=4,
-                bg="#f1c40f",
-                fg="black",
-                font=("Segoe UI", 10, "bold"),
-                anchor="c",
-            )
-            num_label.grid(
-                row=row_index,
-                column=0,
-                rowspan=rowspan,
-                padx=(10, 10),
-                pady=(2, 2),
-                sticky="nsw",
-            )
-            shown_numbers.add(nummer)
-
-        # Stelling
-        stmt_label = tk.Label(
-            table,
-            text=tekst,
+        tk.Label(pad, text=segment, bg=row_bg, fg=TEXT, font=FONT_SEG_TITLE, anchor="w")\
+            .pack(anchor="w")
+        tk.Label(
+            pad,
+            text=oms,
             bg=row_bg,
-            fg="black",
-            font=("Segoe UI", 10),
-            anchor="w",
+            fg=TEXT,
+            font=FONT_SEG_DESC,
             justify="left",
-            wraplength=700,
-            padx=12,
-            pady=6,
-        )
-        stmt_label.grid(
-            row=row_index,
-            column=1,
-            sticky="nsew",
-            padx=(0, 10),
-            pady=(2, 2),
-        )
+            wraplength=self.col_w["segment"] - 28
+        ).pack(anchor="w", pady=(6, 0))
 
-        # 5 anker-vakjes
-        var = vraag_vars[row_id]
-        for offset, code in enumerate(ANKERS):
-            col = 2 + offset
+        # Scores
+        act = self._cell(r, self.col_w["act"], row_h, SCORE_BG)
+        comp = self._cell(r, self.col_w["comp"], row_h, SCORE_BG)
+        edu = self._cell(r, self.col_w["edu"], row_h, SCORE_BG)
+        total = self._cell(r, self.col_w["total"], row_h, SCORE_BG)
 
-            cell = tk.Frame(table, bg=row_bg, bd=1, relief="solid")
-            cell.grid(row=row_index, column=col, padx=3, pady=(2, 2), sticky="nsew")
+        act_lbl = tk.Label(act, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_SCORE)
+        comp_lbl = tk.Label(comp, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_SCORE)
+        edu_lbl = tk.Label(edu, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_SCORE)
+        tot_lbl = tk.Label(total, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_TOTAL)
 
-            rb = tk.Radiobutton(
-                cell,
-                variable=var,
-                value=code,
-                indicatoron=False,
-                text="",
-                width=2,
-                font=("Segoe UI", 11),
-                bg=row_bg,
-                fg="black",
-                activebackground=row_bg,
-                activeforeground="black",
-                selectcolor=row_bg,
-                relief="flat",
-                borderwidth=0,
-                command=lambda q=row_id: update_row(q),
-                cursor="hand2",
-            )
-            rb.pack(expand=True, fill="both")
-            vraag_buttons[row_id].append((code, rb))
+        act_lbl.pack(expand=True)
+        comp_lbl.pack(expand=True)
+        edu_lbl.pack(expand=True)
+        tot_lbl.pack(expand=True)
 
-    # init: alles leeg
-    for rid in vraag_vars.keys():
-        update_row(rid)
+        self.score_labels[cid] = (act_lbl, comp_lbl, edu_lbl, tot_lbl)
 
-    # Bewaar keuzes op parent_frame (voor later)
-    parent_frame.loopbaan_vars = vraag_vars
-
-    # =================== Beschrijvingen ===================
-    desc_frame = tk.Frame(scroll_frame, bg="white")
-    desc_frame.pack(fill="x", padx=20, pady=(20, 20))
-
-    tk.Label(
-        desc_frame,
-        text="Loopbaanankers – omschrijving",
-        bg="white",
-        fg="black",
-        font=("Segoe UI", 11, "bold"),
-        anchor="w",
-    ).pack(fill="x", pady=(0, 5))
-
-    for naam, tekst in CAREER_ANCHOR_STATEMENTS.items():
-        box = tk.Frame(desc_frame, bg="#f5f5f5", bd=1, relief="solid")
-        box.pack(fill="x", pady=4)
-
-        tk.Label(
-            box,
-            text=naam,
-            bg="#f1c40f",
-            fg="black",
+        # Button
+        cbtn = self._cell(r, self.col_w["btn"], row_h, row_bg)
+        btn = tk.Button(
+            cbtn,
+            text="Invullen",
             font=("Segoe UI", 10, "bold"),
-            width=16,
-            anchor="center",
-            padx=4,
-            pady=4,
-        ).pack(side="left", fill="y")
+            relief="solid",
+            bd=1,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+            command=lambda x=cid: self.open_invullen(x)
+        )
+        btn.pack(fill="both", expand=True, padx=10, pady=18)
+
+    # -------- scrolling --------
+    def _on_inner_configure(self, _):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def _on_canvas_configure(self, event):
+        sb = max(16, self.vsb.winfo_reqwidth())
+        w = max(300, event.width - sb)
+        self.canvas.itemconfig(self.inner_id, width=w)
+
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    # -------- popup --------
+    def open_invullen(self, cid):
+        root = self.winfo_toplevel()
+        win = tk.Toplevel(root)
+        win.title(f"Invullen – Cluster {cid}")
+        win.geometry("520x340")
+        win.configure(bg=MAIN_BG)
+
+        tk.Label(win, text=f"Cluster {cid} – Invullen", bg=MAIN_BG, fg=TEXT, font=("Segoe UI", 14, "bold"))\
+            .pack(anchor="w", padx=18, pady=(16, 8))
 
         tk.Label(
-            box,
-            text=tekst,
-            bg="#f5f5f5",
-            fg="black",
-            font=("Segoe UI", 10),
-            justify="left",
-            wraplength=650,
-            anchor="w",
-            padx=8,
-            pady=6,
-        ).pack(side="left", fill="both", expand=True)
+            win,
+            text="Koppel hier later de echte stellingen (activiteiten/competenties/educatief).\n"
+                 "Voor nu: klik op 'Opslaan' om dummy-scores te testen.",
+            bg=MAIN_BG, fg=MUTED, font=("Segoe UI", 10), justify="left"
+        ).pack(anchor="w", padx=18)
 
-    # =================== Opslaan en verder ===================
-    def on_submit_loopbaan():
-        # 1) alles ingevuld?
-        missing = [row_id for row_id, v in parent_frame.loopbaan_vars.items() if not v.get()]
-        if missing:
-            messagebox.showwarning(
-                "Onvolledige vragenlijst",
-                f"Er zijn nog {len(missing)} stellingen zonder keuze."
-            )
-            return
+        box = tk.Frame(win, bg=MAIN_BG)
+        box.pack(fill="x", padx=18, pady=16)
 
-        # 2) resultaten opslaan
-        parent_frame.loopbaan_results = {row_id: v.get() for row_id, v in parent_frame.loopbaan_vars.items()}
+        act_var = tk.IntVar(value=self.scores[cid]["act"])
+        comp_var = tk.IntVar(value=self.scores[cid]["comp"])
+        edu_var = tk.IntVar(value=self.scores[cid]["edu"])
 
-        # 3) door naar fase 2.1
-        navigate("phase2.1")
+        for label, var, mx in [
+            ("Activiteiten (max 7)", act_var, 7),
+            ("Competenties (max 5)", comp_var, 5),
+            ("Educatief (max 5)", edu_var, 5),
+        ]:
+            row = tk.Frame(box, bg=MAIN_BG)
+            row.pack(fill="x", pady=6)
+            tk.Label(row, text=label, bg=MAIN_BG, fg=TEXT, font=("Segoe UI", 10)).pack(side="left")
+            sp = tk.Spinbox(row, from_=0, to=mx, width=6, textvariable=var)
+            sp.pack(side="right")
 
-    btn_frame = tk.Frame(scroll_frame, bg="white")
-    btn_frame.pack(fill="x", pady=(5, 20))
+        btns = tk.Frame(win, bg=MAIN_BG)
+        btns.pack(fill="x", padx=18, pady=14)
 
-    btn_skip = tk.Button(
-        btn_frame,
-        text="Overslaan",
-        bg="#b3b3b3",
-        fg="white",
-        font=("Segoe UI", 11, "bold"),
-        padx=20,
-        pady=5,
-        command=lambda: navigate("phase2.1"),
-    )
-    btn_skip.pack(side="left", padx=30)
+        def save():
+            self.scores[cid]["act"] = int(act_var.get())
+            self.scores[cid]["comp"] = int(comp_var.get())
+            self.scores[cid]["edu"] = int(edu_var.get())
+            self.refresh_scores(cid)
+            win.destroy()
 
-    btn_submit = tk.Button(
-        btn_frame,
-        text="Opslaan en verder",
-        bg="#4d4d4d",
-        fg="white",
-        font=("Segoe UI", 11, "bold"),
-        padx=20,
-        pady=5,
-        command=on_submit_loopbaan,
-    )
-    btn_submit.pack(side="right", padx=30)
+        tk.Button(btns, text="Annuleren", command=win.destroy, relief="groove", bd=1, padx=14)\
+            .pack(side="right")
+        tk.Button(btns, text="Opslaan", command=save, relief="groove", bd=1, padx=18)\
+            .pack(side="right", padx=(0, 10))
+
+    def refresh_scores(self, cid):
+        act = self.scores[cid]["act"]
+        comp = self.scores[cid]["comp"]
+        edu = self.scores[cid]["edu"]
+        total = act + comp + edu
+
+        act_lbl, comp_lbl, edu_lbl, tot_lbl = self.score_labels[cid]
+        act_lbl.config(text=str(act))
+        comp_lbl.config(text=str(comp))
+        edu_lbl.config(text=str(edu))
+        tot_lbl.config(text=str(total))
+
+
+# -------------------- BUILDER FUNCTION --------------------
+def build_carriereclusters_page(parent_frame: tk.Frame, navigate) -> None:
+    clear_frame(parent_frame)
+    page = CareerClusters21Page(parent_frame, navigate)
+    page.pack(fill="both", expand=True)

@@ -297,6 +297,8 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         parent_frame.assessment_results = results
         save_path = write_assessment_answers_to_excel(results)
         if save_path:
+            # Store the Excel file path on parent_frame so subsequent phases can add to it
+            parent_frame.excel_file_path = save_path
             messagebox.showinfo("Succes", f"Antwoorden opgeslagen naar:\n{save_path}")
         else:
             messagebox.showwarning("Waarschuwing", "Antwoorden opgeslagen maar Excel-bestand kon niet worden gegenereerd.")

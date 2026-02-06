@@ -9,6 +9,8 @@ except Exception:
     _USE_PILLOW = False
 import phases.phase10 as phase10  # phase10.py
 import phases.phase20 as phase20  # phase20.py
+import phases.phase21 as phase21  # phase21.py
+import phases.phase22 as phase22  # phase22.py
 import prognosis_model # prognosis_model.py
  
 # --------- Start screen ---------
@@ -147,13 +149,15 @@ def open_career_anchors():
     for w in content.winfo_children():
         w.destroy()
 
-    phase20.build_career_anchors_page(content)
+    phase20.build_career_anchors_page(content, navigate_to)
 
 
 def navigate_to(page: str):
     """Router function to navigate to different pages based on string identifier."""
     if page == "phase2.0":
         open_career_anchors()
+    elif page == "phase2.1":
+        open_career_clusters()
     elif page == "assessments":
         open_assessments()
     elif page == "home":
@@ -191,9 +195,22 @@ def open_career_clusters():
     for w in content.winfo_children():
         w.destroy()
 
-    # TODO: Add phase21 implementation when available
-    # frame_21 = phase21.create_career_clusters_frame(content)
-    # frame_21.pack(fill="both", expand=True)
+    # Try known builder names from phase21
+    builder = None
+    try:
+        builder = getattr(phase21, "build_carriereclusters_page", None) or getattr(phase21, "build_loopbaanankers_page", None) or getattr(phase21, "create_career_clusters_frame", None)
+    except Exception:
+        builder = None
+
+    if builder:
+        try:
+            builder(content, navigate_to)
+        except TypeError:
+            builder(content)
+    else:
+        # Fallback message
+        lbl = tk.Label(content, text="Fase 2.1 is nog niet geïmplementeerd.", bg="white", fg="black")
+        lbl.pack(padx=20, pady=20)
 
 
 # --------- Load the start screen back ---------

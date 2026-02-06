@@ -1,7 +1,22 @@
 import tkinter as tk
 from tkinter import messagebox
 from ui.ui_components import clear_frame
-# from phases.phase21 import create_career_clusters_frame, on_next_page  # TODO: Uncomment when phase21 is implemented
+from utils.write_assessments_to_excel import add_career_anchors_to_excel
+# Try to import Phase 2.1 helpers; if the module exists use its API,
+# otherwise keep safe None values and show friendly messages at runtime.
+try:
+    import phases.phase21 as phase21
+    # phase21 may expose the builder under different names; try common variants
+    phase21_build = (
+        getattr(phase21, "build_carriereclusters_page", None)
+        or getattr(phase21, "build_loopbaanankers_page", None)
+        or getattr(phase21, "create_career_clusters_frame", None)
+    )
+    phase21_on_next = getattr(phase21, "on_next_page", None)
+except Exception:
+    phase21 = None
+    phase21_build = None
+    phase21_on_next = None
 
 # ----------------------------- Phase 2.0 - Career anchors -----------------------------
 
@@ -87,7 +102,7 @@ CAREER_ANCHOR_DESCRIPTIONS = {
 }
 
 
-def build_career_anchors_page(parent_frame: tk.Frame) -> None:
+def build_career_anchors_page(parent_frame: tk.Frame, navigate=None) -> None:
     """Show Phase 2.0 – Career Anchors in content."""
 
     clear_frame(parent_frame)
@@ -433,15 +448,60 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
             row_id: v.get() for row_id, v in parent_frame.career_vars.items()
         }
 
+        # Save to Excel file if it exists
+        if hasattr(parent_frame, 'excel_file_path') and parent_frame.excel_file_path:
+            success = add_career_anchors_to_excel(parent_frame.excel_file_path, parent_frame.career_results)
+            if success:
+                messagebox.showinfo("Succes", "Loopbaanankers opgeslagen naar Excel-bestand.")
+            else:
+                messagebox.showwarning("Waarschuwing", "Loopbaanankers konden niet naar Excel-bestand worden geschreven.")
+
         # Empty right panel
         clear_frame(parent_frame)
 
-        #Load Phase 2.1 Career Clusters in the same panel
-        frame_21 = create_career_clusters_frame(parent_frame)
+        # Load Phase 2.1 Career Clusters in the same panel (if available)
+        build_fn = phase21_build if 'phase21' in globals() else None
+
+        if build_fn:
+            try:
+                frame_21 = build_fn(parent_frame, navigate)
+            except TypeError:
+                # Some builders don't accept navigate; call with single arg
+                try:
+                    frame_21 = build_fn(parent_frame)
+                except Exception:
+                    frame_21 = tk.Frame(parent_frame, bg="white")
+                    tk.Label(frame_21, text="Fase 2.1 kon niet worden geladen.", bg="white", fg="black").pack(padx=20, pady=20)
+            except Exception:
+                frame_21 = tk.Frame(parent_frame, bg="white")
+                tk.Label(frame_21, text="Fase 2.1 kon niet worden geladen.", bg="white", fg="black").pack(padx=20, pady=20)
+        else:
+            frame_21 = tk.Frame(parent_frame, bg="white")
+            tk.Label(frame_21, text="Fase 2.1 is nog niet geïmplementeerd.", bg="white", fg="black").pack(padx=20, pady=20)
+
         frame_21.pack(fill="both", expand=True)
 
     btn_frame = tk.Frame(scroll_frame, bg="white")
     btn_frame.pack(fill="x", pady=(5, 20))
+
+    def _handle_skip():
+        # Prefer the passed navigate callback
+        if navigate:
+            try:
+                navigate("phase2.1")
+                return
+            except Exception:
+                pass
+
+        # Next prefer phase21-specific helper
+        if 'phase21' in globals() and phase21_on_next:
+            try:
+                phase21_on_next()
+                return
+            except Exception:
+                pass
+
+        messagebox.showinfo("Niet beschikbaar", "Fase 2.1 is nog niet beschikbaar.")
 
     btn_skip = tk.Button(
         btn_frame,
@@ -451,7 +511,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
         font=("Segoe UI", 11, "bold"),
         padx=20,
         pady=5,
-        command=on_next_page,
+        command=_handle_skip,
     )
     btn_skip.pack(side="left", padx=30)
 
