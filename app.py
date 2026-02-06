@@ -152,12 +152,27 @@ def open_career_anchors():
     phase20.build_career_anchors_page(content, navigate_to)
 
 
+def open_cultuur():
+    """Show the Phase 2.2 – Culture page within content."""
+    show_back_button()
+    # Back button from Phase 2.2 goes to Phase 2.1
+    btn_back.config(command=open_career_clusters)
+
+    # Empty content
+    for w in content.winfo_children():
+        w.destroy()
+
+    phase22.build_cultuur_page(content, navigate_to)
+
+
 def navigate_to(page: str):
     """Router function to navigate to different pages based on string identifier."""
     if page == "phase2.0":
         open_career_anchors()
     elif page == "phase2.1":
         open_career_clusters()
+    elif page == "phase2.2":
+        open_cultuur()
     elif page == "assessments":
         open_assessments()
     elif page == "home":
