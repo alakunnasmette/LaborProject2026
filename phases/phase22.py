@@ -277,7 +277,7 @@ class Culture22Page(tk.Frame):
 
         # Ga door naar volgende stap (pas aan naar jouw router)
         # Bijvoorbeeld: self.navigate("phase2.3")
-        self.navigate("home")
+        self.navigate("phase2.3")
 
 
 # -------------------- BUILDER FUNCTION --------------------
