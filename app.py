@@ -7,7 +7,7 @@ try:
     _USE_PILLOW = True
 except Exception:
     _USE_PILLOW = False
-import phases.phase10 as phase10  # phase10.py
+import phases.phase11 as phase11  # phase10.py
 import phases.phase20 as phase20  # phase20.py
 import phases.phase21 as phase21  # phase21.py
 import phases.phase22 as phase22  # phase22.py
@@ -199,7 +199,7 @@ def open_assessments():
     for w in content.winfo_children():
         w.destroy()
 
-    phase10.build_assessments_page(content, navigate_to)
+    phase11.build_assessments_page(content, navigate_to)
 
 def open_prognosis_model():
     """Show the prognosis model page."""
