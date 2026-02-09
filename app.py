@@ -7,6 +7,7 @@ except Exception:
     _USE_PILLOW = False
 import assessments  # assessments.py
 import prognosis_model # prognosis_model.py
+import phase20 # phase 2.0
  
 # --------- Start screen ---------
 root = tk.Tk()
@@ -29,7 +30,7 @@ logo_label = None
 if _USE_PILLOW: 
     print("Pillow is available for image processing.")
 else:
-    print("Pillow is not availbable. Use Tkinter's PhotoImage.")
+    print("Pillow is not available. Use Tkinter's PhotoImage.")
     aiter
  
 # --------- Sidebar logo ---------
@@ -142,10 +143,15 @@ def open_career_anchors():
     show_back_button()
     btn_back.config(command=open_assessments)
 
+    # clear content
     for w in content.winfo_children():
         w.destroy()
 
-    assessments.build_career_anchors_page(content)
+    # assessments.build_career_anchors_page(content)
+
+    # new Phase 2.0 page
+    phase20.show(content)
+
 
 
 def open_assessments():
