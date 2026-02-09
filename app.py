@@ -11,6 +11,7 @@ import phases.phase10 as phase10  # phase10.py
 import phases.phase20 as phase20  # phase20.py
 import phases.phase21 as phase21  # phase21.py
 import phases.phase22 as phase22  # phase22.py
+import phases.phase23 as phase23  # phase23.py
 import prognosis_model # prognosis_model.py
  
 # --------- Start screen ---------
@@ -173,11 +174,21 @@ def navigate_to(page: str):
         open_career_clusters()
     elif page == "phase2.2":
         open_cultuur()
-    elif page == "assessments":
-        open_assessments()
+    elif page == "phase2.3":
+        open_job_characteristics_models()
     elif page == "home":
         show_home()
     # Add other pages as needed
+
+def open_job_characteristics_models():
+    """Show the Job Characteristics Models page."""
+    show_back_button()
+    btn_back.config(command=show_home)
+
+    for w in content.winfo_children():
+        w.destroy()
+
+    phase23.build_job_characteristics_models_page(content, navigate_to)
 
 
 def open_assessments():

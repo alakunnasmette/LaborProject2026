@@ -11,7 +11,7 @@ ROW_BG_2 = "#e0e0e0"
 CELL_BORDER = "#b3b3b3"
 
 DARK_GREY = "#727272"
-LIGHT_GREY = "#b3b3b3"
+LIGHT_GREY = "#eeeeee"
 TEXT_FONT = ("Segoe UI", 11)
 
 # --------- Likert-schaal: 1 t/m 5 ---------
@@ -125,7 +125,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
         row,
         text=stelling,
         bg=LIGHT_GREY,
-        fg="white",
+        fg="black",
         font=TEXT_FONT,
         anchor="w",
         justify="left",
