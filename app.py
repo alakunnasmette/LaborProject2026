@@ -1,6 +1,7 @@
 import tkinter as tk
 import os
 import sys
+import ctypes
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from PIL import Image, ImageTk
@@ -20,6 +21,10 @@ root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="white")
 root.state("zoomed")
+
+myappid = 'mycompany.myproduct.version'  # Required for Windows
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+root.iconbitmap(r"icon.ico")  # Use raw string to avoid path issues
 
 # --------- Sidebar ---------
 SIDEBAR_WIDTH = 180
