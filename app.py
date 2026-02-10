@@ -19,6 +19,7 @@ root = tk.Tk()
 root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="white")
+root.state("zoomed")
 
 # --------- Sidebar ---------
 SIDEBAR_WIDTH = 180

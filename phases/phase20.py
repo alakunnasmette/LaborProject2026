@@ -479,7 +479,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate=None) -> None:
             frame_21 = tk.Frame(parent_frame, bg="white")
             tk.Label(frame_21, text="Fase 2.1 is nog niet geïmplementeerd.", bg="white", fg="black").pack(padx=20, pady=20)
 
-        frame_21.pack(fill="both", expand=True)
+        frame_21(fill="both", expand=True)
 
     btn_frame = tk.Frame(scroll_frame, bg="white")
     btn_frame.pack(fill="x", pady=(5, 20))
