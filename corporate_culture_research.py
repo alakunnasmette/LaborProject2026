@@ -271,12 +271,12 @@ class Culture22Page(tk.Frame):
             )
             return
 
-        # resultaten bewaren op het parent frame (voor later export)
+        # save results on the parent frame (for later export)
         self.cultuur_results = {k: v.get() for k, v in self.vars.items()}
         self.cultuur_totals = {g.id: self.subtotal(g.id) for g in GROUPS}
 
-        # Ga door naar volgende stap (pas aan naar jouw router)
-        # Bijvoorbeeld: self.navigate("phase2.3")
+        # Continue to the next step (adjust to your router)
+        # For example: self.navigate("phase2.3")
         self.navigate("home")
 
 

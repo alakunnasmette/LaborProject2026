@@ -1,6 +1,7 @@
 # assessments.py
 import tkinter as tk
 from tkinter import messagebox
+import write_assessments_to_excel # write_assessments_to_excel.py
 
 ROW_BG_1 = "#eeeeee"
 ROW_BG_2 = "#e0e0e0"
@@ -10,7 +11,7 @@ DARK_GREY = "#727272"
 LIGHT_GREY = "#b3b3b3"
 TEXT_FONT = ("Segoe UI", 11)
 
-# --------- Likert-schaal: 1 t/m 5 ---------
+# --------- Likert-scale: 1 t/m 5 ---------
 LIKERT_OPTIONS = [
     ("1", "Oneens"),
     ("2", "Deels oneens"),
@@ -82,8 +83,8 @@ def clear_frame(frame: tk.Widget) -> None:
 
 def get_assessment_results(parent_frame: tk.Frame) -> dict[int, int | None]:
     """
-    Haal alle ingevulde antwoorden op uit parent_frame.assessment_vars.
-    Geeft een dict terug: {nummer: int(waarde) of None als leeg}
+    Retrieve all entered answers from parent_frame.assessment_vars.
+    Returns a dict: {number: int(value) or None if empty}
     """
     results: dict[int, int | None] = {}
     vars_dict = getattr(parent_frame, "assessment_vars", {})
@@ -96,12 +97,12 @@ def get_assessment_results(parent_frame: tk.Frame) -> dict[int, int | None]:
 
 
 def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.StringVar) -> None:
-    """Eén rij: nummer + stelling + 1..5 knoppen (rechts uitgelijnd)."""
+    """One row: number + position + 1..5 buttons (right-aligned)."""
 
     row = tk.Frame(parent, bg=LIGHT_GREY)
     row.pack(fill="x", pady=1)
 
-    # zorg dat kolom 2 (stelling) meerekt, zodat kolom 3 altijd rechts zit
+    # make sure that column 2 (position) stretches, so that column 3 is always on the right
     row.grid_columnconfigure(1, weight=1)
 
     # Nummer (geel)
@@ -116,7 +117,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     )
     num_label.grid(row=0, column=0, padx=(10, 10), sticky="w")
 
-    # Stelling
+    # Stat
     stmt_label = tk.Label(
         row,
         text=stelling,
@@ -129,7 +130,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     )
     stmt_label.grid(row=0, column=1, sticky="w", padx=10, pady=8)
 
-    # Likert-knoppen (rechts)
+    # Likert buttons (right)
     likert_frame = tk.Frame(row, bg=LIGHT_GREY)
     likert_frame.grid(row=0, column=2, padx=20, pady=8, sticky="e")
 
@@ -169,12 +170,12 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
 # -------------------- Page builder --------------------
 def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     """
-    Bouwt de Big Five 1.1 vragenlijst in het rechter scherm.
-    navigate is de router uit app.py, dus je kan: navigate("phase2.0") etc.
+    Builds the Big Five 1.1 questionnaire in the right screen.
+    Navigate is the router from app.py, so you can use: navigate("phase2.0") etc.
     """
     clear_frame(parent_frame)
 
-    # ---------- scrollbare container ----------
+    # ---------- scrollbar container ----------
     container = tk.Frame(parent_frame, bg="white")
     container.pack(fill="both", expand=True)
 
@@ -203,7 +204,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
 
     canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-    # ---------- titel & uitleg ----------
+    # ---------- title and explanation ----------
     title = tk.Label(
         scroll_frame,
         text="Fase 1.1 – Big Five persoonlijkheidsdimensies",
@@ -228,7 +229,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     )
     subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
-    # ---------- kolomkoppen ----------
+    # ---------- column headings ----------
     header = tk.Frame(scroll_frame, bg=DARK_GREY)
     header.pack(fill="x")
 
@@ -263,7 +264,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         padx=40,
     ).grid(row=0, column=2, sticky="e")
 
-    # ---------- alle items ----------
+    # ---------- all items ----------
     parent_frame.assessment_vars = {}
 
     questions_container = tk.Frame(scroll_frame, bg="white")
@@ -277,7 +278,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     # spacer
     tk.Frame(scroll_frame, bg="white", height=10).pack(fill="x")
 
-    # ---------- Opslaan en verder-knop ----------
+    # ---------- Save and continue button ----------
     def on_submit():
         results = get_assessment_results(parent_frame)
 
@@ -289,10 +290,10 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
             )
             return
 
-        # (optioneel) bewaar resultaten voor later gebruik/export
+        # (optional) save results for later use/export
         parent_frame.assessment_results = results
 
-        # -> ga naar Fase 2.0
+        # -> go to Phase 2.0
         navigate("phase2.0")
 
     btn_frame = tk.Frame(scroll_frame, bg="white")
@@ -310,5 +311,5 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     )
     btn_submit.pack(side="right", padx=30)
 
-    # extra ruimte onderaan
+    # extra space at the bottom
     tk.Frame(scroll_frame, bg="white", height=30).pack(fill="x")

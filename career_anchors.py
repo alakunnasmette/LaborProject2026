@@ -11,66 +11,66 @@ ROW_BG_2 = "#e0e0e0"
 # Anchors: V = Up, W = Safe, X = Free, Y = Balance, Z = Challenge
 
 CAREER_STATEMENTS = [
-    (1, "V", "Graag wil ik het voor mezelf en voor anderen dusdanig regelen dat succes verzekerd is."),
-    (1, "X", "Ik houd me binnen een werksituatie het liefst bezig met mijn eigen zaken."),
-    (2, "Y", "Binnen het werk moet er tijd zijn voor zaken die jezelf belangrijk vindt en moet er gelegenheid zijn om zinvolle relaties te cultiveren."),
-    (2, "V", "Vooruitkomen is voor mij belangrijker dan persoonlijke behoeften."),
-    (3, "W", "Ik werk graag in een omgeving waar hard werken, loyaliteit en toewijding gewaardeerd wordt."),
-    (3, "X", "Ik houd van een werksituatie waar ik mijn eigen doelen kan stellen en ze kan bereiken op mijn eigen manier en op mijn eigen tempo."),
-    (4, "V", "Ik ben strijdlustig, kan goed analyseren en met mensen omgaan."),
-    (4, "Y", "Ik kan goed mijn evenwicht bewaren tussen de eisen van mijn werk en die van mijn privé-leven."),
-    (5, "X", "Ik wil onafhankelijk werken."),
-    (5, "W", "Ik houd ervan me een vertegenwoordiger te voelen van een groter geheel."),
-    (6, "Z", "Ik houd ervan als consultant of probleemoplosser te werken en me dusdanig te profileren door middel van een opwindend project."),
-    (6, "V", "Ik houd ervan in een situatie te werken waarin ik de leiding heb en verantwoordelijk ben voor het bereiken van bepaalde doelen."),
-    (7, "Y", "Mijn echtgenoot/partner is net zo belangrijk voor mij als mijn loopbaan."),
-    (7, "Z", "Mijn echtgenoot/partner verdwijnt naar de achtergrond als ik midden in een zeer opwindend project zit."),
-    (8, "X", "Het allerbelangrijkst voor mij is vrijheid."),
-    (8, "Y", "Het allerbelangrijkst voor mij is een doel in mijn leven."),
-    (9, "W", "Ik ben bekwaam, loyaal, betrouwbaar en ik werk hard."),
-    (9, "Z", "Ik ben sociaal en in de omgang, een goede leider en een goede organisator."),
-    (10, "X", "Ik ben onafhankelijk."),
-    (10, "Y", "Ik ben evenwichtig."),
-    (11, "Z", "Ik ben iemand die in actie komt door opwindende projecten."),
-    (11, "Y", "Ik ben iemand die graag met anderen werkt."),
-    (12, "X", "Ik ben ambitieus en iemand die graag met anderen wedijvert."),
-    (12, "W", "Ik ben iemand die een medewerker zijn met wie men kan rekenen."),
-    (13, "Z", "Ik voel zelfvertrouwen en ben in staat mezelf te redden."),
-    (13, "V", "Ik heb veel fantasie en enthousiasme."),
-    (14, "W", "Ik ben stabiel en vasthoudend."),
-    (14, "X", "Ik ben onafhankelijk en in staat een eigen koers te bepalen."),
-    (15, "Y", "Ik ben iemand die goed kan plannen en coördineren."),
-    (15, "Z", "Ik ben iemand die situaties analyseert en creatieve, nieuwe oplossingen ontwikkelt."),
-    (16, "V", "Ik ben een expert op mijn terrein."),
-    (16, "W", "Ik ben een betrouwbare en degelijk persoon."),
-    (17, "Y", "Ik ben iemand die wil werken volgens vaststaande procedures."),
-    (17, "X", "Ik ben iemand die probeert de doelen in het werk in overeenstemming te brengen met het persoonlijk nastreven."),
-    (18, "Z", "Een persoonlijk doel is om mijn eigen lot te bepalen."),
-    (18, "Y", "Een persoonlijk doel is om mijn werk te verweven met mijn privé-leven."),
-    (19, "W", "Ik vind het belangrijk een veilige baan te hebben en het gevoel te hebben erbij te horen."),
-    (19, "X", "Ik vind het belangrijk om tijd te kunnen besteden aan mijn privé-leven en hobby’s."),
-    (20, "V", "Ik geef de voorkeur aan een carrière waarin veel promotiekansen voorhanden zijn."),
-    (20, "Z", "Ik geef de voorkeur aan om in staat gesteld te worden uitdagende problemen en taken aan te pakken."),
-    (21, "Y", "Ik ben graag in een werksituatie waar invloed uitgeoefend kan worden."),
-    (21, "W", "Ik waardeer een baan waar je langere tijd kunt blijven werken en waar je gewaardeerd en geaccepteerd wordt."),
-    (22, "V", "Ik denk dat de juiste mensen en goede vrienden maken belangrijk is om vooruit te komen."),
-    (22, "Z", "Ik denk dat het essentieel is om interessesgebieden te ontwikkelen."),
-    (23, "Y", "Voor mij geldt als basis het scheppen van een evenwicht tussen mijn privé-leven en mijn werk."),
-    (23, "W", "Voor mij geldt als basis stabiliteit, waardering en een veilige plaats binnen mijn werksituatie."),
-    (24, "X", "Ik denk dat ik graag een positie zou willen hebben met een maximum aan zelfstandigheid."),
-    (24, "V", "Ik denk dat ik graag tot \"de kring van ingewijden\" zou willen behoren."),
-    (25, "W", "Voor mij geldt als basis stabiliteit, waardering en een veilige plaats op het werk."),
-    (25, "V", "Als basis geldt voor mij dat ik vooruit wil komen in de werkomgeving."),
-    (26, "V", "Ik denk dat geld, macht en aanzien een belangrijke maatstaf zijn van een succesvolle loopbaan."),
-    (26, "Y", "Ik denk dat een loopbaan succesvol is als je evenveel tijd hebt voor het werk, het gezin en je eigen ontwikkeling."),
-    (27, "Z", "Ik wil liever uitblinken op mijn gebied."),
-    (27, "W", "Ik wil liever beschouwd worden als betrouwbaar en loyaal."),
-    (28, "W", "Ik geef de voorkeur aan het werken met een team op lange termijn en een hechte basis."),
-    (28, "Z", "Ik geef de voorkeur aan het werken met een taakgerichte of projectgroep op korte termijn basis en in een hoog tempo."),
-    (29, "Z", "Ik geef de voorkeur aan professionele ontwikkeling en permanente training."),
-    (29, "X", "Ik geef de voorkeur aan professionele ontwikkeling om een expert te worden en om meer flexibiliteit en onafhankelijkheid te verkrijgen."),
-    (30, "Y", "Ik geef de voorkeur aan een werksituatie die een evenwicht garandeert tussen mijn privé-leven en mijn werk."),
-    (30, "Z", "Ik geef de voorkeur aan een werksituatie die opwindend is en mij stimuleert."),
+    (1, "V", "V | Graag wil ik het voor mezelf en voor anderen dusdanig regelen dat succes verzekerd is."),
+    (1, "X", "X | Ik houd me binnen een werksituatie het liefst bezig met mijn eigen zaken."),
+    (2, "Y", "Y | Binnen het werk moet er tijd zijn voor zaken die jezelf belangrijk vindt en moet er gelegenheid zijn om zinvolle relaties te cultiveren."),
+    (2, "V", "V | Vooruitkomen is voor mij belangrijker dan persoonlijke behoeften."),
+    (3, "W", "W | Ik werk graag in een omgeving waar hard werken, loyaliteit en toewijding gewaardeerd wordt."),
+    (3, "X", "X | Ik houd van een werksituatie waar ik mijn eigen doelen kan stellen en ze kan bereiken op mijn eigen manier en op mijn eigen tempo."),
+    (4, "V", "V | Ik ben strijdlustig, kan goed analyseren en met mensen omgaan."),
+    (4, "Y", "Y | Ik kan goed mijn evenwicht bewaren tussen de eisen van mijn werk en die van mijn privé-leven."),
+    (5, "X", "X | Ik wil onafhankelijk werken."),
+    (5, "W", "W | Ik houd ervan me een vertegenwoordiger te voelen van een groter geheel."),
+    (6, "Z", "Z | Ik houd ervan als consultant of probleemoplosser te werken en me dusdanig te profileren door middel van een opwindend project."),
+    (6, "V", "V | Ik houd ervan in een situatie te werken waarin ik de leiding heb en verantwoordelijk ben voor het bereiken van bepaalde doelen."),
+    (7, "Y", "Y | Mijn echtgenoot/partner is net zo belangrijk voor mij als mijn loopbaan."),
+    (7, "Z", "Z | Mijn echtgenoot/partner verdwijnt naar de achtergrond als ik midden in een zeer opwindend project zit."),
+    (8, "X", "X | Het allerbelangrijkst voor mij is vrijheid."),
+    (8, "Y", "Y | Het allerbelangrijkst voor mij is een doel in mijn leven."),
+    (9, "W", "W | Ik ben bekwaam, loyaal, betrouwbaar en ik werk hard."),
+    (9, "Z", "Z | Ik ben sociaal en in de omgang, een goede leider en een goede organisator."),
+    (10, "X", "X | Ik ben onafhankelijk."),
+    (10, "Y", "Y | Ik ben evenwichtig."),
+    (11, "Z", "Z | Ik ben iemand die in actie komt door opwindende projecten."),
+    (11, "Y", "Y | Ik ben iemand die graag met anderen werkt."),
+    (12, "X", "X | Ik ben ambitieus en iemand die graag met anderen wedijvert."),
+    (12, "W", "W | Ik ben iemand die een medewerker zijn met wie men kan rekenen."),
+    (13, "Z", "Z | Ik voel zelfvertrouwen en ben in staat mezelf te redden."),
+    (13, "V", "V | Ik heb veel fantasie en enthousiasme."),
+    (14, "W", "W | Ik ben stabiel en vasthoudend."),
+    (14, "X", "X | Ik ben onafhankelijk en in staat een eigen koers te bepalen."),
+    (15, "Y", "Y | Ik ben iemand die goed kan plannen en coördineren."),
+    (15, "Z", "Z | Ik ben iemand die situaties analyseert en creatieve, nieuwe oplossingen ontwikkelt."),
+    (16, "V", "V | Ik ben een expert op mijn terrein."),
+    (16, "W", "W | Ik ben een betrouwbare en degelijk persoon."),
+    (17, "Y", "Y | Ik ben iemand die wil werken volgens vaststaande procedures."),
+    (17, "X", "X | Ik ben iemand die probeert de doelen in het werk in overeenstemming te brengen met het persoonlijk nastreven."),
+    (18, "Z", "Z | Een persoonlijk doel is om mijn eigen lot te bepalen."),
+    (18, "Y", "Y | Een persoonlijk doel is om mijn werk te verweven met mijn privé-leven."),
+    (19, "W", "W | Ik vind het belangrijk een veilige baan te hebben en het gevoel te hebben erbij te horen."),
+    (19, "X", "X | Ik vind het belangrijk om tijd te kunnen besteden aan mijn privé-leven en hobby’s."),
+    (20, "V", "V | Ik geef de voorkeur aan een carrière waarin veel promotiekansen voorhanden zijn."),
+    (20, "Z", "Z | Ik geef de voorkeur aan om in staat gesteld te worden uitdagende problemen en taken aan te pakken."),
+    (21, "Y", "Y | Ik ben graag in een werksituatie waar invloed uitgeoefend kan worden."),
+    (21, "W", "W | Ik waardeer een baan waar je langere tijd kunt blijven werken en waar je gewaardeerd en geaccepteerd wordt."),
+    (22, "V", "V | Ik denk dat de juiste mensen en goede vrienden maken belangrijk is om vooruit te komen."),
+    (22, "Z", "Z | Ik denk dat het essentieel is om interessesgebieden te ontwikkelen."),
+    (23, "Y", "Y | Voor mij geldt als basis het scheppen van een evenwicht tussen mijn privé-leven en mijn werk."),
+    (23, "W", "W | Voor mij geldt als basis stabiliteit, waardering en een veilige plaats binnen mijn werksituatie."),
+    (24, "X", "X | Ik denk dat ik graag een positie zou willen hebben met een maximum aan zelfstandigheid."),
+    (24, "V", "V | Ik denk dat ik graag tot \"de kring van ingewijden\" zou willen behoren."),
+    (25, "W", "W | Voor mij geldt als basis stabiliteit, waardering en een veilige plaats op het werk."),
+    (25, "V", "V | Als basis geldt voor mij dat ik vooruit wil komen in de werkomgeving."),
+    (26, "V", "V | Ik denk dat geld, macht en aanzien een belangrijke maatstaf zijn van een succesvolle loopbaan."),
+    (26, "Y", "Y | Ik denk dat een loopbaan succesvol is als je evenveel tijd hebt voor het werk, het gezin en je eigen ontwikkeling."),
+    (27, "Z", "Z | Ik wil liever uitblinken op mijn gebied."),
+    (27, "W", "W | Ik wil liever beschouwd worden als betrouwbaar en loyaal."),
+    (28, "W", "W | Ik geef de voorkeur aan het werken met een team op lange termijn en een hechte basis."),
+    (28, "Z", "Z | Ik geef de voorkeur aan het werken met een taakgerichte of projectgroep op korte termijn basis en in een hoog tempo."),
+    (29, "Z", "Z | Ik geef de voorkeur aan professionele ontwikkeling en permanente training."),
+    (29, "X", "X | Ik geef de voorkeur aan professionele ontwikkeling om een expert te worden en om meer flexibiliteit en onafhankelijkheid te verkrijgen."),
+    (30, "Y", "Y | Ik geef de voorkeur aan een werksituatie die een evenwicht garandeert tussen mijn privé-leven en mijn werk."),
+    (30, "Z", "Z | Ik geef de voorkeur aan een werksituatie die opwindend is en mij stimuleert."),
 ]
 
 # Descriptions of the 5 career anchors
@@ -90,12 +90,12 @@ def clear_frame(frame: tk.Widget) -> None:
 
 
 # -------------------- Page builder --------------------
-def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
+def build_career_anchors_page(parent_frame: tk.Frame, navigate) -> None:
     """Toon Fase 2.0 – Loopbaanankers in het rechterpaneel."""
 
     clear_frame(parent_frame)
 
-    # =================== Scrollbare container ===================
+    # =================== Scrollbar container ===================
     container = tk.Frame(parent_frame, bg="white")
     container.pack(fill="both", expand=True)
 
@@ -148,14 +148,14 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
     )
     subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
-    # =================== Tabel ===================
+    # =================== Table ===================
     table = tk.Frame(scroll_frame, bg="white")
     table.pack(fill="both", expand=True, padx=20, pady=(0, 10))
 
     # 7 kolommen
     for c in range(7):
         table.grid_columnconfigure(c, weight=0)
-    table.grid_columnconfigure(1, weight=1)  # stellingkolom rekt mee
+    table.grid_columnconfigure(1, weight=1)  # shelving column stretches
 
     header_bg = "#807C7D"
     headers = [
@@ -182,7 +182,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
 
     ANKERS = ["V", "W", "X", "Y", "Z"]
 
-    # één StringVar per rij (stelling)
+    # one StringVar per row (statement)
     vraag_vars: dict[int, tk.StringVar] = {}
     vraag_buttons: dict[int, list[tuple[str, tk.Radiobutton]]] = {}
 
@@ -195,14 +195,14 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
             else:
                 btn.config(text="", font=("Segoe UI", 11))
 
-    # hoeveel regels horen bij elk vraagnummer (rowspan)
+    # how many lines correspond to each question number (rowspan)
     question_counts: dict[int, int] = {}
     for nummer, _anker, _tekst in CAREER_STATEMENTS:
         question_counts[nummer] = question_counts.get(nummer, 0) + 1
 
     shown_numbers: set[int] = set()
 
-    # Bouw rijen
+    # Build rows
     for row_index, (nummer, _anker, tekst) in enumerate(CAREER_STATEMENTS, start=1):
         row_id = row_index
         vraag_vars[row_id] = tk.StringVar(value="")
@@ -210,7 +210,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
 
         row_bg = ROW_BG_1 if row_index % 2 == 1 else ROW_BG_2
 
-        # Nummer (één geel blok per vraagnummer)
+        # Number (one yellow block per question number)
         if nummer not in shown_numbers:
             rowspan = question_counts.get(nummer, 1)
             num_label = tk.Label(
@@ -232,7 +232,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
             )
             shown_numbers.add(nummer)
 
-        # Stelling
+        # Statement
         stmt_label = tk.Label(
             table,
             text=tekst,
@@ -253,7 +253,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
             pady=(2, 2),
         )
 
-        # 5 anker-vakjes
+        # 5 anchor boxes
         var = vraag_vars[row_id]
         for offset, code in enumerate(ANKERS):
             col = 2 + offset
@@ -282,14 +282,14 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
             rb.pack(expand=True, fill="both")
             vraag_buttons[row_id].append((code, rb))
 
-    # init: alles leeg
+    # init: all empty
     for rid in vraag_vars.keys():
         update_row(rid)
 
-    # Bewaar keuzes op parent_frame (voor later)
+    # Save choices on parent_frame (for later)
     parent_frame.loopbaan_vars = vraag_vars
 
-    # =================== Beschrijvingen ===================
+    # =================== Descriptions ===================
     desc_frame = tk.Frame(scroll_frame, bg="white")
     desc_frame.pack(fill="x", padx=20, pady=(20, 20))
 
@@ -331,7 +331,7 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
             pady=6,
         ).pack(side="left", fill="both", expand=True)
 
-    # =================== Opslaan en verder ===================
+    # =================== Save and continue ===================
     def on_submit_loopbaan():
         # 1) alles ingevuld?
         missing = [row_id for row_id, v in parent_frame.loopbaan_vars.items() if not v.get()]
@@ -342,10 +342,10 @@ def build_loopbaanankers_page(parent_frame: tk.Frame, navigate) -> None:
             )
             return
 
-        # 2) resultaten opslaan
+        # 2) save results
         parent_frame.loopbaan_results = {row_id: v.get() for row_id, v in parent_frame.loopbaan_vars.items()}
 
-        # 3) door naar fase 2.1
+        # 3) go to phase 2.1
         navigate("phase2.1")
 
     btn_frame = tk.Frame(scroll_frame, bg="white")

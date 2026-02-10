@@ -75,7 +75,7 @@ class CareerClusters21Page(tk.Frame):
 
     # -------- UI builders --------
     def _build(self):
-        # Titelblok
+        # Titleblock
         header = tk.Frame(self, bg=HEADER_BG)
         header.pack(fill="x", padx=22, pady=(18, 10))
 
@@ -88,11 +88,11 @@ class CareerClusters21Page(tk.Frame):
             bg=HEADER_BG, fg=MUTED, font=FONT_SUB
         ).pack(anchor="w", pady=(6, 0))
 
-        # Wrapper voor tabel
+        # Wrapper for table
         table_wrap = tk.Frame(self, bg=MAIN_BG)
         table_wrap.pack(fill="both", expand=True, padx=22, pady=(0, 10))  # iets minder onderruimte, want we hebben knop
 
-        # Kolombreedtes
+        # Column widths
         self.col_w = {
             "cluster": 70,
             "segment": 560,
@@ -103,7 +103,7 @@ class CareerClusters21Page(tk.Frame):
             "btn": 170
         }
 
-        # Header rij (fixed)
+        # Header row (fixed)
         hdr = tk.Frame(table_wrap, bg=MAIN_BG)
         hdr.pack(fill="x")
 
@@ -115,7 +115,7 @@ class CareerClusters21Page(tk.Frame):
         self._th(hdr, "Totaal", self.col_w["total"])
         self._th(hdr, "", self.col_w["btn"])
 
-        # Scrollbare body
+        # Scrollbar body
         body = tk.Frame(table_wrap, bg=MAIN_BG)
         body.pack(fill="both", expand=True)
 
@@ -136,12 +136,12 @@ class CareerClusters21Page(tk.Frame):
         for idx, (cid, segment, oms) in enumerate(CLUSTERS, start=1):
             self._row(self.inner, idx, cid, segment, oms)
 
-        # ----- OPSLAAN EN VERDER -----
+        # ----- SAVE AND CONTINUE -----
         footer = tk.Frame(self, bg=MAIN_BG)
         footer.pack(fill="x", padx=22, pady=(0, 18))
 
         def on_submit_next():
-            # minimaal 1 cluster ingevuld (totaal > 0)
+            # at least 1 cluster filled in (total > 0)
             any_filled = any(
                 (v["act"] + v["comp"] + v["edu"]) > 0
                 for v in self.scores.values()
@@ -153,8 +153,8 @@ class CareerClusters21Page(tk.Frame):
                 )
                 return
 
-            # Hierna naar jouw volgende pagina:
-            # pas dit aan naar de volgende Fase Pagina
+        # Next, move on to your next page:
+        # Adjust this to the next Phase Page
             self.navigate("phase2.2")  # bijv. "phase3.0"
 
         btn = tk.Button(
