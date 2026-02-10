@@ -3,6 +3,7 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import messagebox
 from dataclasses import dataclass
+from collections import defaultdict
 
 # ---------- Data ----------
 @dataclass(frozen=True)
@@ -104,22 +105,7 @@ def make_likert_buttons(parent: tk.Widget, var: tk.StringVar, bg: str) -> tk.Fra
         var.set(v)
         refresh()
 
-    for i, v in enumerate(LIKERT):
-        b = tk.Button(
-            f,
-            text=v,
-            width=3,
-            bd=1,
-            font=S["f"],
-            cursor="hand2",
-            command=lambda x=v: choose(x),
-            bg=S["btn"]
-        )
-        b.grid(row=0, column=i, padx=3)
-        buttons[v] = b
 
-    refresh()
-    return f
 
 # ---------- Page ----------
 class Culture22Page(tk.Frame):
@@ -133,9 +119,19 @@ class Culture22Page(tk.Frame):
     def subtotal(self, gid: int) -> int:
         tot = 0
         for i in range(1, 5):
-            v = self.vars[(gid, i)].get().strip()
-            if v.isdigit():
-                tot += int(v)
+            pair = self.vars.get((gid, i))
+            if not pair:
+                continue
+            # pair is (skill_var, interest_var)
+            skill_var, interest_var = pair
+            try:
+                tot += int(skill_var.get())
+            except Exception:
+                pass
+            try:
+                tot += int(interest_var.get())
+            except Exception:
+                pass
         return tot
 
     def update_subtotal(self, gid: int):
@@ -144,9 +140,10 @@ class Culture22Page(tk.Frame):
     def build(self):
         _, _, inner = scrollable(self)
 
+
         tk.Label(inner, text="Fase 2.1 – Carrierrèclusters",
                  bg=S["bg"], font=S["f_title"], anchor="w").pack(fill="x", padx=20, pady=(15, 5))
-        tk.Label(inner, text="lees de stellingen en geef aan met 1 als je eens bent met de stelling.",
+        tk.Label(inner, text="Lees de stellingen uit het Excel-bestand en geef aan met een vinkje als je vaardigheid of interesse hebt.",
                  bg=S["bg"], font=S["f_sub"], anchor="w").pack(fill="x", padx=20, pady=(0, 12))
 
         outer = tk.Frame(inner, bg=S["bg"])
@@ -160,35 +157,58 @@ class Culture22Page(tk.Frame):
         # header
         h = tk.Frame(left, bg=S["dark"])
         h.pack(fill="x")
-        tk.Label(h, text="Cultuur", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="w", padx=10)\
+        tk.Label(h, text="Cluster", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="w", padx=10)\
             .grid(row=0, column=0, sticky="w")
-        tk.Label(h, text="Aspecten: stellingen", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
+        tk.Label(h, text="Stelling", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
             .grid(row=0, column=1, sticky="w")
+        tk.Label(h, text="Vaardigheid", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+            .grid(row=0, column=2, sticky="w")
+        tk.Label(h, text="Interesse", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+            .grid(row=0, column=3, sticky="w")
 
         body = tk.Frame(left, bg=S["bg"])
         body.pack(fill="both", expand=True)
 
-        row_counter = 0
-        for g in GROUPS:
+        # Hardcoded questions for each cluster
+        # Example structure: {cluster_id: [ {main_statement, skill_statement, interest_statement}, ... ] }
+        # Fill in your questions for each cluster below:
+        CLUSTER_QUESTIONS = {
+            1: [
+                # Example: {"main_statement": "<question text>", "skill_statement": "<skill label>", "interest_statement": "<interest label>"},
+            ],
+            2: [
+                # ...
+            ],
+            3: [
+                # ...
+            ],
+            4: [
+                # ...
+            ],
+        }
+
+        rows_by_cluster = defaultdict(list)
+        for cluster_id, questions in CLUSTER_QUESTIONS.items():
+            for idx, q in enumerate(questions, start=1):
+                rows_by_cluster[cluster_id].append((idx, q))
+
+        for cluster_id, rows in rows_by_cluster.items():
+            # Cluster header
             grp = tk.Frame(body, bg=S["yellow"])
             grp.pack(fill="x", pady=(8, 2))
-            tk.Label(grp, text=str(g.id), bg=S["yellow"], font=S["f_b"], width=8)\
-                .grid(row=0, column=0)
-            tk.Label(grp, text=g.name, bg=S["yellow"], font=S["f_b"], anchor="w", padx=10)\
-                .grid(row=0, column=1, sticky="w")
+            tk.Label(grp, text=str(cluster_id), bg=S["yellow"], font=S["f_b"], width=8).grid(row=0, column=0)
+            tk.Label(grp, text=f"Cluster {cluster_id}", bg=S["yellow"], font=S["f_b"], anchor="w", padx=10).grid(row=0, column=1, sticky="w")
 
-            for i, stmt in enumerate(g.stmts, start=1):
-                row_counter += 1
-                bg = S["odd"] if row_counter % 2 else S["even"]
-
+            for idx, row in rows:  # Show all questions per cluster
+                bg = S["odd"] if idx % 2 else S["even"]
                 r = tk.Frame(body, bg=bg)
                 r.pack(fill="x", pady=1)
                 r.grid_columnconfigure(1, weight=1)
 
-                tk.Label(r, text="", bg=bg, width=8).grid(row=0, column=0, sticky="w")
+                tk.Label(r, text=str(row["cluster_id"]), bg=bg, width=8).grid(row=0, column=0, sticky="w")
                 tk.Label(
                     r,
-                    text=f"{i}. {stmt}",
+                    text=f"{idx}. {row['main_statement']}",
                     bg=bg,
                     font=S["f"],
                     anchor="w",
@@ -197,12 +217,16 @@ class Culture22Page(tk.Frame):
                     padx=10
                 ).grid(row=0, column=1, sticky="w")
 
-                v = tk.StringVar(value="")
-                self.vars[(g.id, i)] = v
-                v.trace_add("write", lambda *_a, gid=g.id: self.update_subtotal(gid))
+                skill_var = tk.IntVar(value=0)
+                interest_var = tk.IntVar(value=0)
+                self.vars[(row["cluster_id"], idx)] = (skill_var, interest_var)
+                skill_var.trace_add("write", lambda *_a, gid=row["cluster_id"]: self.update_subtotal(gid))
+                interest_var.trace_add("write", lambda *_a, gid=row["cluster_id"]: self.update_subtotal(gid))
 
-                make_likert_buttons(r, v, bg).grid(row=0, column=2, sticky="e", padx=(10, 25))
-                tk.Label(r, text="", bg=bg, width=8).grid(row=0, column=3, sticky="e")
+                cb_skill = tk.Checkbutton(r, text=row['skill_statement'] if row['skill_statement'] else "(geen tekst)", variable=skill_var, onvalue=1, offvalue=0, bg=bg)
+                cb_skill.grid(row=0, column=2, sticky="e", padx=(10, 6))
+                cb_interest = tk.Checkbutton(r, text=row['interest_statement'] if row['interest_statement'] else "(geen tekst)", variable=interest_var, onvalue=1, offvalue=0, bg=bg)
+                cb_interest.grid(row=0, column=3, sticky="e", padx=(0, 10))
 
             # subtotal row
             sub = tk.Frame(body, bg=S["yellow"])
@@ -210,14 +234,13 @@ class Culture22Page(tk.Frame):
             sub.grid_columnconfigure(1, weight=1)
 
             tk.Label(sub, text="", bg=S["yellow"], width=8).grid(row=0, column=0)
-            tk.Label(sub, text="Totaal score (4 stellingen)", bg=S["yellow"], font=S["f_b"],
-                     anchor="w", padx=10).grid(row=0, column=1, sticky="w")
+            tk.Label(sub, text=f"Totaal score ({len(rows)} stellingen)", bg=S["yellow"], font=S["f_b"], anchor="w", padx=10).grid(row=0, column=1, sticky="w")
             tk.Label(sub, text="", bg=S["yellow"], width=22).grid(row=0, column=2)
 
             lbl = tk.Label(sub, text="0", bg=S["yellow"], font=S["f_b"], width=8, anchor="e", padx=10)
             lbl.grid(row=0, column=3, sticky="e")
-            self.sub_lbl[g.id] = lbl
-            self.update_subtotal(g.id)
+            self.sub_lbl[cluster_id] = lbl
+            self.update_subtotal(cluster_id)
 
         # right descriptions
         tk.Label(right, text="Cultuur – omschrijving", bg=S["bg"], font=S["f_b"], anchor="w")\
@@ -254,30 +277,36 @@ class Culture22Page(tk.Frame):
         ).pack(side="right")
 
     def submit(self):
-        missing = [
-            (gid, i)
-            for gid in range(1, 5)
-            for i in range(1, 5)
-            if not self.vars[(gid, i)].get().strip()
-        ]
-        if missing:
-            messagebox.showwarning(
-                "Onvolledige vragenlijst",
-                f"Er zijn nog {len(missing)} stellingen niet ingevuld."
-            )
-            return
+        # Save checkbox results (0/1) and totals per group
+        self.cultuur_results = {}
+        for k, v in self.vars.items():
+            # v may be a tuple (skill_var, interest_var)
+            if isinstance(v, tuple) and len(v) == 2:
+                skill_var, interest_var = v
+                try:
+                    sval = int(skill_var.get())
+                except Exception:
+                    sval = 0
+                try:
+                    ival = int(interest_var.get())
+                except Exception:
+                    ival = 0
+                self.cultuur_results[k] = {"skill": sval, "interest": ival}
+            else:
+                # fallback for single var
+                try:
+                    self.cultuur_results[k] = int(v.get())
+                except Exception:
+                    self.cultuur_results[k] = v
 
-        # resultaten bewaren op het parent frame (voor later export)
-        self.cultuur_results = {k: v.get() for k, v in self.vars.items()}
         self.cultuur_totals = {g.id: self.subtotal(g.id) for g in GROUPS}
 
-        # Ga door naar volgende stap (pas aan naar jouw router)
-        # Bijvoorbeeld: self.navigate("phase2.2")
+        # Proceed to next page
         self.navigate("phase2.2")
 
 
 # -------------------- BUILDER FUNCTION --------------------
-def build_cultuur_page(parent_frame: tk.Frame, navigate) -> None:
+def build_carriereclusters_page(parent_frame: tk.Frame, navigate) -> None:
     clear_frame(parent_frame)
     page = Culture22Page(parent_frame, navigate)
     page.pack(fill="both", expand=True)

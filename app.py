@@ -217,6 +217,9 @@ def open_career_clusters():
     for w in content.winfo_children():
         w.destroy()
 
+    # Set Excel file path for phase 2.1
+    content.excel_file_path = os.path.join(os.getcwd(), "Loopbaan onderzoek 5.0 template.xlsx")
+
     # Try known builder names from phase21
     builder = None
     try:
