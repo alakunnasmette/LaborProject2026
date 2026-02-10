@@ -112,18 +112,21 @@ class Culture22Page(tk.Frame):
     def __init__(self, parent: tk.Widget, navigate):
         super().__init__(parent, bg=S["bg"])
         self.navigate = navigate
-        self.vars: dict[tuple[int, int], tk.StringVar] = {}
+        self.vars: dict[tuple[int, int], tuple[tk.IntVar, tk.IntVar, tk.IntVar]] = {}
         self.sub_lbl: dict[int, tk.Label] = {}
         self.build()
 
     def subtotal(self, gid: int) -> int:
         tot = 0
-        for i in range(1, 5):
-            pair = self.vars.get((gid, i))
-            if not pair:
+        # Iterate over all (gid, idx) in self.vars for this gid
+        for (cluster_id, idx), triple in self.vars.items():
+            if cluster_id != gid:
                 continue
-            # pair is (skill_var, interest_var)
-            skill_var, interest_var = pair
+            main_var, skill_var, interest_var = triple
+            try:
+                tot += int(main_var.get())
+            except Exception:
+                pass
             try:
                 tot += int(skill_var.get())
             except Exception:
@@ -161,10 +164,12 @@ class Culture22Page(tk.Frame):
             .grid(row=0, column=0, sticky="w")
         tk.Label(h, text="Stelling", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
             .grid(row=0, column=1, sticky="w")
-        tk.Label(h, text="Vaardigheid", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+        tk.Label(h, text="Hoofd", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
             .grid(row=0, column=2, sticky="w")
-        tk.Label(h, text="Interesse", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+        tk.Label(h, text="Vaardigheid", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
             .grid(row=0, column=3, sticky="w")
+        tk.Label(h, text="Interesse", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+            .grid(row=0, column=4, sticky="w")
 
         body = tk.Frame(left, bg=S["bg"])
         body.pack(fill="both", expand=True)
@@ -174,13 +179,37 @@ class Culture22Page(tk.Frame):
         # Fill in your questions for each cluster below:
         CLUSTER_QUESTIONS = {
             1: [
-                # Example: {"main_statement": "<question text>", "skill_statement": "<skill label>", "interest_statement": "<interest label>"},
-            ],
-            2: [
-                # ...
-            ],
-            3: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             4: [
                 # ...
@@ -221,7 +250,7 @@ class Culture22Page(tk.Frame):
             16: [
                 # ...
             ],
-        }
+    }
 
         rows_by_cluster = defaultdict(list)
         for cluster_id, questions in CLUSTER_QUESTIONS.items():
@@ -241,10 +270,21 @@ class Culture22Page(tk.Frame):
                 r.pack(fill="x", pady=1)
                 r.grid_columnconfigure(1, weight=1)
 
-                tk.Label(r, text=str(row["cluster_id"]), bg=bg, width=8).grid(row=0, column=0, sticky="w")
+                tk.Label(r, text=str(row.get("cluster_id", cluster_id)), bg=bg, width=8).grid(row=0, column=0, sticky="w")
+                main_var = tk.IntVar(value=0)
+                skill_var = tk.IntVar(value=0)
+                interest_var = tk.IntVar(value=0)
+                self.vars[(row.get("cluster_id", cluster_id), idx)] = (main_var, skill_var, interest_var)
+                main_var.trace_add("write", lambda *_a, gid=row.get("cluster_id", cluster_id): self.update_subtotal(gid))
+                skill_var.trace_add("write", lambda *_a, gid=row.get("cluster_id", cluster_id): self.update_subtotal(gid))
+                interest_var.trace_add("write", lambda *_a, gid=row.get("cluster_id", cluster_id): self.update_subtotal(gid))
+
+                # Main statement checkbox replaces the number label
+                cb_main = tk.Checkbutton(r, text="", variable=main_var, onvalue=1, offvalue=0, bg=bg)
+                cb_main.grid(row=0, column=0, sticky="w", padx=(10, 6))
                 tk.Label(
                     r,
-                    text=f"{idx}. {row['main_statement']}",
+                    text=f"{idx}. {row.get('main_statement', '')}",
                     bg=bg,
                     font=S["f"],
                     anchor="w",
@@ -252,16 +292,9 @@ class Culture22Page(tk.Frame):
                     wraplength=680,
                     padx=10
                 ).grid(row=0, column=1, sticky="w")
-
-                skill_var = tk.IntVar(value=0)
-                interest_var = tk.IntVar(value=0)
-                self.vars[(row["cluster_id"], idx)] = (skill_var, interest_var)
-                skill_var.trace_add("write", lambda *_a, gid=row["cluster_id"]: self.update_subtotal(gid))
-                interest_var.trace_add("write", lambda *_a, gid=row["cluster_id"]: self.update_subtotal(gid))
-
-                cb_skill = tk.Checkbutton(r, text=row['skill_statement'] if row['skill_statement'] else "(geen tekst)", variable=skill_var, onvalue=1, offvalue=0, bg=bg)
-                cb_skill.grid(row=0, column=2, sticky="e", padx=(10, 6))
-                cb_interest = tk.Checkbutton(r, text=row['interest_statement'] if row['interest_statement'] else "(geen tekst)", variable=interest_var, onvalue=1, offvalue=0, bg=bg)
+                cb_skill = tk.Checkbutton(r, text=row.get('skill_statement', "(geen tekst)"), variable=skill_var, onvalue=1, offvalue=0, bg=bg)
+                cb_skill.grid(row=0, column=2, sticky="e", padx=(0, 6))
+                cb_interest = tk.Checkbutton(r, text=row.get('interest_statement', "(geen tekst)"), variable=interest_var, onvalue=1, offvalue=0, bg=bg)
                 cb_interest.grid(row=0, column=3, sticky="e", padx=(0, 10))
 
             # subtotal row
@@ -341,8 +374,9 @@ class Culture22Page(tk.Frame):
         self.navigate("phase2.2")
 
 
+
 # -------------------- BUILDER FUNCTION --------------------
-def build_carriereclusters_page(parent_frame: tk.Frame, navigate) -> None:
+def build_carriereclusters_page(parent_frame: tk.Frame, navigate=None) -> None:
     clear_frame(parent_frame)
     page = Culture22Page(parent_frame, navigate)
     page.pack(fill="both", expand=True)
