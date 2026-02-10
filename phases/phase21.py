@@ -162,13 +162,11 @@ class Culture22Page(tk.Frame):
         h.pack(fill="x")
         tk.Label(h, text="Cluster", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="w", padx=10)\
             .grid(row=0, column=0, sticky="w")
-        tk.Label(h, text="Stelling", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
-            .grid(row=0, column=1, sticky="w")
-        tk.Label(h, text="Hoofd", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+        tk.Label(h, text="Activiteiten die beschrijven wat de cliënt leuk vind om te doen", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
             .grid(row=0, column=2, sticky="w")
-        tk.Label(h, text="Vaardigheid", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+        tk.Label(h, text="Competenties", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
             .grid(row=0, column=3, sticky="w")
-        tk.Label(h, text="Interesse", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
+        tk.Label(h, text="Educatieve onderwerpen", bg=S["dark"], fg="white", font=S["f_b"], anchor="center", padx=10)\
             .grid(row=0, column=4, sticky="w")
 
         body = tk.Frame(left, bg=S["bg"])
@@ -211,44 +209,500 @@ class Culture22Page(tk.Frame):
                     "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
                 },
             ],
+            2: [
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
+            ],
+            3: [
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
+            ],
             4: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             5: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             6: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             7: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             8: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             9: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             10: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             11: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             12: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             13: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             14: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             15: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
             16: [
-                # ...
+                {
+                    "main_statement": "Leren hoe flora en fauna groeit en in leven blijft",
+                    "skill_statement": "Zelfredzaam",
+                    "interest_statement": "Wiskunde"
+                },
+                {
+                    "main_statement": "Het zo optimaal mogelijk gebruik maken van de grondstoffen van de aarde",
+                    "skill_statement": "Natuurliefhebber",
+                    "interest_statement": "Beheer van natuurlijke grondstoffen"
+                },
+                {
+                    "main_statement": "Jagen en/of vissen",
+                    "skill_statement": "Fysiek actief",
+                    "interest_statement": "Aardrijkskunde"
+                },
+                {
+                    "main_statement": "Het beschermen van het milieu",
+                    "skill_statement": "Planner",
+                    "interest_statement": "Scheikunde"
+                },
+                {
+                    "main_statement": "Buiten zijn in allerlei weersomstandigheden",
+                    "skill_statement": "Creatieve probleemoplosser",
+                    "interest_statement": "Landbouw"
+                },
+                {
+                    "main_statement": "Plannen,budgetteren en registraties bijhouden.",
+                },
+                {
+                    "main_statement": "Het bedienen van machines en deze in goede conditie houden",   
+                },
             ],
     }
 
