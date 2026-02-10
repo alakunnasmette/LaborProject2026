@@ -164,10 +164,6 @@ class Culture22Page(tk.Frame):
             .grid(row=0, column=0, sticky="w")
         tk.Label(h, text="Aspecten: stellingen", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
             .grid(row=0, column=1, sticky="w")
-        tk.Label(h, text="Score", bg=S["dark"], fg="white", font=S["f_b"], width=22, anchor="e", padx=10)\
-            .grid(row=0, column=2, sticky="e")
-        tk.Label(h, text="Totaal", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="e", padx=10)\
-            .grid(row=0, column=3, sticky="e")
 
         body = tk.Frame(left, bg=S["bg"])
         body.pack(fill="both", expand=True)

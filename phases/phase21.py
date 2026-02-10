@@ -1,341 +1,283 @@
-# career_clusters.py
+# corporate_culture_research.py
+from __future__ import annotations
 import tkinter as tk
-from tkinter import ttk, messagebox
-from utils.write_assessments_to_excel import add_career_clusters_to_excel
+from tkinter import messagebox
+from dataclasses import dataclass
 
-# -------------------- STYLING --------------------
-MAIN_BG = "#ffffff"
-HEADER_BG = "#ffffff"
-TABLE_HEADER_BG = "#f2f2f2"
-ROW_ALT_BG = "#fafafa"
-SCORE_BG = "#efefef"
-BORDER = "#2b2b2b"
-TEXT = "#111111"
-MUTED = "#333333"
+# ---------- Data ----------
+@dataclass(frozen=True)
+class Group:
+    id: int
+    name: str
+    desc: str
+    stmts: list[str]
 
-FONT_H1 = ("Segoe UI", 16, "bold")
-FONT_SUB = ("Segoe UI", 10)
-FONT_TH = ("Segoe UI", 10, "bold")
-FONT_SEG_TITLE = ("Segoe UI", 10, "bold")
-FONT_SEG_DESC = ("Segoe UI", 9)
-FONT_SCORE = ("Segoe UI", 10)
-FONT_TOTAL = ("Segoe UI", 10, "bold")
-
-# -------------------- DATA (16 CLUSTERS) --------------------
-CLUSTERS = [
-    (1, "Landbouw, voeding en natuurlijke grondstoffen",
-     "De productie, verwerking, marketing, distributie, financiering en ontwikkeling van agrarische grondstoffen en hulpbronnen waaronder voedsel, vezels, houtproducten, natuurlijke hulpbronnen, tuinbouw, en andere plantaardige en dierlijke producten cq. hulpbronnen."),
-    (2, "Architectuur en constructie",
-     "Carrières bij het ontwerpen, plannen, beheren, bouwen en behoud van de gebouwde omgeving."),
-    (3, "Kunst, audio- visuele technologie en communicatie",
-     "Ontwerpen, produceren, vertonen, uitvoeren, schrijven en publiceren van multimedia-inhoud waaronder visuele en podiumkunsten, design, journalistiek en entertainmentdiensten."),
-    (4, "Business Management en administratie",
-     "Business Management en administratie loopbaan omvatten het plannen, organiseren, leiden en evalueren van zakelijke functies essentieel voor efficiënte en productieve bedrijfsactiviteiten. Management en administratie carrièremogelijkheden zijn beschikbaar in elke sector van de economie."),
-    (5, "Educatie en training",
-     "Planning, beheer en verstrekking van onderwijs- en opleidingsdiensten en gerelateerde ondersteuningsdiensten."),
-    (6, "Financiën",
-     "Planning, services voor financiële en investeringsplanning, bankieren, verzekeringen en bedrijfsfinancieel beheer."),
-    (7, "Overheid en publieke administratie",
-     "Het uitvoeren van overheidsfuncties om governance op te nemen. Denkende aan nationale veiligheid, buitenlandse dienst, planning, inkomsten en belastingen, regulatie en beheer en administratie bij de lokale staat en federale niveaus."),
-    (8, "Gezondheidswetenschappen",
-     "Planning, beheer en levering van therapeutische diensten, diagnostische diensten, medische informatica, ondersteunende diensten en biotechnologie onderzoek en ontwikkeling."),
-    (9, "Hospitality en toerisme",
-     "Hospitality en toerisme omvat het management, marketing en activiteiten van restaurants en andere eetgelegenheden, logies, attracties en recreatie-evenementen en reisgerelateerde diensten."),
-    (10, "Humanitaire dienstverlening",
-     "Individuen voorbereiden op een baan in loopbaantrajecten en betrekking hebben op gezinnen en menselijke behoeften."),
-    (11, "ICT",
-     "Verbanden leggen in een IT-beroepskader voor instapniveau, technische en professionele loopbanen gerelateerd aan het ontwerp, ontwikkeling, ondersteuning en beheer van hardware, software, multimedia- en systeemintegratiediensten."),
-    (12, "Publieke veiligheid en zekerheid",
-     "Planning, beheer en verstrekking van wettelijke, openbare veiligheid, beschermende diensten en binnenlandse veiligheid inclusief professionele en technische ondersteuningsdiensten."),
-    (13, "Fabricage",
-     "Planning, beheer en uitvoering van de verwerking van materialen in tussentijdse of eindproducten en aanverwante professionele en technische ondersteuningsactiviteiten zoals productieplanning en controle, onderhoud en productie / procestechniek."),
-    (14, "Marketing, sales en service",
-     "Planning, beheer en uitvoering van marketingactiviteiten ten behoeve van het bereiken van organisatorische doelstellingen."),
-    (15, "Wetenschap, technologie, engineering en mathematica",
-     "Planning, beheer en bijdrage van wetenschappelijk onderzoek en professionele en technische diensten (bijv; wetenschap en techniek) inclusief laboratorium- en testdiensten en onderzoeks- en ontwikkelingsdiensten."),
-    (16, "Transport, distributie en logistiek",
-     "Planning, beheer en verplaatsing van mensen, materialen en goederen over de weg, pijpleiding, lucht, spoor en water en aanverwante professionele en technische ondersteuningsdiensten zoals transportinfrastructuur, planning en beheer, logistieke diensten, mobiele apparatuur en onderhoud van faciliteiten."),
+GROUPS = [
+    Group(1, "Landbouw, voeding en natuurlijke grondstoffen / Agriculture, food and natural resources",
+          "Typerend voor familiebedrijven, landbouw, horeca, zorg e.d.",
+          [
+              "Er bestaan gemeenschappelijke waarden en doelstellingen.",
+              "Onderlinge samenhang (wij-gevoel). Teamwork, het beste uit elkaar halen.",
+              "Klanten worden als partners beschouwd.",
+              "Regels en procedures zijn ondergeschikt aan het gevoel een team te zijn.",
+          ]),
+    Group(2, "Innovatieve cultuur",
+          "Typerend voor softwarebedrijven, luchtvaart, ruimtevaart e.d.",
+          [
+              "Snel reageren op snel veranderende omstandigheden.",
+              "Innovatie en vernieuwing (nieuwe diensten/producten).",
+              "Creatief en flexibel zijn wordt gestimuleerd.",
+              "De organisatie is flexibel en kan snel een nieuwe vorm aannemen.",
+          ]),
+    Group(3, "Beheersgerichte cultuur",
+          "Typerend voor overheids- of onderwijsinstellingen.",
+          [
+              "Procedures en regels staan centraal.",
+              "Leidinggevenden coördineren en organiseren.",
+              "Stabiliteit, efficiëntie en voorspelbaarheid zijn belangrijk.",
+              "Trage besluitvormingsprocessen.",
+          ]),
+    Group(4, "Resultaatgerichte cultuur",
+          "Richting externe transacties; concurreren met gelijkaardige organisaties.",
+          [
+              "Productiviteit, resultaten, winst en taakgerichtheid.",
+              "Externe positionering om concurrentie te versterken.",
+              "Duidelijk doel en (soms) agressieve strategie.",
+              "Leidinggevenden veeleisend; nadruk op marktleider zijn.",
+          ]),
 ]
 
-# -------------------- HELPERS --------------------
+
+
+# Styles 
+S = {
+    "bg": "#ffffff",
+    "dark": "#727272",
+    "odd": "#eeeeee",   
+    "even": "#e0e0e0",
+    "yellow": "#f1c40f",
+    "btn": "#d9d9d9",
+    "btn_on": "#4d4d4d",
+    "f_title": ("Segoe UI", 14, "bold"),
+    "f_sub": ("Segoe UI", 10),
+    "f": ("Segoe UI", 10),
+    "f_b": ("Segoe UI", 10, "bold"),
+}
+
+# ---------- Helpers ----------
 def clear_frame(frame: tk.Widget) -> None:
     for w in frame.winfo_children():
         w.destroy()
 
+def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
+    wrap = tk.Frame(parent, bg=S["bg"])
+    wrap.pack(fill="both", expand=True)
 
-# -------------------- PAGE --------------------
-class CareerClusters21Page(tk.Frame):
+    c = tk.Canvas(wrap, bg=S["bg"], highlightthickness=0)
+    sb = tk.Scrollbar(wrap, orient="vertical", command=c.yview)
+    c.configure(yscrollcommand=sb.set)
+    c.pack(side="left", fill="both", expand=True)
+    sb.pack(side="right", fill="y")
+
+    inner = tk.Frame(c, bg=S["bg"])
+    win = c.create_window((0, 0), window=inner, anchor="nw")
+
+    inner.bind("<Configure>", lambda _e: c.configure(scrollregion=c.bbox("all")))
+    c.bind("<Configure>", lambda e: c.itemconfig(win, width=e.width))
+    c.bind_all("<MouseWheel>", lambda e: c.yview_scroll(-int(e.delta / 120), "units"))
+
+    return wrap, c, inner
+
+def make_likert_buttons(parent: tk.Widget, var: tk.StringVar, bg: str) -> tk.Frame:
+    f = tk.Frame(parent, bg=bg)
+    buttons = {}
+
+    def refresh():
+        cur = var.get()
+        for v, b in buttons.items():
+            if v == cur:
+                b.config(relief="sunken", bg=S["btn_on"], fg="white")
+            else:
+                b.config(relief="raised", bg=S["btn"], fg="black")
+
+    def choose(v: str):
+        var.set(v)
+        refresh()
+
+    for i, v in enumerate(LIKERT):
+        b = tk.Button(
+            f,
+            text=v,
+            width=3,
+            bd=1,
+            font=S["f"],
+            cursor="hand2",
+            command=lambda x=v: choose(x),
+            bg=S["btn"]
+        )
+        b.grid(row=0, column=i, padx=3)
+        buttons[v] = b
+
+    refresh()
+    return f
+
+# ---------- Page ----------
+class Culture22Page(tk.Frame):
     def __init__(self, parent: tk.Widget, navigate):
-        super().__init__(parent, bg=MAIN_BG)
-        self.parent_frame = parent  # Store reference to parent for Excel access
+        super().__init__(parent, bg=S["bg"])
         self.navigate = navigate
+        self.vars: dict[tuple[int, int], tk.StringVar] = {}
+        self.sub_lbl: dict[int, tk.Label] = {}
+        self.build()
 
-        self.scores = {cid: {"act": 0, "comp": 0, "edu": 0} for cid, *_ in CLUSTERS}
-        self.score_labels = {}  # cid -> (act_lbl, comp_lbl, edu_lbl, total_lbl)
+    def subtotal(self, gid: int) -> int:
+        tot = 0
+        for i in range(1, 5):
+            v = self.vars[(gid, i)].get().strip()
+            if v.isdigit():
+                tot += int(v)
+        return tot
 
-        self._build()
+    def update_subtotal(self, gid: int):
+        self.sub_lbl[gid].config(text=str(self.subtotal(gid)))
 
-    # -------- UI builders --------
-    def _build(self):
-        # Titelblok
-        header = tk.Frame(self, bg=HEADER_BG)
-        header.pack(fill="x", padx=22, pady=(18, 10))
+    def build(self):
+        _, _, inner = scrollable(self)
 
-        tk.Label(header, text="FASE 2.1 – Carrièreclusters", bg=HEADER_BG, fg=TEXT, font=FONT_H1)\
-            .pack(anchor="w")
+        tk.Label(inner, text="Fase 2.1 – Carrierrèclusters",
+                 bg=S["bg"], font=S["f_title"], anchor="w").pack(fill="x", padx=20, pady=(15, 5))
+        tk.Label(inner, text="lees de stellingen en geef aan met 1 als je eens bent met de stelling.",
+                 bg=S["bg"], font=S["f_sub"], anchor="w").pack(fill="x", padx=20, pady=(0, 12))
 
-        tk.Label(
-            header,
-            text="Per cluster: klik op 'Invullen' en selecteer de stellingen die passen. De scores worden automatisch berekend.",
-            bg=HEADER_BG, fg=MUTED, font=FONT_SUB
-        ).pack(anchor="w", pady=(6, 0))
+        outer = tk.Frame(inner, bg=S["bg"])
+        outer.pack(fill="both", expand=True, padx=20)
 
-        # Wrapper voor tabel
-        table_wrap = tk.Frame(self, bg=MAIN_BG)
-        table_wrap.pack(fill="both", expand=True, padx=22, pady=(0, 10))  # iets minder onderruimte, want we hebben knop
+        left = tk.Frame(outer, bg=S["bg"])
+        right = tk.Frame(outer, bg=S["bg"])
+        left.pack(side="left", fill="both", expand=True)
+        right.pack(side="right", fill="y", padx=(15, 0))
 
-        # Kolombreedtes
-        self.col_w = {
-            "cluster": 70,
-            "segment": 560,
-            "act": 120,
-            "comp": 120,
-            "edu": 120,
-            "total": 80,
-            "btn": 170
-        }
+        # header
+        h = tk.Frame(left, bg=S["dark"])
+        h.pack(fill="x")
+        tk.Label(h, text="Cultuur", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="w", padx=10)\
+            .grid(row=0, column=0, sticky="w")
+        tk.Label(h, text="Aspecten: stellingen", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
+            .grid(row=0, column=1, sticky="w")
 
-        # Header rij (fixed)
-        hdr = tk.Frame(table_wrap, bg=MAIN_BG)
-        hdr.pack(fill="x")
-
-        self._th(hdr, "Cluster", self.col_w["cluster"])
-        self._th(hdr, "Segment", self.col_w["segment"])
-        self._th(hdr, "Activiteiten\n(max. 7)", self.col_w["act"])
-        self._th(hdr, "Competenties\n(max. 5)", self.col_w["comp"])
-        self._th(hdr, "Educatief\n(max. 5)", self.col_w["edu"])
-        self._th(hdr, "Totaal", self.col_w["total"])
-        self._th(hdr, "", self.col_w["btn"])
-
-        # Scrollbare body
-        body = tk.Frame(table_wrap, bg=MAIN_BG)
+        body = tk.Frame(left, bg=S["bg"])
         body.pack(fill="both", expand=True)
 
-        self.canvas = tk.Canvas(body, bg=MAIN_BG, highlightthickness=0)
-        self.vsb = ttk.Scrollbar(body, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.vsb.set)
+        row_counter = 0
+        for g in GROUPS:
+            grp = tk.Frame(body, bg=S["yellow"])
+            grp.pack(fill="x", pady=(8, 2))
+            tk.Label(grp, text=str(g.id), bg=S["yellow"], font=S["f_b"], width=8)\
+                .grid(row=0, column=0)
+            tk.Label(grp, text=g.name, bg=S["yellow"], font=S["f_b"], anchor="w", padx=10)\
+                .grid(row=0, column=1, sticky="w")
 
-        self.canvas.pack(side="left", fill="both", expand=True)
-        self.vsb.pack(side="right", fill="y")
+            for i, stmt in enumerate(g.stmts, start=1):
+                row_counter += 1
+                bg = S["odd"] if row_counter % 2 else S["even"]
 
-        self.inner = tk.Frame(self.canvas, bg=MAIN_BG)
-        self.inner_id = self.canvas.create_window((0, 0), window=self.inner, anchor="nw")
+                r = tk.Frame(body, bg=bg)
+                r.pack(fill="x", pady=1)
+                r.grid_columnconfigure(1, weight=1)
 
-        self.inner.bind("<Configure>", self._on_inner_configure)
-        self.canvas.bind("<Configure>", self._on_canvas_configure)
-        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+                tk.Label(r, text="", bg=bg, width=8).grid(row=0, column=0, sticky="w")
+                tk.Label(
+                    r,
+                    text=f"{i}. {stmt}",
+                    bg=bg,
+                    font=S["f"],
+                    anchor="w",
+                    justify="left",
+                    wraplength=680,
+                    padx=10
+                ).grid(row=0, column=1, sticky="w")
 
-        for idx, (cid, segment, oms) in enumerate(CLUSTERS, start=1):
-            self._row(self.inner, idx, cid, segment, oms)
+                v = tk.StringVar(value="")
+                self.vars[(g.id, i)] = v
+                v.trace_add("write", lambda *_a, gid=g.id: self.update_subtotal(gid))
 
-        # ----- OPSLAAN EN VERDER -----
-        footer = tk.Frame(self, bg=MAIN_BG)
-        footer.pack(fill="x", padx=22, pady=(0, 18))
+                make_likert_buttons(r, v, bg).grid(row=0, column=2, sticky="e", padx=(10, 25))
+                tk.Label(r, text="", bg=bg, width=8).grid(row=0, column=3, sticky="e")
 
-        def on_submit_next():
-            # minimaal 1 cluster ingevuld (totaal > 0)
-            any_filled = any(
-                (v["act"] + v["comp"] + v["edu"]) > 0
-                for v in self.scores.values()
-            )
-            if not any_filled:
-                messagebox.showwarning(
-                    "Nog niets ingevuld",
-                    "Vul minimaal één cluster in voordat je verder gaat."
-                )
-                return
+            # subtotal row
+            sub = tk.Frame(body, bg=S["yellow"])
+            sub.pack(fill="x", pady=(2, 6))
+            sub.grid_columnconfigure(1, weight=1)
 
-            # Save cluster scores to Excel file if available
-            if hasattr(self.parent_frame, 'excel_file_path') and self.parent_frame.excel_file_path:
-                success = add_career_clusters_to_excel(self.parent_frame.excel_file_path, self.scores)
-                if success:
-                    messagebox.showinfo("Succes", "Carrièreclusters opgeslagen naar Excel-bestand.")
-                else:
-                    messagebox.showwarning("Waarschuwing", "Carrièreclusters konden niet naar Excel-bestand worden geschreven.")
+            tk.Label(sub, text="", bg=S["yellow"], width=8).grid(row=0, column=0)
+            tk.Label(sub, text="Totaal score (4 stellingen)", bg=S["yellow"], font=S["f_b"],
+                     anchor="w", padx=10).grid(row=0, column=1, sticky="w")
+            tk.Label(sub, text="", bg=S["yellow"], width=22).grid(row=0, column=2)
 
-            # Hierna naar jouw volgende pagina:
-            # pas dit aan naar de volgende Fase Pagina
-            self.navigate("phase2.2")  # bijv. "phase3.0"
+            lbl = tk.Label(sub, text="0", bg=S["yellow"], font=S["f_b"], width=8, anchor="e", padx=10)
+            lbl.grid(row=0, column=3, sticky="e")
+            self.sub_lbl[g.id] = lbl
+            self.update_subtotal(g.id)
 
-        btn = tk.Button(
-            footer,
+        # right descriptions
+        tk.Label(right, text="Cultuur – omschrijving", bg=S["bg"], font=S["f_b"], anchor="w")\
+            .pack(fill="x", pady=(0, 8))
+        for g in GROUPS:
+            box = tk.Frame(right, bg="#f5f5f5", bd=1, relief="solid")
+            box.pack(fill="x", pady=6)
+            tk.Label(box, text=g.name, bg=S["yellow"], font=S["f_b"], pady=6).pack(fill="x")
+            tk.Label(
+                box,
+                text=g.desc,
+                bg="#f5f5f5",
+                font=S["f"],
+                wraplength=360,
+                justify="left",
+                anchor="w",
+                padx=8,
+                pady=8
+            ).pack(fill="x")
+
+        # submit
+        btn_row = tk.Frame(inner, bg=S["bg"])
+        btn_row.pack(fill="x", padx=20, pady=(12, 20))
+
+        tk.Button(
+            btn_row,
             text="Opslaan en verder",
-            bg="#4d4d4d",
+            bg=S["btn_on"],
             fg="white",
             font=("Segoe UI", 11, "bold"),
             padx=20,
             pady=6,
-            relief="flat",
-            command=on_submit_next
-        )
-        btn.pack(side="right")
+            command=self.submit
+        ).pack(side="right")
 
-    def _th(self, parent, text, width):
-        f = tk.Frame(parent, bg=TABLE_HEADER_BG, highlightbackground=BORDER, highlightthickness=1)
-        f.pack(side="left", fill="y")
-        f.configure(width=width, height=48)
-        f.pack_propagate(False)
+    def submit(self):
+        missing = [
+            (gid, i)
+            for gid in range(1, 5)
+            for i in range(1, 5)
+            if not self.vars[(gid, i)].get().strip()
+        ]
+        if missing:
+            messagebox.showwarning(
+                "Onvolledige vragenlijst",
+                f"Er zijn nog {len(missing)} stellingen niet ingevuld."
+            )
+            return
 
-        tk.Label(f, text=text, bg=TABLE_HEADER_BG, fg=TEXT, font=FONT_TH, justify="center")\
-            .pack(expand=True, fill="both")
+        # resultaten bewaren op het parent frame (voor later export)
+        self.cultuur_results = {k: v.get() for k, v in self.vars.items()}
+        self.cultuur_totals = {g.id: self.subtotal(g.id) for g in GROUPS}
 
-    def _cell(self, parent, width, height, bg):
-        f = tk.Frame(parent, bg=bg, highlightbackground=BORDER, highlightthickness=1)
-        f.configure(width=width, height=height)
-        f.pack_propagate(False)
-        f.pack(side="left", fill="y")
-        return f
-
-    def _row(self, parent, idx, cid, segment, oms):
-        row_h = 110
-        row_bg = ROW_ALT_BG if idx % 2 == 0 else MAIN_BG
-
-        r = tk.Frame(parent, bg=MAIN_BG)
-        r.pack(fill="x")
-
-        # Cluster
-        c1 = self._cell(r, self.col_w["cluster"], row_h, row_bg)
-        tk.Label(c1, text=str(cid), bg=row_bg, fg=TEXT, font=("Segoe UI", 10, "bold"))\
-            .pack(expand=True)
-
-        # Segment
-        c2 = self._cell(r, self.col_w["segment"], row_h, row_bg)
-        pad = tk.Frame(c2, bg=row_bg)
-        pad.pack(fill="both", expand=True, padx=12, pady=10)
-
-        tk.Label(pad, text=segment, bg=row_bg, fg=TEXT, font=FONT_SEG_TITLE, anchor="w")\
-            .pack(anchor="w")
-        tk.Label(
-            pad,
-            text=oms,
-            bg=row_bg,
-            fg=TEXT,
-            font=FONT_SEG_DESC,
-            justify="left",
-            wraplength=self.col_w["segment"] - 28
-        ).pack(anchor="w", pady=(6, 0))
-
-        # Scores
-        act = self._cell(r, self.col_w["act"], row_h, SCORE_BG)
-        comp = self._cell(r, self.col_w["comp"], row_h, SCORE_BG)
-        edu = self._cell(r, self.col_w["edu"], row_h, SCORE_BG)
-        total = self._cell(r, self.col_w["total"], row_h, SCORE_BG)
-
-        act_lbl = tk.Label(act, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_SCORE)
-        comp_lbl = tk.Label(comp, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_SCORE)
-        edu_lbl = tk.Label(edu, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_SCORE)
-        tot_lbl = tk.Label(total, text="0", bg=SCORE_BG, fg=TEXT, font=FONT_TOTAL)
-
-        act_lbl.pack(expand=True)
-        comp_lbl.pack(expand=True)
-        edu_lbl.pack(expand=True)
-        tot_lbl.pack(expand=True)
-
-        self.score_labels[cid] = (act_lbl, comp_lbl, edu_lbl, tot_lbl)
-
-        # Button
-        cbtn = self._cell(r, self.col_w["btn"], row_h, row_bg)
-        btn = tk.Button(
-            cbtn,
-            text="Invullen",
-            font=("Segoe UI", 10, "bold"),
-            relief="solid",
-            bd=1,
-            padx=16,
-            pady=8,
-            cursor="hand2",
-            command=lambda x=cid: self.open_invullen(x)
-        )
-        btn.pack(fill="both", expand=True, padx=10, pady=18)
-
-    # -------- scrolling --------
-    def _on_inner_configure(self, _):
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-    def _on_canvas_configure(self, event):
-        sb = max(16, self.vsb.winfo_reqwidth())
-        w = max(300, event.width - sb)
-        self.canvas.itemconfig(self.inner_id, width=w)
-
-    def _on_mousewheel(self, event):
-        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    # -------- popup --------
-    def open_invullen(self, cid):
-        root = self.winfo_toplevel()
-        win = tk.Toplevel(root)
-        win.title(f"Invullen – Cluster {cid}")
-        win.geometry("520x340")
-        win.configure(bg=MAIN_BG)
-
-        tk.Label(win, text=f"Cluster {cid} – Invullen", bg=MAIN_BG, fg=TEXT, font=("Segoe UI", 14, "bold"))\
-            .pack(anchor="w", padx=18, pady=(16, 8))
-
-        tk.Label(
-            win,
-            text="Koppel hier later de echte stellingen (activiteiten/competenties/educatief).\n"
-                 "Voor nu: klik op 'Opslaan' om dummy-scores te testen.",
-            bg=MAIN_BG, fg=MUTED, font=("Segoe UI", 10), justify="left"
-        ).pack(anchor="w", padx=18)
-
-        box = tk.Frame(win, bg=MAIN_BG)
-        box.pack(fill="x", padx=18, pady=16)
-
-        act_var = tk.IntVar(value=self.scores[cid]["act"])
-        comp_var = tk.IntVar(value=self.scores[cid]["comp"])
-        edu_var = tk.IntVar(value=self.scores[cid]["edu"])
-
-        for label, var, mx in [
-            ("Activiteiten (max 7)", act_var, 7),
-            ("Competenties (max 5)", comp_var, 5),
-            ("Educatief (max 5)", edu_var, 5),
-        ]:
-            row = tk.Frame(box, bg=MAIN_BG)
-            row.pack(fill="x", pady=6)
-            tk.Label(row, text=label, bg=MAIN_BG, fg=TEXT, font=("Segoe UI", 10)).pack(side="left")
-            sp = tk.Spinbox(row, from_=0, to=mx, width=6, textvariable=var)
-            sp.pack(side="right")
-
-        btns = tk.Frame(win, bg=MAIN_BG)
-        btns.pack(fill="x", padx=18, pady=14)
-
-        def save():
-            self.scores[cid]["act"] = int(act_var.get())
-            self.scores[cid]["comp"] = int(comp_var.get())
-            self.scores[cid]["edu"] = int(edu_var.get())
-            self.refresh_scores(cid)
-            win.destroy()
-
-        tk.Button(btns, text="Annuleren", command=win.destroy, relief="groove", bd=1, padx=14)\
-            .pack(side="right")
-        tk.Button(btns, text="Opslaan", command=save, relief="groove", bd=1, padx=18)\
-            .pack(side="right", padx=(0, 10))
-
-    def refresh_scores(self, cid):
-        act = self.scores[cid]["act"]
-        comp = self.scores[cid]["comp"]
-        edu = self.scores[cid]["edu"]
-        total = act + comp + edu
-
-        act_lbl, comp_lbl, edu_lbl, tot_lbl = self.score_labels[cid]
-        act_lbl.config(text=str(act))
-        comp_lbl.config(text=str(comp))
-        edu_lbl.config(text=str(edu))
-        tot_lbl.config(text=str(total))
+        # Ga door naar volgende stap (pas aan naar jouw router)
+        # Bijvoorbeeld: self.navigate("phase2.2")
+        self.navigate("phase2.2")
 
 
 # -------------------- BUILDER FUNCTION --------------------
-def build_carriereclusters_page(parent_frame: tk.Frame, navigate) -> None:
+def build_cultuur_page(parent_frame: tk.Frame, navigate) -> None:
     clear_frame(parent_frame)
-    page = CareerClusters21Page(parent_frame, navigate)
+    page = Culture22Page(parent_frame, navigate)
     page.pack(fill="both", expand=True)

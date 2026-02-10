@@ -6,6 +6,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ui.ui_components import clear_frame
 from utils.write_assessments_to_excel import add_job_characteristics_to_excel
 
+TEXT_FONT = ("Segoe UI", 11)
+
 # ==================== Job Characteristics Model Data ====================
 JOB_CHARACTERISTICS_MODEL = [
     (1, "Taakvaardigheid",
@@ -85,7 +87,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         text="Fase 2.3 – Werk karakteristieken modellen",
         bg=S["bg"],
         fg="black",
-        font=S["f_title"],
+        font=("Segoe UI", 11, "bold"),
         anchor="w",
     )
     title.pack(fill="x", padx=20, pady=(15, 5))
@@ -95,7 +97,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         text="Geef je eigen antwoord op elke vraag. Typ je gedachten, gevoelens en ervaringen in het tekstvak.",
         bg=S["bg"],
         fg="#555555",
-        font=S["f_sub"],
+        font=("Segoe UI", 10),
         anchor="w",
         justify="left",
         wraplength=700,
@@ -137,7 +139,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             text=description,
             bg=card.cget("bg"),
             fg="#000000",
-            font=S["f_small"],
+            font=("Segoe UI", 11),
             anchor="w",
             wraplength=700,
             justify="left",
@@ -150,7 +152,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             text=question,
             bg=card.cget("bg"),
             fg="black",
-            font=S["f"],
+            font=("Segoe UI", 11),
             anchor="w",
             wraplength=700,
             justify="left",
@@ -162,7 +164,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             card,
             height=4,
             width=80,
-            font=S["f"],
+            font=("Segoe UI", 11),
             bg="white",
             fg="black",
             relief="solid",

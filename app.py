@@ -30,13 +30,8 @@ sidebar.pack(side="left", fill="y")
 # Prevent pack from resizing the sidebar
 sidebar.pack_propagate(False)
 
-# Test if Pillow is available
 
-logo_label = None
-if _USE_PILLOW: 
-    print("Pillow is available for image processing.")
-else:
-    print("Pillow is not availbable. Use Tkinter's PhotoImage.")
+
  
 # --------- Sidebar logo ---------
 logo_label = None
@@ -184,7 +179,7 @@ def navigate_to(page: str):
 def open_job_characteristics_models():
     """Show the Job Characteristics Models page."""
     show_back_button()
-    btn_back.config(command=show_home)
+    btn_back.config(command=open_cultuur)
 
     for w in content.winfo_children():
         w.destroy()
