@@ -6,47 +6,6 @@ from dataclasses import dataclass
 from collections import defaultdict
 
 # ---------- Data ----------
-@dataclass(frozen=True)
-class Group:
-    id: int
-    name: str
-    desc: str
-    stmts: list[str]
-
-GROUPS = [
-    Group(1, "Landbouw, voeding en natuurlijke grondstoffen / Agriculture, food and natural resources",
-          "Typerend voor familiebedrijven, landbouw, horeca, zorg e.d.",
-          [
-              "Er bestaan gemeenschappelijke waarden en doelstellingen.",
-              "Onderlinge samenhang (wij-gevoel). Teamwork, het beste uit elkaar halen.",
-              "Klanten worden als partners beschouwd.",
-              "Regels en procedures zijn ondergeschikt aan het gevoel een team te zijn.",
-          ]),
-    Group(2, "Innovatieve cultuur",
-          "Typerend voor softwarebedrijven, luchtvaart, ruimtevaart e.d.",
-          [
-              "Snel reageren op snel veranderende omstandigheden.",
-              "Innovatie en vernieuwing (nieuwe diensten/producten).",
-              "Creatief en flexibel zijn wordt gestimuleerd.",
-              "De organisatie is flexibel en kan snel een nieuwe vorm aannemen.",
-          ]),
-    Group(3, "Beheersgerichte cultuur",
-          "Typerend voor overheids- of onderwijsinstellingen.",
-          [
-              "Procedures en regels staan centraal.",
-              "Leidinggevenden coördineren en organiseren.",
-              "Stabiliteit, efficiëntie en voorspelbaarheid zijn belangrijk.",
-              "Trage besluitvormingsprocessen.",
-          ]),
-    Group(4, "Resultaatgerichte cultuur",
-          "Richting externe transacties; concurreren met gelijkaardige organisaties.",
-          [
-              "Productiviteit, resultaten, winst en taakgerichtheid.",
-              "Externe positionering om concurrentie te versterken.",
-              "Duidelijk doel en (soms) agressieve strategie.",
-              "Leidinggevenden veeleisend; nadruk op marktleider zijn.",
-          ]),
-]
 
 
 
@@ -116,29 +75,7 @@ class Culture22Page(tk.Frame):
         self.sub_lbl: dict[int, tk.Label] = {}
         self.build()
 
-    def subtotal(self, gid: int) -> int:
-        tot = 0
-        # Iterate over all (gid, idx) in self.vars for this gid
-        for (cluster_id, idx), triple in self.vars.items():
-            if cluster_id != gid:
-                continue
-            main_var, skill_var, interest_var = triple
-            try:
-                tot += int(main_var.get())
-            except Exception:
-                pass
-            try:
-                tot += int(skill_var.get())
-            except Exception:
-                pass
-            try:
-                tot += int(interest_var.get())
-            except Exception:
-                pass
-        return tot
-
-    def update_subtotal(self, gid: int):
-        self.sub_lbl[gid].config(text=str(self.subtotal(gid)))
+    # subtotal and update_subtotal removed (no longer needed)
 
     def build(self):
         _, _, inner = scrollable(self)
@@ -720,22 +657,20 @@ class Culture22Page(tk.Frame):
 
             for idx, row in rows:  # Show all questions per cluster
                 bg = S["odd"] if idx % 2 else S["even"]
-                r = tk.Frame(body, bg=bg)
-                r.pack(fill="x", pady=1)
+                r = tk.Frame(body, bg=bg, highlightbackground="#e0e0e0", highlightthickness=1, bd=0)
+                r.pack(fill="x", pady=2, padx=2)
                 r.grid_columnconfigure(1, weight=1)
+                r.grid_columnconfigure(2, weight=0)
+                r.grid_columnconfigure(3, weight=0)
 
-                tk.Label(r, text=str(row.get("cluster_id", cluster_id)), bg=bg, width=8).grid(row=0, column=0, sticky="w")
                 main_var = tk.IntVar(value=0)
                 skill_var = tk.IntVar(value=0)
                 interest_var = tk.IntVar(value=0)
                 self.vars[(row.get("cluster_id", cluster_id), idx)] = (main_var, skill_var, interest_var)
-                main_var.trace_add("write", lambda *_a, gid=row.get("cluster_id", cluster_id): self.update_subtotal(gid))
-                skill_var.trace_add("write", lambda *_a, gid=row.get("cluster_id", cluster_id): self.update_subtotal(gid))
-                interest_var.trace_add("write", lambda *_a, gid=row.get("cluster_id", cluster_id): self.update_subtotal(gid))
 
-                # Main statement checkbox replaces the number label
                 cb_main = tk.Checkbutton(r, text="", variable=main_var, onvalue=1, offvalue=0, bg=bg)
-                cb_main.grid(row=0, column=0, sticky="w", padx=(10, 6))
+                cb_main.grid(row=0, column=0, sticky="w", padx=(12, 8), pady=2)
+
                 tk.Label(
                     r,
                     text=f"{idx}. {row.get('main_statement', '')}",
@@ -743,46 +678,37 @@ class Culture22Page(tk.Frame):
                     font=S["f"],
                     anchor="w",
                     justify="left",
-                    wraplength=680,
-                    padx=10
-                ).grid(row=0, column=1, sticky="w")
-                cb_skill = tk.Checkbutton(r, text=row.get('skill_statement', "(geen tekst)"), variable=skill_var, onvalue=1, offvalue=0, bg=bg)
-                cb_skill.grid(row=0, column=2, sticky="e", padx=(0, 6))
-                cb_interest = tk.Checkbutton(r, text=row.get('interest_statement', "(geen tekst)"), variable=interest_var, onvalue=1, offvalue=0, bg=bg)
-                cb_interest.grid(row=0, column=3, sticky="e", padx=(0, 10))
+                    wraplength=900,
+                    padx=8
+                ).grid(row=0, column=1, sticky="ew", pady=2)
 
-            # subtotal row
-            sub = tk.Frame(body, bg=S["yellow"])
-            sub.pack(fill="x", pady=(2, 6))
-            sub.grid_columnconfigure(1, weight=1)
+                cb_skill = tk.Checkbutton(
+                    r,
+                    text=row.get('skill_statement', "(geen tekst)"),
+                    variable=skill_var,
+                    onvalue=1,
+                    offvalue=0,
+                    bg=bg,
+                    anchor="w",
+                    padx=6
+                )
+                cb_skill.grid(row=0, column=2, sticky="w", padx=(0, 8), pady=2)
 
-            tk.Label(sub, text="", bg=S["yellow"], width=8).grid(row=0, column=0)
-            tk.Label(sub, text=f"Totaal score ({len(rows)} stellingen)", bg=S["yellow"], font=S["f_b"], anchor="w", padx=10).grid(row=0, column=1, sticky="w")
-            tk.Label(sub, text="", bg=S["yellow"], width=22).grid(row=0, column=2)
+                cb_interest = tk.Checkbutton(
+                    r,
+                    text=row.get('interest_statement', "(geen tekst)"),
+                    variable=interest_var,
+                    onvalue=1,
+                    offvalue=0,
+                    bg=bg,
+                    anchor="w",
+                    padx=6
+                )
+                cb_interest.grid(row=0, column=3, sticky="w", padx=(0, 10), pady=2)
 
-            lbl = tk.Label(sub, text="0", bg=S["yellow"], font=S["f_b"], width=8, anchor="e", padx=10)
-            lbl.grid(row=0, column=3, sticky="e")
-            self.sub_lbl[cluster_id] = lbl
-            self.update_subtotal(cluster_id)
+            # subtotal row removed
 
-        # right descriptions
-        tk.Label(right, text="Cultuur – omschrijving", bg=S["bg"], font=S["f_b"], anchor="w")\
-            .pack(fill="x", pady=(0, 8))
-        for g in GROUPS:
-            box = tk.Frame(right, bg="#f5f5f5", bd=1, relief="solid")
-            box.pack(fill="x", pady=6)
-            tk.Label(box, text=g.name, bg=S["yellow"], font=S["f_b"], pady=6).pack(fill="x")
-            tk.Label(
-                box,
-                text=g.desc,
-                bg="#f5f5f5",
-                font=S["f"],
-                wraplength=360,
-                justify="left",
-                anchor="w",
-                padx=8,
-                pady=8
-            ).pack(fill="x")
+        # right descriptions removed
 
         # submit
         btn_row = tk.Frame(inner, bg=S["bg"])
@@ -800,10 +726,9 @@ class Culture22Page(tk.Frame):
         ).pack(side="right")
 
     def submit(self):
-        # Save checkbox results (0/1) and totals per group
+        # Save checkbox results (0/1) only
         self.cultuur_results = {}
         for k, v in self.vars.items():
-            # v may be a tuple (skill_var, interest_var)
             if isinstance(v, tuple) and len(v) == 2:
                 skill_var, interest_var = v
                 try:
@@ -816,13 +741,11 @@ class Culture22Page(tk.Frame):
                     ival = 0
                 self.cultuur_results[k] = {"skill": sval, "interest": ival}
             else:
-                # fallback for single var
                 try:
                     self.cultuur_results[k] = int(v.get())
                 except Exception:
                     self.cultuur_results[k] = v
-
-        self.cultuur_totals = {g.id: self.subtotal(g.id) for g in GROUPS}
+        # No cultuur_totals by group
 
         # Proceed to next page
         self.navigate("phase2.2")
