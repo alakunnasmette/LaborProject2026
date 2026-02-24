@@ -5,8 +5,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ui.ui_components import clear_frame
 from utils.write_assessments_to_excel import add_job_characteristics_to_excel
-
-TEXT_FONT = ("Segoe UI", 11)
+from ui.ui_styles import S, FONTS, PRIMARY_BG, CARD_LIGHT_BG
 
 # ==================== Job Characteristics Model Data ====================
 JOB_CHARACTERISTICS_MODEL = [
@@ -30,22 +29,6 @@ JOB_CHARACTERISTICS_MODEL = [
         "De mate waarin de werknemer kennis heeft van resultaten. Dit is duidelijke, specifieke, gedetailleerde, bruikbare informatie over de effectiviteit van zijn of haar werkprestaties. Wanneer werknemers duidelijke, bruikbare informatie over hun werkprestaties ontvangen, hebben ze een betere algemene kennis van het effect van hun werkactiviteiten en welke specifieke acties ze moeten ondernemen (indien aanwezig) om hun productiviteit te verbeteren.",
         "Hoe belangrijk vind je het om duidelijke en bruikbare feedback te krijgen over hoe goed je je werk doet? En in welke mate zou je idealiter op de hoogte willen zijn van het effect van je werk en van punten waarop je jezelf kunt verbeteren?"),
 ]
-
-# ==================== Styles ====================
-S = {
-    "bg": "#ffffff",
-    "dark": "#727272",
-    "odd": "#eeeeee",   
-    "even": "#e0e0e0",
-    "yellow": "#f1c40f",
-    "btn": "#d9d9d9",
-    "btn_on": "#4d4d4d",
-    "f_title": ("Segoe UI", 14, "bold"),
-    "f_sub": ("Segoe UI", 10),
-    "f": ("Segoe UI", 10),
-    "f_b": ("Segoe UI", 10, "bold"),
-    "f_small": ("Segoe UI", 9),
-}
 
 # ==================== Build Function ====================
 def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None) -> None:
@@ -87,7 +70,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         text="Fase 2.3 – Werk karakteristieken modellen",
         bg=S["bg"],
         fg="black",
-        font=("Segoe UI", 11, "bold"),
+        font=FONTS["medium_bold"],
         anchor="w",
     )
     title.pack(fill="x", padx=20, pady=(15, 5))
@@ -97,7 +80,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         text="Geef je eigen antwoord op elke vraag. Typ je gedachten, gevoelens en ervaringen in het tekstvak.",
         bg=S["bg"],
         fg="#555555",
-        font=("Segoe UI", 10),
+        font=S["f_sub"],
         anchor="w",
         justify="left",
         wraplength=700,
@@ -139,7 +122,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             text=description,
             bg=card.cget("bg"),
             fg="#000000",
-            font=("Segoe UI", 11),
+            font=FONTS["medium"],
             anchor="w",
             wraplength=700,
             justify="left",
@@ -152,7 +135,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             text=question,
             bg=card.cget("bg"),
             fg="black",
-            font=("Segoe UI", 11),
+            font=FONTS["medium"],
             anchor="w",
             wraplength=700,
             justify="left",
@@ -164,7 +147,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             card,
             height=4,
             width=80,
-            font=("Segoe UI", 11),
+            font=FONTS["medium"],
             bg="white",
             fg="black",
             relief="solid",
@@ -218,9 +201,9 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
     tk.Button(
         button_frame,
         text="Opslaan en verder",
-        bg=S["btn_on"],
+        bg=PRIMARY_BG,
         fg="white",
-        font=("Segoe UI", 11, "bold"),
+        font=FONTS["medium_bold"],
         padx=20,
         pady=8,
         command=on_submit

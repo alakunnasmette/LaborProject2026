@@ -35,8 +35,6 @@ sidebar.pack(side="left", fill="y")
 # Prevent pack from resizing the sidebar
 sidebar.pack_propagate(False)
 
-
-
  
 # --------- Sidebar logo ---------
 logo_label = None
@@ -150,6 +148,9 @@ def open_career_anchors():
 
     for w in content.winfo_children():
         w.destroy()
+
+    # Set Excel file path for phase 2.0
+    content.results_excel_path = os.path.join(os.getcwd(), "results", "Loopbaan onderzoek 5.0 template.xlsx")
 
     phase20.build_career_anchors_page(content, navigate_to)
 

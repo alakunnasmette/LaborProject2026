@@ -3,6 +3,8 @@ from __future__ import annotations
 import tkinter as tk
 from tkinter import messagebox
 from dataclasses import dataclass
+from ui.ui_styles import S, FONTS, PRIMARY_BG
+from ui.ui_components import clear_frame
 
 # ---------- Data ----------
 @dataclass(frozen=True)
@@ -49,26 +51,7 @@ GROUPS = [
 
 LIKERT = ["1", "2", "3", "4", "5"]
 
-# Styles 
-S = {
-    "bg": "#ffffff",
-    "dark": "#727272",
-    "odd": "#eeeeee",   
-    "even": "#e0e0e0",
-    "yellow": "#f1c40f",
-    "btn": "#d9d9d9",
-    "btn_on": "#4d4d4d",
-    "f_title": ("Segoe UI", 14, "bold"),
-    "f_sub": ("Segoe UI", 10),
-    "f": ("Segoe UI", 10),
-    "f_b": ("Segoe UI", 10, "bold"),
-}
-
 # ---------- Helpers ----------
-def clear_frame(frame: tk.Widget) -> None:
-    for w in frame.winfo_children():
-        w.destroy()
-
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
     wrap = tk.Frame(parent, bg=S["bg"])
     wrap.pack(fill="both", expand=True)
@@ -245,9 +228,9 @@ class Culture22Page(tk.Frame):
         tk.Button(
             btn_row,
             text="Opslaan en verder",
-            bg=S["btn_on"],
+            bg=PRIMARY_BG,
             fg="white",
-            font=("Segoe UI", 11, "bold"),
+            font=FONTS["medium_bold"],
             padx=20,
             pady=6,
             command=self.submit

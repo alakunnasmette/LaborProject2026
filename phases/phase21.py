@@ -4,30 +4,10 @@ import tkinter as tk
 from tkinter import messagebox
 from dataclasses import dataclass
 from collections import defaultdict
-
-# ---------- Data ----------
-
-
-
-# Styles 
-S = {
-    "bg": "#ffffff",
-    "dark": "#727272",
-    "odd": "#eeeeee",   
-    "even": "#e0e0e0",
-    "yellow": "#f1c40f",
-    "btn": "#d9d9d9",
-    "btn_on": "#4d4d4d",
-    "f_title": ("Segoe UI", 14, "bold"),
-    "f_sub": ("Segoe UI", 10),
-    "f": ("Segoe UI", 10),
-    "f_b": ("Segoe UI", 10, "bold"),
-}
+from ui.ui_styles import S
+from ui.ui_components import clear_frame
 
 # ---------- Helpers ----------
-def clear_frame(frame: tk.Widget) -> None:
-    for w in frame.winfo_children():
-        w.destroy()
 
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
     wrap = tk.Frame(parent, bg=S["bg"])
@@ -666,7 +646,13 @@ class Culture22Page(tk.Frame):
                 main_var = tk.IntVar(value=0)
                 skill_var = tk.IntVar(value=0)
                 interest_var = tk.IntVar(value=0)
-                self.vars[(row.get("cluster_id", cluster_id), idx)] = (main_var, skill_var, interest_var)
+                
+                # Only store variables if skill and interest statements exist
+                has_skill = 'skill_statement' in row and row.get('skill_statement')
+                has_interest = 'interest_statement' in row and row.get('interest_statement')
+                
+                if has_skill or has_interest:
+                    self.vars[(row.get("cluster_id", cluster_id), idx)] = (main_var, skill_var, interest_var)
 
                 cb_main = tk.Checkbutton(r, text="", variable=main_var, onvalue=1, offvalue=0, bg=bg)
                 cb_main.grid(row=0, column=0, sticky="w", padx=(12, 8), pady=2)
@@ -682,29 +668,33 @@ class Culture22Page(tk.Frame):
                     padx=8
                 ).grid(row=0, column=1, sticky="ew", pady=2)
 
-                cb_skill = tk.Checkbutton(
-                    r,
-                    text=row.get('skill_statement', "(geen tekst)"),
-                    variable=skill_var,
-                    onvalue=1,
-                    offvalue=0,
-                    bg=bg,
-                    anchor="w",
-                    padx=6
-                )
-                cb_skill.grid(row=0, column=2, sticky="w", padx=(0, 8), pady=2)
+                # Only create skill checkbox if skill_statement exists
+                if has_skill:
+                    cb_skill = tk.Checkbutton(
+                        r,
+                        text=row.get('skill_statement'),
+                        variable=skill_var,
+                        onvalue=1,
+                        offvalue=0,
+                        bg=bg,
+                        anchor="w",
+                        padx=6
+                    )
+                    cb_skill.grid(row=0, column=2, sticky="w", padx=(0, 8), pady=2)
 
-                cb_interest = tk.Checkbutton(
-                    r,
-                    text=row.get('interest_statement', "(geen tekst)"),
-                    variable=interest_var,
-                    onvalue=1,
-                    offvalue=0,
-                    bg=bg,
-                    anchor="w",
-                    padx=6
-                )
-                cb_interest.grid(row=0, column=3, sticky="w", padx=(0, 10), pady=2)
+                # Only create interest checkbox if interest_statement exists
+                if has_interest:
+                    cb_interest = tk.Checkbutton(
+                        r,
+                        text=row.get('interest_statement'),
+                        variable=interest_var,
+                        onvalue=1,
+                        offvalue=0,
+                        bg=bg,
+                        anchor="w",
+                        padx=6
+                    )
+                    cb_interest.grid(row=0, column=3, sticky="w", padx=(0, 10), pady=2)
 
             # subtotal row removed
 
@@ -713,6 +703,17 @@ class Culture22Page(tk.Frame):
         # submit
         btn_row = tk.Frame(inner, bg=S["bg"])
         btn_row.pack(fill="x", padx=20, pady=(12, 20))
+
+        tk.Button(
+            btn_row,
+            text="Overslaan",
+            bg=S["btn"],
+            fg="white",
+            font=("Segoe UI", 11, "bold"),
+            padx=20,
+            pady=6,
+            command=lambda: self.navigate("phase2.2")
+        ).pack(side="left", padx=(0, 10))
 
         tk.Button(
             btn_row,
