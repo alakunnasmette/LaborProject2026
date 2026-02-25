@@ -14,6 +14,7 @@ import phases.phase21 as phase21  # phase21.py
 import phases.phase22 as phase22  # phase22.py
 import phases.phase23 as phase23  # phase23.py
 import prognosis_model # prognosis_model.py
+import client_page # client_page.py
  
 # --------- Start screen ---------
 root = tk.Tk()
@@ -21,6 +22,7 @@ root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="white")
 root.state("zoomed")
+
 
 myappid = 'mycompany.myproduct.version'  # Required for Windows
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -141,6 +143,18 @@ def show_home():
     )
     btn_prognosis.grid(row=0, column=1, padx=60, pady=20)
 
+    btn_client = tk.Button(
+        button_frame,
+        text="Client Page",
+        width=BUTTON_WIDTH,
+        height=BUTTON_HEIGHT,
+        bg=BUTTON_BG,
+        relief="flat",
+        font=BUTTON_FONT,
+        command=open_client_page,
+    )
+    btn_client.grid(row=0, column=2, padx=60, pady=20)
+
 def open_career_anchors():
     """Show the Phase 2.0 – Career Anchors page within content."""
     show_back_button()
@@ -212,6 +226,16 @@ def open_prognosis_model():
         w.destroy()
 
     prognosis_model.build_prognosis_page(content)
+
+def open_client_page():
+    """Show the client page."""
+    show_back_button()
+    btn_back.config(command=show_home)
+
+    for w in content.winfo_children():
+        w.destroy()
+
+    client_page.client_page(content)
 
 def open_career_clusters():
     """Show the Phase 2.1 – Career Clusters page within content."""
