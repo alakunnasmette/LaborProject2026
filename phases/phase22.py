@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 from dataclasses import dataclass
 from ui.ui_styles import S, FONTS, PRIMARY_BG
-from ui.ui_components import clear_frame
+from ui.ui_components import clear_frame, create_submit_button, show_incomplete_warning
 
 # ---------- Data ----------
 @dataclass(frozen=True)
@@ -225,16 +225,12 @@ class Culture22Page(tk.Frame):
         btn_row = tk.Frame(inner, bg=S["bg"])
         btn_row.pack(fill="x", padx=20, pady=(12, 20))
 
-        tk.Button(
+        btn_submit = create_submit_button(
             btn_row,
             text="Opslaan en verder",
-            bg=PRIMARY_BG,
-            fg="white",
-            font=FONTS["medium_bold"],
-            padx=20,
-            pady=6,
             command=self.submit
-        ).pack(side="right")
+        )
+        btn_submit.pack(side="right")
 
     def submit(self):
         missing = [
@@ -244,10 +240,7 @@ class Culture22Page(tk.Frame):
             if not self.vars[(gid, i)].get().strip()
         ]
         if missing:
-            messagebox.showwarning(
-                "Onvolledige vragenlijst",
-                f"Er zijn nog {len(missing)} stellingen niet ingevuld."
-            )
+            show_incomplete_warning(len(missing), item_name="stellingen")
             return
 
         # resultaten bewaren op het parent frame (voor later export)

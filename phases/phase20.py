@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from utils import write_assessments_to_excel
-from ui.ui_components import clear_frame
+from ui.ui_components import clear_frame, create_back_button, create_submit_button
 from ui.ui_styles import (
     S, FONTS, PRIMARY_BG, SECONDARY_BG, CARD_LIGHT_BG,
     TABLE_PADX, TABLE_PADY, BUTTON_PADX, BUTTON_PADY, BUTTON_CONTAINER_PADX
@@ -382,30 +382,19 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     btn_frame = tk.Frame(scroll_frame, bg=S["bg"])
     btn_frame.pack(fill="x", pady=(10, 30))
 
-    btn_skip = tk.Button(
-    btn_frame,
+
+    btn_skip = create_back_button(
+        btn_frame,
         text="Overslaan",
-        bg=SECONDARY_BG,
-        fg="white",
-        font=FONTS["medium_bold"],
-        padx=BUTTON_PADX,
-        pady=BUTTON_PADY,
-        command=lambda: navigate_to("phase2.1"),
+        command=lambda: navigate_to("phase2.1")
     )
     btn_skip.pack(side="left", padx=BUTTON_CONTAINER_PADX)
+    btn_skip.bind("<Return>", lambda e: navigate_to("phase2.1"))
 
-    btn_on_pressed = lambda e: navigate_to("phase2.1")
-    btn_skip.bind("<Return>", btn_on_pressed)
-
-    btn_submit = tk.Button(
+    btn_submit = create_submit_button(
         btn_frame,
         text="Opslaan en verder",
-        bg=PRIMARY_BG,
-        fg="white",
-        font=FONTS["medium_bold"],
-        padx=BUTTON_PADX,
-        pady=BUTTON_PADY,
-        command=on_submit_loopbaan,
+        command=on_submit_loopbaan
     )
     btn_submit.pack(side="right", padx=BUTTON_CONTAINER_PADX)
 
