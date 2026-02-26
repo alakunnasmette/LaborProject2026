@@ -1,19 +1,25 @@
 import tkinter as tk
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
     from PIL import Image, ImageTk
     _USE_PILLOW = True
 except Exception:
     _USE_PILLOW = False
-import assessments  # assessments.py
+import phases.phase11 as phase11  # phase10.py
+import phases.phase20 as phase20  # phase20.py
+import phases.phase21 as phase21  # phase21.py
+import phases.phase22 as phase22  # phase22.py
+import phases.phase23 as phase23  # phase23.py
 import prognosis_model # prognosis_model.py
-import phase20 # phase 2.0
  
 # --------- Start screen ---------
 root = tk.Tk()
 root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="white")
+root.state("zoomed")
 
 # --------- Sidebar ---------
 SIDEBAR_WIDTH = 180
@@ -24,14 +30,6 @@ sidebar.pack(side="left", fill="y")
 # Prevent pack from resizing the sidebar
 sidebar.pack_propagate(False)
 
-# Test if Pillow is available
-
-logo_label = None
-if _USE_PILLOW: 
-    print("Pillow is available for image processing.")
-else:
-    print("Pillow is not available. Use Tkinter's PhotoImage.")
-    aiter
  
 # --------- Sidebar logo ---------
 logo_label = None
@@ -143,15 +141,48 @@ def open_career_anchors():
     show_back_button()
     btn_back.config(command=open_assessments)
 
-    # clear content
     for w in content.winfo_children():
         w.destroy()
 
-    # assessments.build_career_anchors_page(content)
+    phase20.build_career_anchors_page(content, navigate_to)
 
-    # new Phase 2.0 page
-    phase20.show(content)
 
+def open_cultuur():
+    """Show the Phase 2.2 – Culture page within content."""
+    show_back_button()
+    # Back button from Phase 2.2 goes to Phase 2.1
+    btn_back.config(command=open_career_clusters)
+
+    # Empty content
+    for w in content.winfo_children():
+        w.destroy()
+
+    phase22.build_cultuur_page(content, navigate_to)
+
+
+def navigate_to(page: str):
+    """Router function to navigate to different pages based on string identifier."""
+    if page == "phase2.0":
+        open_career_anchors()
+    elif page == "phase2.1":
+        open_career_clusters()
+    elif page == "phase2.2":
+        open_cultuur()
+    elif page == "phase2.3":
+        open_job_characteristics_models()
+    elif page == "home":
+        show_home()
+    # Add other pages as needed
+
+def open_job_characteristics_models():
+    """Show the Job Characteristics Models page."""
+    show_back_button()
+    btn_back.config(command=open_cultuur)
+
+    for w in content.winfo_children():
+        w.destroy()
+
+    phase23.build_job_characteristics_models_page(content, navigate_to)
 
 
 def open_assessments():
@@ -162,7 +193,7 @@ def open_assessments():
     for w in content.winfo_children():
         w.destroy()
 
-    assessments.build_assessments_page(content, open_career_anchors)
+    phase11.build_assessments_page(content, navigate_to)
 
 def open_prognosis_model():
     """Show the prognosis model page."""
@@ -184,8 +215,22 @@ def open_career_clusters():
     for w in content.winfo_children():
         w.destroy()
 
-    frame_21 = assessments.create_career_clusters_frame(content)
-    frame_21.pack(fill="both", expand=True)
+    # Try known builder names from phase21
+    builder = None
+    try:
+        builder = getattr(phase21, "build_carriereclusters_page", None) or getattr(phase21, "build_loopbaanankers_page", None) or getattr(phase21, "create_career_clusters_frame", None)
+    except Exception:
+        builder = None
+
+    if builder:
+        try:
+            builder(content, navigate_to)
+        except TypeError:
+            builder(content)
+    else:
+        # Fallback message
+        lbl = tk.Label(content, text="Fase 2.1 is nog niet geïmplementeerd.", bg="white", fg="black")
+        lbl.pack(padx=20, pady=20)
 
 
 # --------- Load the start screen back ---------

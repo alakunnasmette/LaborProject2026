@@ -1,7 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
-import write_assessments_to_excel
-from assessments import clear_frame, ROW_BG_1, ROW_BG_2, create_career_clusters_frame
+import utils.write_assessments_to_excel as write_assessments_to_excel
+from collections import defaultdict
+from ui import ui_styles as styles
+import ui.ui_components as ui
+
 
 # ----------------------------- Phase 2.0 - Career anchors -----------------------------
 
@@ -94,65 +97,28 @@ ANCHOR_TO_COLUMN = {
     "Z": "G",
 }
 
+ANCHORS = ["V", "W", "X", "Y", "Z"]
 
-
-def build_career_anchors_page(parent_frame: tk.Frame) -> None:
+def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     """Show Phase 2.0 – Career Anchors in the right panel with two statements per question."""
 
-    clear_frame(parent_frame)
+    ui.clear_frame(parent_frame)
 
     # =================== Scrollable container ===================
-    container = tk.Frame(parent_frame, bg="white")
-    container.pack(fill="both", expand=True)
+    container, canvas, scroll_frame = ui.create_scrollable_container(
+        parent_frame,
+        bg=styles.PAGE_BACKGROUND_COLOR
+    )
 
-    canvas = tk.Canvas(container, bg="white", highlightthickness=0)
-    scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
-
-    canvas.pack(side="left", fill="both", expand=True)
-    scrollbar.pack(side="right", fill="y")
-
-    scroll_frame = tk.Frame(canvas, bg="white")
-    window_id = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
-    canvas.configure(yscrollcommand=scrollbar.set)
-
-    def on_frame_configure(event=None):
-        canvas.configure(scrollregion=canvas.bbox("all"))
-
-    def on_canvas_resize(event):
-        canvas.itemconfig(window_id, width=event.width)
-
-    scroll_frame.bind("<Configure>", on_frame_configure)
-    canvas.bind("<Configure>", on_canvas_resize)
-
-    def on_mousewheel(event):
-        canvas.yview_scroll(-int(event.delta / 120), "units")
-
-    canvas.bind_all("<MouseWheel>", on_mousewheel)
 
     # =================== Headers ===================
-    title = tk.Label(
+    ui.create_page_title(
         scroll_frame,
-        text="Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
-        bg="white",
-        fg="black",
-        font=("Segoe UI", 14, "bold"),
-        anchor="w",
+        "Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
+        "Beoordeling van stelling a.h.v. onderstaande criteria:\n"
+        "Met welke stelling kan cliënt zich het sterkst identificeren?"
     )
-    title.pack(fill="x", padx=20, pady=(20, 2))
 
-    subtitle = tk.Label(
-        scroll_frame,
-        text=(
-            "Beoordeling van stelling a.h.v. onderstaande criteria:\n"
-            "Met welke stelling kan cliënt zich het sterkst identificeren?"
-        ),
-        bg="white",
-        fg="black",
-        font=("Segoe UI", 10),
-        anchor="w",
-        justify="left",
-    )
-    subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
     # =================== Table headers and rows ===================
     table = tk.Frame(scroll_frame, bg="white")
@@ -164,6 +130,7 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
     table.grid_columnconfigure(1, weight=1)  # statement column stretches
 
     header_bg = "#807C7D"
+    # DONT CHANGE THESE
     headers = [
         ("Nummer", 0),
         ("Stelling", 1),
@@ -185,15 +152,14 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
             anchor="w" if col <= 1 else "center",
         )
         lbl.grid(row=0, column=col, sticky="nsew")
+    # UNTIL HERE
 
-    ANCHORS = ["V", "W", "X", "Y", "Z"]
 
     # -------------------- Group statements per question --------------------
-    from collections import defaultdict
-
     questions = defaultdict(list)
     for nummer, anker, tekst in CAREER_STATEMENTS:
         questions[nummer].append((anker, tekst))
+
 
     # -------------------- Prepare variables --------------------
     vraag_vars: dict[int, tk.StringVar] = {}
@@ -348,11 +314,22 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
         }
 
         # 3. Write to Excel
+        root = parent_frame.winfo_toplevel()
+
+        if not hasattr(root, "results_excel_path"):
+            messagebox.showerror(
+                "Geen Excel-bestand",
+                "Er is nog geen resultatenbestand aangemaakt (fase 1.1)."
+            )
+            return
+
+
+        excel_path = getattr(root, "results_excel_path", None)
+
         save_path = write_assessments_to_excel.write_career_anchors_to_excel(
             excel_answers,
-            parent_frame.results_excel_path
+            excel_path
         )
-        parent_frame.results_excel_path = save_path
 
         if not save_path:
             messagebox.showerror(
@@ -361,15 +338,16 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
             )
             return
 
+        # same excel file
+        root.results_excel_path = save_path
+
         messagebox.showinfo(
             "Opgeslagen",
             f"Antwoorden opgeslagen in:\n{save_path}"
         )
 
         # 4. Next phase
-        clear_frame(parent_frame)
-        frame_21 = create_career_clusters_frame(parent_frame)
-        frame_21.pack(fill="both", expand=True)
+        navigate_to("phase2.1")
 
     btn_frame = tk.Frame(scroll_frame, bg="white")
     btn_frame.pack(fill="x", pady=(10, 30))
@@ -385,7 +363,3 @@ def build_career_anchors_page(parent_frame: tk.Frame) -> None:
         command=on_submit_loopbaan,
     )
     btn_submit.pack(side="right", padx=30)
-
-def show(parent_frame: tk.Frame):
-    """Public function to display Phase 2.0 page."""
-    build_career_anchors_page(parent_frame)
