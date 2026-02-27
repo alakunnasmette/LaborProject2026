@@ -1,56 +1,59 @@
 import tkinter as tk
+from tkinter import ttk
+import json
 import os
-import sys
 import ctypes
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-try:
-    from PIL import Image, ImageTk
-    _USE_PILLOW = True
-except Exception:
-    _USE_PILLOW = False
-import phases.phase11 as phase11  # phase10.py
-import phases.phase20 as phase20  # phase20.py
-import phases.phase21 as phase21  # phase21.py
-import phases.phase22 as phase22  # phase22.py
-import phases.phase23 as phase23  # phase23.py
-import prognosis_model # prognosis_model.py
-import client_page # client_page.py
- 
-# --------- Start screen ---------
+import phases.phase11
+from PIL import Image, ImageTk
+_USE_PILLOW = True
+from tkinter import simpledialog, messagebox
+from ui.ui_styles import *
+from phases.phase11 import build_assessments_page
+from phases.phase20 import build_career_anchors_page
+from phases.phase21 import build_carriereclusters_page
+from phases.phase22 import build_cultuur_page
+from phases.phase23 import build_job_characteristics_models_page
+
 root = tk.Tk()
 root.title("LABOR - Applicatie")
 root.geometry("1000x600")
-root.configure(bg="white")
+root.configure(bg="#f0f0f0")
 root.state("zoomed")
 
-
-myappid = 'mycompany.myproduct.version'  # Required for Windows
+myappid = 'mycompany.myproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-root.iconbitmap(r"icon.ico")  # Use raw string to avoid path issues
+root.iconbitmap(r"icon.ico")
+
+# --------- Global Assessment Variables ---------
+current_assessment_client = None
+
+# --------- Phase Mapping ---------
+PHASES = {
+    "phase1.1": build_assessments_page,
+    "phase2.0": build_career_anchors_page,
+    "phase2.1": build_carriereclusters_page,
+    "phase2.2": build_cultuur_page,
+    "phase2.3": build_job_characteristics_models_page,
+}
+
+# --------- Colors & Styling ---------
 
 # --------- Sidebar ---------
-SIDEBAR_WIDTH = 180
-
-sidebar = tk.Frame(root, bg="black", width=SIDEBAR_WIDTH)
+SIDEBAR_WIDTH = 200
+sidebar = tk.Frame(root, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
 sidebar.pack(side="left", fill="y")
-
-# Prevent pack from resizing the sidebar
 sidebar.pack_propagate(False)
 
- 
-# --------- Sidebar logo ---------
+# Sidebar logo
 logo_label = None
 logo_path = os.path.join("images", "labor-logo.png")
 try:
     if _USE_PILLOW:
-        # Use Pillow for reliable loading and high-quality resizing
         logo_img = Image.open(logo_path)
         logo_img = logo_img.resize((140, 140), Image.LANCZOS)
         logo = ImageTk.PhotoImage(logo_img)
     else:
-        # Fallback to Tk's PhotoImage (supports PNG/GIF on modern Tk)
         logo = tk.PhotoImage(file=logo_path)
-        # If image is larger than desired, try integer subsample scaling
         try:
             w = logo.width()
             h = logo.height()
@@ -61,214 +64,327 @@ try:
         except Exception:
             pass
 
-    logo_label = tk.Label(sidebar, image=logo, bg="black")
-    # Keep a reference to avoid garbage collection
+    logo_label = tk.Label(sidebar, image=logo, bg=COLOR_PRIMARY)
     logo_label.image = logo
-    logo_label.place(relx=0.5, rely=1.0, anchor="s", y=-20)
-
+    logo_label.pack(side="bottom", pady=20)
 except Exception as e:
     print("Logo error:", e)
-    logo_label = tk.Label(sidebar, text="LABOR LOGO", fg="white", bg="black")
-    logo_label.place(relx=0.5, rely=1.0, anchor="s", y=-20)
+    logo_label = tk.Label(sidebar, text="LABOR", fg="white", bg=COLOR_PRIMARY, font=("Arial", 16, "bold"))
+    logo_label.pack(side="bottom", pady=20)
 
-# ---------  Page content ---------
-content = tk.Frame(root, bg="white")
-content.pack(side="right", expand=True, fill="both")
+# --------- Data Storage ---------
+clients_file = "clients.json"
 
-BUTTON_WIDTH = 18
-BUTTON_HEIGHT = 4
-BUTTON_BG = "#d9d9d9"
-BUTTON_FONT = ("Segoe UI", 12)
-BUTTOMN_ACTIVEBG = "#c0c0c0"
+def load_clients():
+    """Load clients from JSON file."""
+    if os.path.exists(clients_file):
+        with open(clients_file, "r") as f:
+            return json.load(f)
+    return []
 
+def save_clients(clients):
+    """Save clients to JSON file."""
+    with open(clients_file, "w") as f:
+        json.dump(clients, f, indent=2)
 
-# --------- Page functions ---------
+def search_clients(query):
+    """Filter clients by name/ID."""
+    clients = load_clients()
+    return [c for c in clients if query.lower() in c.get("name", "").lower()]
 
-# Back button
-btn_back = tk.Button(
-    sidebar,
-    text="← Terug",
-    bg="black",
-    fg="white",
+def create_new_client():
+    """Open dialog to create new client."""
+    name = simpledialog.askstring("New Client", "Enter client name:")
+    if name:
+        clients = load_clients()
+        client_id = len(clients) + 1
+        new_client = {
+            "id": client_id,
+            "name": name,
+            "assessments": [],
+            "prognosis": []
+        }
+        clients.append(new_client)
+        save_clients(clients)
+        show_client_list()
+        messagebox.showinfo("Success", f"Client '{name}' created!")
+
+def clear_content_frame():
+    """Clear the content area."""
+    for widget in content_frame.winfo_children():
+        widget.destroy()
+
+def refresh_client_list(query=""):
+    """Refresh the client list display."""
+    clear_content_frame()
+    
+    # Client list container
+    list_container = tk.Frame(content_frame, bg=COLOR_BG)
+    list_container.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+    
+    # Populate list
+    clients = search_clients(query) if query else load_clients()
+    
+    # Create listbox
+    client_listbox = tk.Listbox(
+        list_container,
+        font=("Segoe UI", 11),
+        bg="white",
+        fg=COLOR_TEXT,
+        relief="flat",
+        bd=1,
+        highlightthickness=0,
+        activestyle="none",
+        selectmode="single"
+    )
+    client_listbox.pack(fill="both", expand=True, side="left")
+    
+    # Scrollbar
+    scrollbar = ttk.Scrollbar(list_container, orient="vertical", command=client_listbox.yview)
+    scrollbar.pack(side="right", fill="y")
+    client_listbox.config(yscrollcommand=scrollbar.set)
+    
+    # Add clients to listbox
+    for i, client in enumerate(clients):
+        client_listbox.insert(tk.END, f"{client['name']} (ID: {client['id']})")
+    
+    # Bind click to open dashboard
+    def on_select(event):
+        sel = client_listbox.curselection()
+        if sel:
+            open_client_dashboard(clients[sel[0]])
+    
+    client_listbox.bind("<Double-Button-1>", on_select)
+
+def open_phase11_assessment(client):
+    """Start the assessment questionnaire for a client."""
+    global current_assessment_client
+    current_assessment_client = client
+    navigate_phase("phase1.1")
+
+def navigate_phase(phase_name):
+    """Navigate to a specific phase."""
+    if phase_name not in PHASES:
+        messagebox.showerror("Error", f"Unknown phase: {phase_name}")
+        return
+    
+    build_func = PHASES[phase_name]
+    build_func(content_frame, navigate_phase)
+
+def show_client_list(query=""):
+    """Display the client list view."""
+    search_entry.delete(0, tk.END)
+    refresh_client_list(query)
+
+def run_assessment(client):
+    """Launch assessment questionnaire for the client."""
+    open_phase11_assessment(client)
+
+def run_prognosis(client):
+    """Launch prognosis questionnaire for the client."""
+    # TODO: Launch prognosis questionnaire
+
+def view_client_results(client):
+    """View results for this client."""
+    # TODO: Show results
+
+def open_client_dashboard(client):
+    """Open the dashboard for this client with assessment and prognosis buttons."""
+    clear_content_frame()
+    
+    # Back button
+    back_btn = tk.Button(
+        content_frame,
+        text="← Terug naar Klantenlijst",
+        command=show_client_list,
+        bg=COLOR_TEXT_LIGHT,
+        fg="white",
+        font=("Segoe UI", 10, "bold"),
+        padx=10,
+        pady=5,
+        relief="flat",
+        cursor="hand2"
+    )
+    back_btn.pack(anchor="w", padx=20, pady=10)
+    
+    # Client info header
+    header_frame = tk.Frame(content_frame, bg=COLOR_PRIMARY)
+    header_frame.pack(fill="x", padx=20, pady=(10, 30))
+    
+    tk.Label(
+        header_frame,
+        text=client["name"],
+        font=("Segoe UI", 24, "bold"),
+        bg=COLOR_PRIMARY,
+        fg="white"
+    ).pack(anchor="w")
+    
+    tk.Label(
+        header_frame,
+        text=f"ID: {client['id']}",
+        font=("Segoe UI", 11),
+        bg=COLOR_PRIMARY,
+        fg=COLOR_LIGHT
+    ).pack(anchor="w")
+    
+    # Action buttons frame
+    buttons_container = tk.Frame(content_frame, bg=COLOR_BG)
+    buttons_container.pack(fill="both", expand=True, padx=20, pady=20)
+    
+    buttons_frame = tk.Frame(buttons_container, bg=COLOR_BG)
+    buttons_frame.pack(fill="x", expand=False)
+    
+    # Assessment Button
+    tk.Button(
+        buttons_frame,
+        text="📋 Assessment Vragenlijst",
+        command=lambda: run_assessment(client),
+        bg=COLOR_SECONDARY,
+        fg="white",
+        font=("Segoe UI", 12, "bold"),
+        padx=30,
+        pady=20,
+        relief="flat",
+        cursor="hand2",
+        activebackground="#2980b9"
+    ).pack(pady=10, fill="x")
+    
+    # Prognosis Button
+    tk.Button(
+        buttons_frame,
+        text="🔮 Prognosis Vragenlijst",
+        command=lambda: run_prognosis(client),
+        bg=COLOR_ACCENT,
+        fg="white",
+        font=("Segoe UI", 12, "bold"),
+        padx=30,
+        pady=20,
+        relief="flat",
+        cursor="hand2",
+        activebackground="#c0392b"
+    ).pack(pady=10, fill="x")
+    
+    # View Results Button
+    tk.Button(
+        buttons_frame,
+        text="📊 Bekijk Resultaten",
+        command=lambda: view_client_results(client),
+        bg=COLOR_SUCCESS,
+        fg="white",
+        font=("Segoe UI", 12, "bold"),
+        padx=30,
+        pady=20,
+        relief="flat",
+        cursor="hand2",
+        activebackground="#229954"
+    ).pack(pady=10, fill="x")
+
+# --------- UI Layout ---------
+main_frame = tk.Frame(root, bg=COLOR_BG)
+main_frame.pack(fill="both", expand=True)
+
+# Top bar with search and new client button
+top_frame = tk.Frame(main_frame, bg=YELLOW_ACCENT, height=80)
+top_frame.pack(fill="x", padx=20, pady=15)
+top_frame.pack_propagate(False)
+if navigate_phase == "phase1.1":
+    visible = False
+
+tk.Label(
+    top_frame,
+    text="Klantenbeheer",
+    font=("Segoe UI", 22, "bold"),
+    bg=YELLOW_ACCENT,
+    fg=COLOR_PRIMARY
+).pack(side="left", padx=10, pady=10)
+
+# Search frame
+search_frame = tk.Frame(top_frame, bg=YELLOW_ACCENT)
+search_frame.pack(side="left", padx=(30, 10), anchor="w")
+
+tk.Label(
+    search_frame,
+    text="Zoeken:",
+    font=("Segoe UI", 10),
+    bg=YELLOW_ACCENT,
+    fg=COLOR_TEXT
+).pack(side="left", padx=(0, 8))
+
+search_entry = tk.Entry(
+    search_frame,
+    width=25,
+    font=("Segoe UI", 10),
     relief="flat",
-    bd=0,
-    font=("Segoe UI", 11, "bold"),
-    activebackground="black",
-    activeforeground="white",
+    bd=2
 )
+search_entry.pack(side="left")
 
-def show_back_button():
-    """Show the back button if it is not already visible."""
-    if not btn_back.winfo_ismapped():
-        btn_back.pack(anchor="nw", pady=20, padx=15)
+tk.Button(
+    search_frame,
+    text="Zoeken",
+    command=lambda: refresh_client_list(search_entry.get()),
+    bg=COLOR_TEXT_LIGHT,
+    fg="white",
+    font=("Segoe UI", 10, "bold"),
+    padx=15,
+    relief="flat",
+    cursor="hand2"
+).pack(side="left", padx=8)
 
-def hide_back_button():
-    """Hide the back button if it is visible."""
-    if btn_back.winfo_ismapped():
-        btn_back.pack_forget()
+# New client button
+tk.Button(
+    top_frame,
+    text="+ Nieuwe Klant",
+    command=create_new_client,
+    bg=CELL_BORDER,
+    fg="white",
+    font=("Segoe UI", 11, "bold"),
+    padx=20,
+    pady=8,
+    relief="flat",
+    cursor="hand2",
+    activebackground="#757575"
+).pack(side="right", padx=15)
 
-def show_home():
-    """Show the start screen."""
-    # Hide back button on start screen
-    hide_back_button()
+# Content frame - this swaps between list view and dashboard
+content_frame = tk.Frame(main_frame, bg=COLOR_BG)
+content_frame.pack(fill="both", expand=True)
 
-    # Empty content
-    for w in content.winfo_children():
-        w.destroy()
-
-    button_frame = tk.Frame(content, bg="white")
-    button_frame.pack(expand=True)
-
-    btn_assessments = tk.Button(
-        button_frame,
-        text="Assessments",
-        width=BUTTON_WIDTH,
-        height=BUTTON_HEIGHT,
-        bg=BUTTON_BG,
-        relief="flat",
-        font=BUTTON_FONT,
-        command=open_assessments,
-    )
-    btn_assessments.grid(row=0, column=0, padx=60, pady=20)
-
-    btn_prognosis = tk.Button(
-        button_frame,
-        text="Prognosemodel",
-        width=BUTTON_WIDTH,
-        height=BUTTON_HEIGHT,
-        bg=BUTTON_BG,
-        relief="flat",
-        font=BUTTON_FONT,
-        command=open_prognosis_model,
-    )
-    btn_prognosis.grid(row=0, column=1, padx=60, pady=20)
-
-    btn_client = tk.Button(
-        button_frame,
-        text="Client Page",
-        width=BUTTON_WIDTH,
-        height=BUTTON_HEIGHT,
-        bg=BUTTON_BG,
-        relief="flat",
-        font=BUTTON_FONT,
-        command=open_client_page,
-    )
-    btn_client.grid(row=0, column=2, padx=60, pady=20)
-
-def open_career_anchors():
-    """Show the Phase 2.0 – Career Anchors page within content."""
-    show_back_button()
-    btn_back.config(command=open_assessments)
-
-    for w in content.winfo_children():
-        w.destroy()
-
-    # Set Excel file path for phase 2.0
-    content.results_excel_path = os.path.join(os.getcwd(), "results", "Loopbaan onderzoek 5.0 template.xlsx")
-
-    phase20.build_career_anchors_page(content, navigate_to)
-
-
-def open_cultuur():
-    """Show the Phase 2.2 – Culture page within content."""
-    show_back_button()
-    # Back button from Phase 2.2 goes to Phase 2.1
-    btn_back.config(command=open_career_clusters)
-
-    # Empty content
-    for w in content.winfo_children():
-        w.destroy()
-
-    phase22.build_cultuur_page(content, navigate_to)
-
-
-def navigate_to(page: str):
-    """Router function to navigate to different pages based on string identifier."""
-    if page == "phase2.0":
-        open_career_anchors()
-    elif page == "phase2.1":
-        open_career_clusters()
-    elif page == "phase2.2":
-        open_cultuur()
-    elif page == "phase2.3":
-        open_job_characteristics_models()
-    elif page == "home":
-        show_home()
-    # Add other pages as needed
-
-def open_job_characteristics_models():
-    """Show the Job Characteristics Models page."""
-    show_back_button()
-    btn_back.config(command=open_cultuur)
-
-    for w in content.winfo_children():
-        w.destroy()
-
-    phase23.build_job_characteristics_models_page(content, navigate_to)
-
-
-def open_assessments():
-    """Show the assessments page (Big Five) within content."""
-    show_back_button()
-    btn_back.config(command=show_home)
-
-    for w in content.winfo_children():
-        w.destroy()
-
-    phase11.build_assessments_page(content, navigate_to)
-
-def open_prognosis_model():
-    """Show the prognosis model page."""
-    show_back_button()
-    btn_back.config(command=show_home)
-
-    for w in content.winfo_children():
-        w.destroy()
-
-    prognosis_model.build_prognosis_page(content)
-
-def open_client_page():
-    """Show the client page."""
-    show_back_button()
-    btn_back.config(command=show_home)
-
-    for w in content.winfo_children():
-        w.destroy()
-
-    client_page.client_page(content)
-
-def open_career_clusters():
-    """Show the Phase 2.1 – Career Clusters page within content."""
-    show_back_button()
-    # Back button from Phase 2.1 goes to Phase 2.0
-    btn_back.config(command=open_career_anchors)
-
-    # Empty content
-    for w in content.winfo_children():
-        w.destroy()
-
-    # Set Excel file path for phase 2.1
-    content.excel_file_path = os.path.join(os.getcwd(), "Loopbaan onderzoek 5.0 template.xlsx")
-
-    # Try known builder names from phase21
-    builder = None
-    try:
-        builder = getattr(phase21, "build_carriereclusters_page", None) or getattr(phase21, "build_loopbaanankers_page", None) or getattr(phase21, "create_career_clusters_frame", None)
-    except Exception:
-        builder = None
-
-    if builder:
-        try:
-            builder(content, navigate_to)
-        except TypeError:
-            builder(content)
-    else:
-        # Fallback message
-        lbl = tk.Label(content, text="Fase 2.1 is nog niet geïmplementeerd.", bg="white", fg="black")
-        lbl.pack(padx=20, pady=20)
-
-
-# --------- Load the start screen back ---------
-show_home()
+# Initialize the client list display
+show_client_list()
 
 root.mainloop()
+
+# Add to imports at the top of app.py:
+from phases.phase11 import build_assessments_page
+from phases.phase20 import build_career_anchors_page
+from phases.phase21 import build_carriereclusters_page
+from phases.phase22 import build_cultuur_page
+from phases.phase23 import build_job_characteristics_models_page
+
+# Global to track current client during questionnaire
+current_assessment_client = None
+
+# Phase mapping
+PHASES = {
+    "phase1.1": build_assessments_page,
+    "phase2.0": build_career_anchors_page,
+    "phase2.1": build_carriereclusters_page,
+    "phase2.2": build_cultuur_page,
+    "phase2.3": build_job_characteristics_models_page,
+}
+
+def navigate_phase(phase_name):
+    """Navigate to a specific phase."""
+    if phase_name not in PHASES:
+        messagebox.showerror("Error", f"Unknown phase: {phase_name}")
+        return
+    
+    build_func = PHASES[phase_name]
+    build_func(content_frame, navigate_phase)
+
+def open_phase11_assessment(client):
+    """Start the assessment questionnaire for a client."""
+    global current_assessment_client
+    current_assessment_client = client
+    navigate_phase("phase1.1")
