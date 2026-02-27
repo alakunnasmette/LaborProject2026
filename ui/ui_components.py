@@ -70,4 +70,40 @@ def create_warning_label(parent, text):
     )
     return label
 
+# --- Reusable Sidebar ---
+def create_sidebar(root, bg=None, width=200):
+    bg = bg or getattr(stylesheet, 'COLOR_PRIMARY', stylesheet.SIDEBAR_BACKGROUND_COLOR)
+    sidebar = tk.Frame(root, bg=bg, width=width)
+    sidebar.pack(side="left", fill="y")
+    sidebar.pack_propagate(False)
+    return sidebar
+
+# --- Reusable Logo ---
+def add_logo_to_sidebar(sidebar, logo_path="images/labor-logo.png", use_pillow=True, bg=None):
+    import os
+    try:
+        from PIL import Image, ImageTk
+        logo_img = Image.open(logo_path)
+        logo_img = logo_img.resize((140, 140), Image.LANCZOS)
+        logo = ImageTk.PhotoImage(logo_img)
+    except Exception:
+        try:
+            logo = tk.PhotoImage(file=logo_path)
+            w = logo.width()
+            h = logo.height()
+            if w > 140 or h > 140:
+                sx = max(1, int(round(w / 140)))
+                sy = max(1, int(round(h / 140)))
+                logo = logo.subsample(sx, sy)
+        except Exception:
+            logo = None
+    if logo:
+        logo_label = tk.Label(sidebar, image=logo, bg=bg or getattr(stylesheet, 'COLOR_PRIMARY', stylesheet.SIDEBAR_BACKGROUND_COLOR))
+        logo_label.image = logo
+        logo_label.pack(side="bottom", pady=20)
+    else:
+        logo_label = tk.Label(sidebar, text="LABOR", fg="white", bg=bg or getattr(stylesheet, 'COLOR_PRIMARY', stylesheet.SIDEBAR_BACKGROUND_COLOR), font=("Arial", 16, "bold"))
+        logo_label.pack(side="bottom", pady=20)
+    return logo_label
+
 
