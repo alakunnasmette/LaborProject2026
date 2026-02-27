@@ -40,39 +40,12 @@ PHASES = {
 
 # --------- Colors & Styling ---------
 
+from ui.ui_components import create_sidebar, add_logo_to_sidebar
+
 # --------- Sidebar ---------
 SIDEBAR_WIDTH = 200
-sidebar = tk.Frame(root, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
-sidebar.pack(side="left", fill="y")
-sidebar.pack_propagate(False)
-
-# Sidebar logo
-logo_label = None
-logo_path = os.path.join("images", "labor-logo.png")
-try:
-    if _USE_PILLOW:
-        logo_img = Image.open(logo_path)
-        logo_img = logo_img.resize((140, 140), Image.LANCZOS)
-        logo = ImageTk.PhotoImage(logo_img)
-    else:
-        logo = tk.PhotoImage(file=logo_path)
-        try:
-            w = logo.width()
-            h = logo.height()
-            if w > 140 or h > 140:
-                sx = max(1, int(round(w / 140)))
-                sy = max(1, int(round(h / 140)))
-                logo = logo.subsample(sx, sy)
-        except Exception:
-            pass
-
-    logo_label = tk.Label(sidebar, image=logo, bg=COLOR_PRIMARY)
-    logo_label.image = logo
-    logo_label.pack(side="bottom", pady=20)
-except Exception as e:
-    print("Logo error:", e)
-    logo_label = tk.Label(sidebar, text="LABOR", fg="white", bg=COLOR_PRIMARY, font=("Arial", 16, "bold"))
-    logo_label.pack(side="bottom", pady=20)
+sidebar = create_sidebar(root, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
+logo_label = add_logo_to_sidebar(sidebar, logo_path=os.path.join("images", "labor-logo.png"), use_pillow=_USE_PILLOW, bg=COLOR_PRIMARY)
 
 # --------- Data Storage ---------
 clients_file = "clients.json"
