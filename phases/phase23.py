@@ -3,10 +3,10 @@ from tkinter import messagebox
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ui.ui_components import clear_frame
+from ui.ui_components import clear_frame, create_submit_button
 from utils.write_assessments_to_excel import add_job_characteristics_to_excel
+from ui.ui_styles import S, FONTS, PRIMARY_BG, CARD_LIGHT_BG
 
-TEXT_FONT = ("Segoe UI", 11)
 
 # ==================== Job Characteristics Model Data ====================
 JOB_CHARACTERISTICS_MODEL = [
@@ -31,21 +31,6 @@ JOB_CHARACTERISTICS_MODEL = [
         "Hoe belangrijk vind je het om duidelijke en bruikbare feedback te krijgen over hoe goed je je werk doet? En in welke mate zou je idealiter op de hoogte willen zijn van het effect van je werk en van punten waarop je jezelf kunt verbeteren?"),
 ]
 
-# ==================== Styles ====================
-S = {
-    "bg": "#ffffff",
-    "dark": "#727272",
-    "odd": "#eeeeee",   
-    "even": "#e0e0e0",
-    "yellow": "#f1c40f",
-    "btn": "#d9d9d9",
-    "btn_on": "#4d4d4d",
-    "f_title": ("Segoe UI", 14, "bold"),
-    "f_sub": ("Segoe UI", 10),
-    "f": ("Segoe UI", 10),
-    "f_b": ("Segoe UI", 10, "bold"),
-    "f_small": ("Segoe UI", 9),
-}
 
 # ==================== Build Function ====================
 def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None) -> None:
@@ -87,7 +72,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         text="Fase 2.3 – Werk karakteristieken modellen",
         bg=S["bg"],
         fg="black",
-        font=("Segoe UI", 11, "bold"),
+        font=FONTS["medium_bold"],
         anchor="w",
     )
     title.pack(fill="x", padx=20, pady=(15, 5))
@@ -97,7 +82,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         text="Geef je eigen antwoord op elke vraag. Typ je gedachten, gevoelens en ervaringen in het tekstvak.",
         bg=S["bg"],
         fg="#555555",
-        font=("Segoe UI", 10),
+        font=S["f_sub"],
         anchor="w",
         justify="left",
         wraplength=700,
@@ -139,7 +124,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             text=description,
             bg=card.cget("bg"),
             fg="#000000",
-            font=("Segoe UI", 11),
+            font=FONTS["medium"],
             anchor="w",
             wraplength=700,
             justify="left",
@@ -152,7 +137,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             text=question,
             bg=card.cget("bg"),
             fg="black",
-            font=("Segoe UI", 11),
+            font=FONTS["medium"],
             anchor="w",
             wraplength=700,
             justify="left",
@@ -164,7 +149,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             card,
             height=4,
             width=80,
-            font=("Segoe UI", 11),
+            font=FONTS["medium"],
             bg="white",
             fg="black",
             relief="solid",
@@ -184,7 +169,6 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
 
     def on_submit():
         """Validate and submit answers."""
-        # Check if all fields are filled
         missing = []
         for q_num, text_box in text_entries.items():
             answer = text_box.get("1.0", "end-1c").strip()
@@ -198,10 +182,10 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             )
             return
 
-        # Save answers to dictionary
+        # save answers to dictionary
         answers = {q_num: text_box.get("1.0", "end-1c").strip() for q_num, text_box in text_entries.items()}
         
-        # Save to Excel file if it exists
+        # save to Excel file
         root = parent_frame.winfo_toplevel()
         excel_path = getattr(root, "results_excel_path", None)
 
@@ -217,23 +201,18 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
                 answers
         )
 
-                # 7️⃣ Inform user
         messagebox.showinfo(
-            "Opgeslagen",
-            f"Antwoorden succesvol opgeslagen in:\n{excel_path}"
+            "Succes",
+            f"Je antwoorden zijn opgeslagen"
         )
 
-        # Navigate to home or next section
+        # to homepage
         if navigate:
             navigate("home")
 
-    tk.Button(
+    btn_submit = create_submit_button(
         button_frame,
         text="Opslaan en verder",
-        bg=S["btn_on"],
-        fg="white",
-        font=("Segoe UI", 11, "bold"),
-        padx=20,
-        pady=8,
         command=on_submit
-    ).pack(side="right")
+    )
+    btn_submit.pack(side="right")

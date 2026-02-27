@@ -5,29 +5,9 @@ import os
 from tkinter import messagebox
 from dataclasses import dataclass
 from collections import defaultdict
-
+from ui.ui_styles import S
+from ui.ui_components import clear_frame
 import utils.write_assessments_to_excel as write_assessments_to_excel
-
-# ---------- Data ----------
-# Styles 
-S = {
-    "bg": "#ffffff",
-    "dark": "#727272",
-    "odd": "#eeeeee",   
-    "even": "#e0e0e0",
-    "yellow": "#f1c40f",
-    "btn": "#d9d9d9",
-    "btn_on": "#4d4d4d",
-    "f_title": ("Segoe UI", 14, "bold"),
-    "f_sub": ("Segoe UI", 10),
-    "f": ("Segoe UI", 10),
-    "f_b": ("Segoe UI", 10, "bold"),
-}
-
-# ---------- Helpers ----------
-def clear_frame(frame: tk.Widget) -> None:
-    for w in frame.winfo_children():
-        w.destroy()
 
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
     wrap = tk.Frame(parent, bg=S["bg"])
@@ -740,11 +720,11 @@ class Culture22Page(tk.Frame):
         """
 
         # prepare the answers dict for Excel
-        answers_to_excel = {}  # key: (cluster_id, idx), value: (main, skill, interest)
+        answers_to_excel = {}
 
         for key, var_tuple in self.vars.items():
             if not isinstance(var_tuple, tuple) or len(var_tuple) != 3:
-                # Safety check
+                # safety check
                 continue
 
             main_var, skill_var, interest_var = var_tuple
@@ -796,7 +776,7 @@ class Culture22Page(tk.Frame):
             f"Antwoorden opgeslagen in:\n{saved_path}"
         )
 
-        # Move to the next phase
+        #  next phase
         self.navigate("phase2.2")
 
 # -------------------- BUILDER FUNCTION --------------------

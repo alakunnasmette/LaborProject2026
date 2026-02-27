@@ -1,18 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
-import utils.write_assessments_to_excel as write_assessments_to_excel
-from collections import defaultdict
-from ui import ui_styles as styles
-import ui.ui_components as ui
-
+from utils import write_assessments_to_excel
+from ui.ui_components import clear_frame, create_back_button, create_submit_button
+from ui.ui_styles import (
+    S, FONTS, PRIMARY_BG, SECONDARY_BG, CARD_LIGHT_BG,
+    TABLE_PADX, TABLE_PADY, BUTTON_PADX, BUTTON_PADY, BUTTON_CONTAINER_PADX
+)
 
 # ----------------------------- Phase 2.0 - Career anchors -----------------------------
-
-# Table colors
-ROW_BG_1 = "#eeeeee"
-ROW_BG_2 = "#e0e0e0"
-
-# --------- Fase 2.0 – Career anchors: fetch data from Excel ---------
 # Each entry: (question number, anchor letter, statement text)
 # Anchors: V = Moving upward, W = Feeling safe, X = Being free, Y = Finding balance, Z = Seeking challenge.
 
@@ -79,7 +74,7 @@ CAREER_STATEMENTS = [
     (30, "Z", "Z | Ik geef de voorkeur aan een werksituatie die opwindend is en mij stimuleert."),
 ]
 
-# Descriptions of the 5 career anchors
+
 CAREER_ANCHOR_DESCRIPTIONS = {
     "Omhoog komen": "Deze op opwaartse mobiliteit gerichte loopbaanoriëntatie wordt gewoonlijk geassocieerd met het vooruitkomen in een hiërarchische en/of statusgevoelige organisatie. Het verwerven van steeds meer invloed speelt in deze kaders een grote rol. Prestige en beloning nemen bij iedere opwaartse beweging toe.",
     "Veilig voelen": "Sommige personen hebben behoefte aan een veilige baan in een duidelijke organisatie die vooral gekenmerkt wordt door orde en rust. Zij geven de voorkeur aan een lang en vast dienstverband, erkenning en appreciatie door de werkgever. In ruil daarvoor bieden ze een loyale en toegewijde instelling en zijn ze niet bang om hard te werken. Onderling respect, wederkerigheid en loyaliteit karakteriseren de werkhouding.",
@@ -88,7 +83,7 @@ CAREER_ANCHOR_DESCRIPTIONS = {
     "Uitdaging zoeken": "Deze loopbaanoriëntatie wordt gekenmerkt door de behoefte aan opwinding en uitdaging en een sterke betrokkenheid bij het werk. Men is er op gericht dichtbij het centrum van actie, avontuur en creativiteit te zijn en heeft er zeer veel moeite mee zich aan het werk los te maken. Een bureaucratische organisatie wordt als bijzonder remmend ervaren. Autonomie is belangrijk maar het belangrijkste is opwindend en uitdagend werk.",
 }
 
-# --------- Career anchor → Excel column mapping ---------
+# --------------- career anchors -> Excel column mapping ---------------
 ANCHOR_TO_COLUMN = {
     "V": "C",
     "W": "D",
@@ -102,35 +97,73 @@ ANCHORS = ["V", "W", "X", "Y", "Z"]
 def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     """Show Phase 2.0 – Career Anchors in the right panel with two statements per question."""
 
-    ui.clear_frame(parent_frame)
+    clear_frame(parent_frame)
 
-    # =================== Scrollable container ===================
-    container, canvas, scroll_frame = ui.create_scrollable_container(
-        parent_frame,
-        bg=styles.PAGE_BACKGROUND_COLOR
-    )
+    # --------------- Scrollable container ---------------
 
+    container = tk.Frame(parent_frame, bg="white")
 
-    # =================== Headers ===================
-    ui.create_page_title(
+    container.pack(fill="both", expand=True)
+    canvas = tk.Canvas(container, bg="white", highlightthickness=0)
+    scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
+
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+
+    scroll_frame = tk.Frame(canvas, bg="white")
+    window_id = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    def on_frame_configure(event=None):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    def on_canvas_resize(event):
+        canvas.itemconfig(window_id, width=event.width)
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+    canvas.bind("<Configure>", on_canvas_resize)
+
+    def on_mousewheel(event):
+        canvas.yview_scroll(-int(event.delta / 120), "units")
+
+    canvas.bind_all("<MouseWheel>", on_mousewheel)
+
+    # --------------- Headers ---------------
+
+    title = tk.Label(
         scroll_frame,
-        "Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
-        "Beoordeling van stelling a.h.v. onderstaande criteria:\n"
-        "Met welke stelling kan cliënt zich het sterkst identificeren?"
+        text="Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
+        bg=S["bg"],
+        fg="black",
+        font=S["f_title"],
+        anchor="w",
     )
+    title.pack(fill="x", padx=20, pady=(20, 2))
 
+    subtitle = tk.Label(
+        scroll_frame,
+        text=(
+            "Beoordeling van stelling a.h.v. onderstaande criteria:\n"
+            "Met welke stelling kan cliënt zich het sterkst identificeren?"
+        ),
+        bg=S["bg"],
+        fg="black",
+        font=S["f_sub"],
+        anchor="w",
+        justify="left",
+    )
+    subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
     # =================== Table headers and rows ===================
-    table = tk.Frame(scroll_frame, bg="white")
-    table.pack(fill="both", expand=True, padx=20, pady=(0, 10))
+    table = tk.Frame(scroll_frame, bg=S["bg"])
+    table.pack(fill="both", expand=True, padx=TABLE_PADX, pady=(TABLE_PADY))
 
-    # 7 columns
+    # columns
     for c in range(7):
         table.grid_columnconfigure(c, weight=0)
     table.grid_columnconfigure(1, weight=1)  # statement column stretches
 
-    header_bg = "#807C7D"
-    # DONT CHANGE THESE
+    header_bg = S["header"]
     headers = [
         ("Nummer", 0),
         ("Stelling", 1),
@@ -147,15 +180,16 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             text=text,
             bg=header_bg,
             fg="white",
-            font=("Segoe UI", 10, "bold"),
+            font=S["f_b"],
             padx=10,
             anchor="w" if col <= 1 else "center",
         )
         lbl.grid(row=0, column=col, sticky="nsew")
-    # UNTIL HERE
 
 
     # -------------------- Group statements per question --------------------
+    from collections import defaultdict
+
     questions = defaultdict(list)
     for nummer, anker, tekst in CAREER_STATEMENTS:
         questions[nummer].append((anker, tekst))
@@ -174,35 +208,35 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         current = vraag_vars[question_number].get()
         for code, btn in vraag_buttons[question_number]:
             if code == current:
-                btn.config(text="1", font=("Segoe UI", 11, "bold"))
+                btn.config(text="1", font=FONTS["medium_bold"])
             else:
-                btn.config(text="", font=("Segoe UI", 11))
+                btn.config(text="", font=FONTS["medium"])
 
     # -------------------- Build rows --------------------
     row_index = 1
     for nummer, stmts in sorted(questions.items()):
-        row_bg = ROW_BG_1 if row_index % 2 == 1 else ROW_BG_2
+        row_bg = S["odd"] if row_index % 2 == 1 else S["even"]
 
-        # Nummer (one yellow block per question)
+        # Number (yellow block)
         num_label = tk.Label(
             table,
             text=str(nummer),
             width=4,
-            bg="#f1c40f",
+            bg=S["yellow"],
             fg="black",
-            font=("Segoe UI", 10, "bold"),
+            font=S["f_b"],
             anchor="c",
         )
         num_label.grid(row=row_index, column=0, rowspan=len(stmts), padx=(10, 10), pady=(2, 2), sticky="nsw")
 
-        # Statement(s) stacked vertically
+        # Statements stacked vertically
         stmt_text = "\n".join([tekst for _, tekst in stmts])
         stmt_label = tk.Label(
             table,
             text=stmt_text,
             bg=row_bg,
             fg="black",
-            font=("Segoe UI", 10),
+            font=S["f"],
             anchor="w",
             justify="left",
             padx=12,
@@ -229,7 +263,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
                 indicatoron=False,
                 text="",
                 width=2,
-                font=("Segoe UI", 11),
+                font=FONTS["medium"],
                 bg=row_bg,
                 fg="black",
                 activebackground=row_bg,
@@ -249,32 +283,32 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     for qnum in vraag_vars.keys():
         update_row(qnum)
 
-    # Save choices on parent_frame (for later)
+    # save choices on parent_frame
     parent_frame.loopbaan_vars = vraag_vars
 
-    # =================== Descriptions ===================
-    desc_frame = tk.Frame(scroll_frame, bg="white")
+    # -------------------- Descriptions --------------------
+    desc_frame = tk.Frame(scroll_frame, bg=S["bg"])
     desc_frame.pack(fill="x", padx=20, pady=(20, 20))
 
     tk.Label(
         desc_frame,
         text="Loopbaanankers – omschrijving",
-        bg="white",
+        bg=S["bg"],
         fg="black",
-        font=("Segoe UI", 11, "bold"),
+        font=FONTS["medium_bold"],
         anchor="w",
     ).pack(fill="x", pady=(0, 5))
 
     for naam, tekst in CAREER_ANCHOR_DESCRIPTIONS.items():
-        box = tk.Frame(desc_frame, bg="#f5f5f5", bd=1, relief="solid")
+        box = tk.Frame(desc_frame, bg=CARD_LIGHT_BG, bd=1, relief="solid")
         box.pack(fill="x", pady=4)
 
         tk.Label(
             box,
             text=naam,
-            bg="#f1c40f",
+            bg=S["yellow"],
             fg="black",
-            font=("Segoe UI", 10, "bold"),
+            font=S["f_b"],
             width=16,
             anchor="center",
             padx=4,
@@ -284,9 +318,9 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         tk.Label(
             box,
             text=tekst,
-            bg="#f5f5f5",
+            bg=CARD_LIGHT_BG,
             fg="black",
-            font=("Segoe UI", 10),
+            font=S["f"],
             justify="left",
             wraplength=650,
             anchor="w",
@@ -294,11 +328,11 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             pady=6,
         ).pack(side="left", fill="both", expand=True)
 
-    # =================== Save and continue ===================
+    # -------------------- Save and continue --------------------
     def on_submit_loopbaan():
         vraag_vars = parent_frame.loopbaan_vars
 
-        # 1. Validate
+        # validate answers
         missing = [q for q, var in vraag_vars.items() if not var.get()]
         if missing:
             messagebox.showwarning(
@@ -307,13 +341,13 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             )
             return
 
-        # 2. Map answers to Excel columns
+        # map to columns
         excel_answers = {
             qnum: ANCHOR_TO_COLUMN[var.get()]
             for qnum, var in vraag_vars.items()
         }
 
-        # 3. Write to Excel
+        # 3write to excel
         root = parent_frame.winfo_toplevel()
 
         if not hasattr(root, "results_excel_path"):
@@ -346,20 +380,28 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             f"Antwoorden opgeslagen in:\n{save_path}"
         )
 
-        # 4. Next phase
+        # next phase 
         navigate_to("phase2.1")
 
-    btn_frame = tk.Frame(scroll_frame, bg="white")
+    btn_frame = tk.Frame(scroll_frame, bg=S["bg"])
     btn_frame.pack(fill="x", pady=(10, 30))
 
-    btn_submit = tk.Button(
+    btn_skip = create_back_button(
+        btn_frame,
+        text="Overslaan",
+        command=lambda: navigate_to("phase2.1")
+    )
+    btn_skip.pack(side="left", padx=BUTTON_CONTAINER_PADX)
+    btn_skip.bind("<Return>", lambda e: navigate_to("phase2.1"))
+
+
+    btn_submit = create_submit_button(
         btn_frame,
         text="Opslaan en verder",
-        bg="#4d4d4d",
-        fg="white",
-        font=("Segoe UI", 11, "bold"),
-        padx=20,
-        pady=5,
         command=on_submit_loopbaan,
     )
-    btn_submit.pack(side="right", padx=30)
+    btn_submit.pack(side="right", padx=BUTTON_CONTAINER_PADX)
+
+def show(parent_frame: tk.Frame):
+    """Public function to display Phase 2.0 page."""
+    build_career_anchors_page(parent_frame)

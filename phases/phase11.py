@@ -1,20 +1,26 @@
-# assessments.py
 import tkinter as tk
 from tkinter import messagebox
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.write_assessments_to_excel import write_assessment_answers_to_excel
+from ui.ui_components import clear_frame, add_nav_buttons
+from ui.ui_styles import (
+    DARK_GREY,
+    LIGHT_GREY,
+    TEXT_FONT,
+    FONTS,
+    PRIMARY_BG,
+    SECONDARY_BG,
+    ACCENT_PRIMARY_COLOR,
+    BUTTON_PADX,
+    BUTTON_PADY,
+    BUTTON_CONTAINER_PADX,
+    LIKERT_SELECTED_BG,
+    LIKERT_DEFAULT_BG,
+)
 
-ROW_BG_1 = "#eeeeee"
-ROW_BG_2 = "#e0e0e0"
-CELL_BORDER = "#b3b3b3"
-
-DARK_GREY = "#727272"
-LIGHT_GREY = "#eeeeee"
-TEXT_FONT = ("Segoe UI", 11)
-
-# --------- Likert-schaal: 1 t/m 5 ---------
+# --------- Likert-scale: 1 t/m 5 ---------
 LIKERT_OPTIONS = [
     ("1", "Oneens"),
     ("2", "Deels oneens"),
@@ -78,12 +84,6 @@ BIG_FIVE_ITEMS = [
 ]
 
 
-# -------------------- Helpers --------------------
-def clear_frame(frame: tk.Widget) -> None:
-    for w in frame.winfo_children():
-        w.destroy()
-
-
 def get_assessment_results(parent_frame: tk.Frame) -> dict[int, int | None]:
     """
     Haal alle ingevulde antwoorden op uit parent_frame.assessment_vars.
@@ -105,22 +105,22 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     row = tk.Frame(parent, bg=LIGHT_GREY)
     row.pack(fill="x", pady=1)
 
-    # zorg dat kolom 2 (stelling) meerekt, zodat kolom 3 altijd rechts zit
+    # make sure that column 2 (position) stretches, so that column 3 is always on the right
     row.grid_columnconfigure(1, weight=1)
 
-    # Nummer (geel)
+    # Number (yellow)
     num_label = tk.Label(
         row,
         text=str(nummer),
         width=4,
-        bg="#f1c40f",
+        bg=ACCENT_PRIMARY_COLOR,
         fg="black",
-        font=("Segoe UI", 10, "bold"),
+        font=FONTS["small_bold"],
         anchor="c",
     )
     num_label.grid(row=0, column=0, padx=(10, 10), sticky="w")
 
-    # Stelling
+    # Statement
     stmt_label = tk.Label(
         row,
         text=stelling,
@@ -133,7 +133,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     )
     stmt_label.grid(row=0, column=1, sticky="w", padx=10, pady=8)
 
-    # Likert-knoppen (rechts)
+    # Likert buttons (right)
     likert_frame = tk.Frame(row, bg=LIGHT_GREY)
     likert_frame.grid(row=0, column=2, padx=20, pady=8, sticky="e")
 
@@ -143,9 +143,9 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
         current = var.get()
         for value, widget in buttons:
             if current == value:
-                widget.config(relief="sunken", bg="#4d4d4d", fg="white")
+                widget.config(relief="sunken", bg=LIKERT_SELECTED_BG, fg="white")
             else:
-                widget.config(relief="raised", bg="#d9d9d9", fg="black")
+                widget.config(relief="raised", bg=LIKERT_DEFAULT_BG, fg="black")
 
     for col, (value, _label_text) in enumerate(LIKERT_OPTIONS):
         btn = tk.Label(
@@ -154,9 +154,9 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
             width=3,
             bd=1,
             relief="raised",
-            bg="#d9d9d9",
+            bg=LIKERT_DEFAULT_BG,
             fg="black",
-            font=("Segoe UI", 10),
+            font=FONTS["small"],
         )
         btn.grid(row=0, column=col, padx=4)
 
@@ -178,7 +178,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     """
     clear_frame(parent_frame)
 
-    # ---------- scrollbare container ----------
+    # ---------- scrollable container ----------
     container = tk.Frame(parent_frame, bg="white")
     container.pack(fill="both", expand=True)
 
@@ -207,13 +207,13 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
 
     canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-    # ---------- titel & uitleg ----------
+    # ---------- title & explanation ----------
     title = tk.Label(
         scroll_frame,
         text="Fase 1.1 – Big Five persoonlijkheidsdimensies",
         bg="white",
         fg="black",
-        font=("Segoe UI", 14, "bold"),
+        font=FONTS["title"],
         anchor="w",
     )
     title.pack(fill="x", padx=20, pady=(15, 5))
@@ -226,13 +226,13 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         ),
         bg="white",
         fg="black",
-        font=("Segoe UI", 10),
+        font=FONTS["small"],
         anchor="w",
         justify="left",
     )
     subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
-    # ---------- kolomkoppen ----------
+    # ---------- column headings ----------
     header = tk.Frame(scroll_frame, bg=DARK_GREY)
     header.pack(fill="x")
 
@@ -241,7 +241,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         text="Nummer",
         bg=DARK_GREY,
         fg="white",
-        font=("Segoe UI", 10, "bold"),
+        font=FONTS["small_bold"],
         width=8,
         anchor="w",
         padx=10,
@@ -252,7 +252,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         text="Stelling",
         bg=DARK_GREY,
         fg="white",
-        font=("Segoe UI", 10, "bold"),
+        font=FONTS["small_bold"],
         anchor="w",
         padx=10,
     ).grid(row=0, column=1, sticky="w")
@@ -262,12 +262,12 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         text="",
         bg=DARK_GREY,
         fg="white",
-        font=("Segoe UI", 10, "bold"),
+        font=FONTS["small_bold"],
         anchor="e",
         padx=40,
     ).grid(row=0, column=2, sticky="e")
 
-    # ---------- alle items ----------
+    # ---------- all items ----------
     parent_frame.assessment_vars = {}
 
     questions_container = tk.Frame(scroll_frame, bg="white")
@@ -281,7 +281,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     # spacer
     tk.Frame(scroll_frame, bg="white", height=10).pack(fill="x")
 
-    # ---------- Opslaan en verder-knop ----------
+    # ---------- Save and continue button ----------
     def on_submit():
         results = get_assessment_results(parent_frame)
 
@@ -309,32 +309,17 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     btn_frame = tk.Frame(scroll_frame, bg="white")
     btn_frame.pack(fill="x", pady=(5, 20))
 
-    btn_skip = tk.Button(
+    add_nav_buttons(
+
         btn_frame,
-        text="Overslaan",
-        bg="#b3b3b3",
-        fg="white",
-        font=("Segoe UI", 11, "bold"),
-        padx=20,
-        pady=5,
-        command=lambda: navigate("phase2.0"),
+        submit_command=on_submit,
+        skip_command=lambda: navigate("phase2.0"),
+        skip_text="Overslaan",
+        submit_text="Opslaan en verder",
+        skip_side="left",
+        submit_side="right",
+        padx=BUTTON_CONTAINER_PADX
     )
-    btn_skip.pack(side="left", padx=30)
 
-    btn_on_pressed = lambda e: navigate("phase2.0")
-    btn_skip.bind("<Return>", btn_on_pressed)
-
-    btn_submit = tk.Button(
-        btn_frame,
-        text="Opslaan en verder",
-        bg="#4d4d4d",
-        fg="white",
-        font=("Segoe UI", 11, "bold"),
-        padx=20,
-        pady=5,
-        command=on_submit,
-    )
-    btn_submit.pack(side="right", padx=30)
-
-    # extra ruimte onderaan
+    # eextra ruimte onderaan
     tk.Frame(scroll_frame, bg="white", height=30).pack(fill="x")

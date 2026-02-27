@@ -4,7 +4,8 @@ import tkinter as tk
 import os
 from tkinter import messagebox
 from dataclasses import dataclass
-
+from ui.ui_styles import S, FONTS, PRIMARY_BG
+from ui.ui_components import clear_frame, create_submit_button, show_incomplete_warning
 import utils.write_assessments_to_excel as write_assessments_to_excel
 
 # ---------- Data ----------
@@ -51,26 +52,6 @@ GROUPS = [
 ]
 
 LIKERT = ["1", "2", "3", "4", "5"]
-
-# Styles 
-S = {
-    "bg": "#ffffff",
-    "dark": "#727272",
-    "odd": "#eeeeee",   
-    "even": "#e0e0e0",
-    "yellow": "#f1c40f",
-    "btn": "#d9d9d9",
-    "btn_on": "#4d4d4d",
-    "f_title": ("Segoe UI", 14, "bold"),
-    "f_sub": ("Segoe UI", 10),
-    "f": ("Segoe UI", 10),
-    "f_b": ("Segoe UI", 10, "bold"),
-}
-
-# ---------- Helpers ----------
-def clear_frame(frame: tk.Widget) -> None:
-    for w in frame.winfo_children():
-        w.destroy()
 
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
     wrap = tk.Frame(parent, bg=S["bg"])
@@ -165,12 +146,6 @@ class Culture22Page(tk.Frame):
         h.pack(fill="x")
         tk.Label(h, text="Cultuur", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="w", padx=10)\
             .grid(row=0, column=0, sticky="w")
-        tk.Label(h, text="Aspecten: stellingen", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
-            .grid(row=0, column=1, sticky="w")
-        tk.Label(h, text="Score", bg=S["dark"], fg="white", font=S["f_b"], width=22, anchor="e", padx=10)\
-            .grid(row=0, column=2, sticky="e")
-        tk.Label(h, text="Totaal", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="e", padx=10)\
-            .grid(row=0, column=3, sticky="e")
 
         body = tk.Frame(left, bg=S["bg"])
         body.pack(fill="both", expand=True)
@@ -249,16 +224,13 @@ class Culture22Page(tk.Frame):
         btn_row = tk.Frame(inner, bg=S["bg"])
         btn_row.pack(fill="x", padx=20, pady=(12, 20))
 
-        tk.Button(
+        btn_submit = create_submit_button(
             btn_row,
             text="Opslaan en verder",
-            bg=S["btn_on"],
-            fg="white",
-            font=("Segoe UI", 11, "bold"),
-            padx=20,
-            pady=6,
             command=self.submit
-        ).pack(side="right")
+        )
+        btn_submit.pack(side="right")
+
 
     def submit(self):
         """
@@ -274,10 +246,7 @@ class Culture22Page(tk.Frame):
             if not self.vars[(gid, i)].get().strip()
         ]
         if missing:
-            messagebox.showwarning(
-                "Onvolledige vragenlijst",
-                f"Er zijn nog {len(missing)} stellingen niet ingevuld."
-            )
+            show_incomplete_warning(len(missing), item_name="stellingen")
             return
 
         # prepare answers dict {(group_id, stmt_index): value}
@@ -309,17 +278,16 @@ class Culture22Page(tk.Frame):
         # save path
         root.results_excel_path = saved_path
 
-        # 6️⃣ Optional: calculate totals per group
+        # calculate totals per group
         self.cultuur_totals = {g.id: self.subtotal(g.id) for g in GROUPS}
 
-        # 7️⃣ Inform user
         messagebox.showinfo(
             "Opgeslagen",
             f"Antwoorden succesvol opgeslagen in:\n{saved_path}"
         )
 
-        # 8️⃣ Navigate to next phase
-        self.navigate("phase2.3")  # Adjust to your next phase
+        # next phase
+        self.navigate("phase2.3")
 
 
 # -------------------- BUILDER FUNCTION --------------------
