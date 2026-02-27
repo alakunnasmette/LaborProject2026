@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.write_assessments_to_excel import write_assessment_answers_to_excel
-from ui.ui_components import clear_frame
+from ui.ui_components import clear_frame, add_nav_buttons
 from ui.ui_styles import (
     DARK_GREY,
     LIGHT_GREY,
@@ -312,32 +312,17 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     btn_frame = tk.Frame(scroll_frame, bg="white")
     btn_frame.pack(fill="x", pady=(5, 20))
 
-    btn_skip = tk.Button(
-        btn_frame,
-        text="Overslaan",
-        bg=SECONDARY_BG,
-        fg="white",
-        font=FONTS["medium_bold"],
-        padx=BUTTON_PADX,
-        pady=BUTTON_PADY,
-        command=lambda: navigate("phase2.0"),
-    )
-    btn_skip.pack(side="left", padx=BUTTON_CONTAINER_PADX)
 
-    btn_on_pressed = lambda e: navigate("phase2.0")
-    btn_skip.bind("<Return>", btn_on_pressed)
-
-    btn_submit = tk.Button(
+    add_nav_buttons(
         btn_frame,
-        text="Opslaan en verder",
-        bg=PRIMARY_BG,
-        fg="white",
-        font=FONTS["medium_bold"],
-        padx=BUTTON_PADX,
-        pady=BUTTON_PADY,
-        command=on_submit,
+        submit_command=on_submit,
+        skip_command=lambda: navigate("phase2.0"),
+        skip_text="Overslaan",
+        submit_text="Opslaan en verder",
+        skip_side="left",
+        submit_side="right",
+        padx=BUTTON_CONTAINER_PADX
     )
-    btn_submit.pack(side="right", padx=BUTTON_CONTAINER_PADX)
 
     # extra ruimte onderaan
     tk.Frame(scroll_frame, bg="white", height=30).pack(fill="x")

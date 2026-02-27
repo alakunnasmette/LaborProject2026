@@ -3,7 +3,7 @@ from tkinter import messagebox
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ui.ui_components import clear_frame
+from ui.ui_components import clear_frame, create_submit_button
 from utils.write_assessments_to_excel import add_job_characteristics_to_excel
 from ui.ui_styles import S, FONTS, PRIMARY_BG, CARD_LIGHT_BG
 
@@ -198,13 +198,9 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         if navigate:
             navigate("home")
 
-    tk.Button(
+    btn_submit = create_submit_button(
         button_frame,
         text="Opslaan en verder",
-        bg=PRIMARY_BG,
-        fg="white",
-        font=FONTS["medium_bold"],
-        padx=20,
-        pady=8,
         command=on_submit
-    ).pack(side="right")
+    )
+    btn_submit.pack(side="right")
