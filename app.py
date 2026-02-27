@@ -1,5 +1,6 @@
 import tkinter as tk
 import os
+import ctypes
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 try:
@@ -20,6 +21,10 @@ root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="white")
 root.state("zoomed")
+
+myappid = 'mycompany.myproduct.version'
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+root.iconbitmap(r"icon.ico")
 
 # --------- Sidebar ---------
 SIDEBAR_WIDTH = 180
