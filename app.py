@@ -336,14 +336,14 @@ tk.Button(
     top_frame,
     text="+ Nieuwe Klant",
     command=create_new_client,
-    bg=CELL_BORDER,
+    bg=COLOR_TEXT_LIGHT,
     fg="white",
     font=("Segoe UI", 11, "bold"),
     padx=20,
     pady=8,
     relief="flat",
     cursor="hand2",
-    activebackground="#757575"
+    activebackground=COLOR_TEXT_LIGHT
 ).pack(side="right", padx=15)
 
 # Content frame - this swaps between list view and dashboard
