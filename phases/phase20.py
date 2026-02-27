@@ -383,20 +383,17 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     btn_frame.pack(fill="x", pady=(10, 30))
 
 
-    btn_skip = create_back_button(
+    from ui.ui_components import add_nav_buttons
+    add_nav_buttons(
         btn_frame,
-        text="Overslaan",
-        command=lambda: navigate_to("phase2.1")
+        submit_command=on_submit_loopbaan,
+        skip_command=(lambda: navigate_to("phase2.1")),
+        skip_text="Overslaan",
+        submit_text="Opslaan en verder",
+        skip_side="left",
+        submit_side="right",
+        padx=BUTTON_CONTAINER_PADX
     )
-    btn_skip.pack(side="left", padx=BUTTON_CONTAINER_PADX)
-    btn_skip.bind("<Return>", lambda e: navigate_to("phase2.1"))
-
-    btn_submit = create_submit_button(
-        btn_frame,
-        text="Opslaan en verder",
-        command=on_submit_loopbaan
-    )
-    btn_submit.pack(side="right", padx=BUTTON_CONTAINER_PADX)
 
 def show(parent_frame: tk.Frame):
     """Public function to display Phase 2.0 page."""

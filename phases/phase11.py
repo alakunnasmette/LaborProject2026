@@ -313,6 +313,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     btn_frame.pack(fill="x", pady=(5, 20))
 
 
+    from ui.ui_components import add_nav_buttons
     add_nav_buttons(
         btn_frame,
         submit_command=on_submit,

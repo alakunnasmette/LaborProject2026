@@ -198,9 +198,14 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         if navigate:
             navigate("home")
 
-    btn_submit = create_submit_button(
+    from ui.ui_components import add_nav_buttons
+    add_nav_buttons(
         button_frame,
-        text="Opslaan en verder",
-        command=on_submit
+        submit_command=on_submit,
+        skip_command=(lambda: navigate("home")) if navigate else None,
+        skip_text="Terug",
+        submit_text="Opslaan en verder",
+        skip_side="left",
+        submit_side="right",
+        padx=20
     )
-    btn_submit.pack(side="right")
