@@ -1,8 +1,10 @@
+from http import client
 import tkinter as tk
 from tkinter import ttk
 import json
 import os
 import ctypes
+from xmlrpc import client
 import phases.phase11
 from PIL import Image, ImageTk
 _USE_PILLOW = True
@@ -92,22 +94,106 @@ def search_clients(query):
     clients = load_clients()
     return [c for c in clients if query.lower() in c.get("name", "").lower()]
 
-def create_new_client():
-    """Open dialog to create new client."""
-    name = simpledialog.askstring("New Client", "Enter client name:")
-    if name:
+def show_create_client_form():
+    """Display form to create a new client with all fields."""
+    clear_content_frame()
+
+    button_frame = tk.Frame(content_frame, bg=COLOR_BG)
+    button_frame.pack(fill="x", padx=20, pady=(0, 20))
+    text: str = "← Terug naar Klantenlijst"
+    tk.Button(
+        button_frame,
+        text=text,
+        command=show_client_list,
+        bg=COLOR_TEXT_LIGHT,
+        fg="white",
+        font=("Segoe UI", 10, "bold"),
+        padx=10,
+        pady=5
+    ).pack(side="left")
+
+    form_frame = tk.Frame(content_frame, bg=COLOR_BG)
+    form_frame.pack(padx=40, pady=30, fill="x")
+
+    tk.Label(
+        form_frame,
+        text="Nieuwe Klant Toevoegen",
+        font=("Segoe UI", 20, "bold"),
+        bg=COLOR_BG,
+        fg=COLOR_PRIMARY
+    ).pack(anchor="w", pady=(0, 20))
+
+    # Dictionary to store entry widgets
+    entries = {}
+
+    fields = [
+        "Naam",
+        "Geboortedatum",
+        "Email",
+        "Telefoonnummer",
+        "Adres",
+        "Opleidingen",
+        "Land van herkomst"
+    ]
+
+    for field in fields:
+        row = tk.Frame(form_frame, bg=COLOR_BG)
+        row.pack(fill="x", pady=5)
+
+        tk.Label(
+            row,
+            text=field,
+            width=20,
+            anchor="w",
+            bg=COLOR_BG,
+            fg=COLOR_TEXT
+        ).pack(side="left")
+
+        entry = tk.Entry(row, font=("Segoe UI", 11))
+        entry.pack(side="left", fill="x", expand=True)
+
+        entries[field] = entry
+
+    # Save button
+    def save_client():
+        name = entries["Naam"].get().strip()
+
+        if not name:
+            messagebox.showerror("Fout", "Naam is verplicht.")
+            return
+
         clients = load_clients()
-        client_id = len(clients) + 1
+        client_id = max([c["id"] for c in clients], default=0) + 1
+
         new_client = {
             "id": client_id,
             "name": name,
+            "Date of Birth": entries["Geboortedatum"].get(),
+            "email": entries["Email"].get(),
+            "phone number": entries["Telefoonnummer"].get(),
+            "address": entries["Adres"].get(),
+            "Qualifications": entries["Opleidingen"].get(),
+            "Country of origin": entries["Land van herkomst"].get(),
             "assessments": [],
             "prognosis": []
         }
+
         clients.append(new_client)
         save_clients(clients)
+
+        messagebox.showinfo("Succes", f"Client '{name}' aangemaakt!")
         show_client_list()
-        messagebox.showinfo("Success", f"Client '{name}' created!")
+
+    tk.Button(
+        form_frame,
+        text="Opslaan",
+        command=save_client,
+        bg=COLOR_SUCCESS,
+        fg="white",
+        font=("Segoe UI", 12, "bold"),
+        padx=20,
+        pady=10
+    ).pack(pady=20)
 
 def clear_content_frame():
     """Clear the content area."""
@@ -191,6 +277,26 @@ def view_client_results(client):
 def open_client_dashboard(client):
     """Open the dashboard for this client with assessment and prognosis buttons."""
     clear_content_frame()
+    info_frame = tk.Frame(content_frame, bg=COLOR_BG)
+    info_frame.pack(fill="x", padx=20, pady=(0, 20))
+
+    info_fields = [
+        ("Geboortedatum", client.get("Date of Birth", "")),
+        ("Email", client.get("email", "")),
+        ("Telefoon", client.get("phone number", "")),
+        ("Adres", client.get("address", "")),
+        ("Opleidingen", client.get("Qualifications", "")),
+        ("Land", client.get("Country of origin", "")),
+]
+
+    for label, value in info_fields:
+        tk.Label(
+        info_frame,
+        text=f"{label}: {value}",
+        font=("Segoe UI", 11),
+        bg=COLOR_BG,
+        fg=COLOR_TEXT
+    ).pack(anchor="w")
     
     # Back button
     back_btn = tk.Button(
@@ -221,7 +327,6 @@ def open_client_dashboard(client):
     
     tk.Label(
         header_frame,
-        text=f"ID: {client['id']}",
         font=("Segoe UI", 11),
         bg=COLOR_PRIMARY,
         fg=COLOR_LIGHT
@@ -335,7 +440,7 @@ tk.Button(
 tk.Button(
     top_frame,
     text="+ Nieuwe Klant",
-    command=create_new_client,
+    command=show_create_client_form,
     bg=COLOR_TEXT_LIGHT,
     fg="white",
     font=("Segoe UI", 11, "bold"),
@@ -388,3 +493,8 @@ def open_phase11_assessment(client):
     global current_assessment_client
     current_assessment_client = client
     navigate_phase("phase1.1")
+
+try:
+    root.mainloop()
+except KeyboardInterrupt:
+    pass

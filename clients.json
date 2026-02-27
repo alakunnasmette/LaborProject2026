@@ -10,5 +10,17 @@
     "name": "John doe",
     "assessments": [],
     "prognosis": []
+  },
+  {
+    "id": 3,
+    "name": "John Smith",
+    "Date of Birth": "20-05-1980",
+    "email": "JohnSmith@gmail.com",
+    "phone number": "+31 XXXXXXXXX",
+    "address": "Mars",
+    "Qualifications": "Software engineer",
+    "Country of origin": "Nederland",
+    "assessments": [],
+    "prognosis": []
   }
 ]
