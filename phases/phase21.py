@@ -703,14 +703,17 @@ class Culture22Page(tk.Frame):
         btn_row = tk.Frame(inner, bg=S["bg"])
         btn_row.pack(fill="x", padx=20, pady=(12, 20))
 
-        tk.Button(
+        from ui.ui_components import create_back_button, create_submit_button
+        btn_skip = create_back_button(
+            btn_row,
+            text="Overslaan",
+            command=lambda: self.navigate("phase2.2")
+        )
+        btn_skip.pack(side="left", padx=(0, 10))
+
+        btn_submit = create_submit_button(
             btn_row,
             text="Opslaan en verder",
-            bg=S["btn_on"],
-            fg="white",
-            font=("Segoe UI", 11, "bold"),
-            padx=20,
-            pady=6,
             command=self.submit
         ).pack(side="right")
 
