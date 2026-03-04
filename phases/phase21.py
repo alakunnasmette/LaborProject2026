@@ -9,6 +9,8 @@ from ui.ui_styles import S
 from ui.ui_components import clear_frame
 import utils.write_assessments_to_excel as write_assessments_to_excel
 
+# ---------- Helpers ----------
+
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
     wrap = tk.Frame(parent, bg=S["bg"])
     wrap.pack(fill="both", expand=True)
@@ -624,7 +626,6 @@ class Culture22Page(tk.Frame):
         for cluster_id, questions in CLUSTER_QUESTIONS.items():
             for idx, q in enumerate(questions, start=1):
                 rows_by_cluster[cluster_id].append((idx, q))
-
 
         for cluster_id, rows in rows_by_cluster.items():
             # Cluster header

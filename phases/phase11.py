@@ -83,6 +83,7 @@ BIG_FIVE_ITEMS = [
     (50, "Ik zit vol met ideeën."),
 ]
 
+# --- Table column headers ---
 
 def get_assessment_results(parent_frame: tk.Frame) -> dict[int, int | None]:
     """
@@ -310,7 +311,6 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     btn_frame.pack(fill="x", pady=(5, 20))
 
     add_nav_buttons(
-
         btn_frame,
         submit_command=on_submit,
         skip_command=lambda: navigate("phase2.0"),
@@ -321,5 +321,5 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         padx=BUTTON_CONTAINER_PADX
     )
 
-    # eextra ruimte onderaan
+    # extra space at the bottom
     tk.Frame(scroll_frame, bg="white", height=30).pack(fill="x")

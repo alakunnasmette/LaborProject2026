@@ -2,6 +2,15 @@ import tkinter as tk
 
 # Centralized UI styling constants and small helpers for the app
 
+COLOR_PRIMARY = "#000000"
+COLOR_SECONDARY = "#3498db"
+COLOR_ACCENT = "#e74c3c"
+COLOR_SUCCESS = "#27ae60"
+COLOR_BG = "#f0f0f0"
+COLOR_LIGHT = "#ecf0f1"
+COLOR_TEXT = "#2c3e50"
+COLOR_TEXT_LIGHT = "#7f8c8d"
+
 # Colors
 ROW_BG_1 = "#eeeeee"
 ROW_BG_2 = "#e0e0e0"

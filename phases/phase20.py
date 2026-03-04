@@ -156,7 +156,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
 
     # =================== Table headers and rows ===================
     table = tk.Frame(scroll_frame, bg=S["bg"])
-    table.pack(fill="both", expand=True, padx=TABLE_PADX, pady=(TABLE_PADY))
+    table.pack(fill="both", expand=True, padx=TABLE_PADX, pady=TABLE_PADY)
 
     # columns
     for c in range(7):
@@ -341,13 +341,13 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             )
             return
 
-        # map to columns
+        # map to Excel columns
         excel_answers = {
             qnum: ANCHOR_TO_COLUMN[var.get()]
             for qnum, var in vraag_vars.items()
         }
 
-        # 3write to excel
+        # write to Excel
         root = parent_frame.winfo_toplevel()
 
         if not hasattr(root, "results_excel_path"):
@@ -380,7 +380,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             f"Antwoorden opgeslagen in:\n{save_path}"
         )
 
-        # next phase 
+        # next phase
         navigate_to("phase2.1")
 
     btn_frame = tk.Frame(scroll_frame, bg=S["bg"])

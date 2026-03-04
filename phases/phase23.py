@@ -4,9 +4,8 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ui.ui_components import clear_frame, create_submit_button
-from utils.write_assessments_to_excel import add_job_characteristics_to_excel
+from utils.write_assessments_to_excel import write_phase_2_3_to_excel
 from ui.ui_styles import S, FONTS, PRIMARY_BG, CARD_LIGHT_BG
-
 
 # ==================== Job Characteristics Model Data ====================
 JOB_CHARACTERISTICS_MODEL = [
@@ -30,7 +29,6 @@ JOB_CHARACTERISTICS_MODEL = [
         "De mate waarin de werknemer kennis heeft van resultaten. Dit is duidelijke, specifieke, gedetailleerde, bruikbare informatie over de effectiviteit van zijn of haar werkprestaties. Wanneer werknemers duidelijke, bruikbare informatie over hun werkprestaties ontvangen, hebben ze een betere algemene kennis van het effect van hun werkactiviteiten en welke specifieke acties ze moeten ondernemen (indien aanwezig) om hun productiviteit te verbeteren.",
         "Hoe belangrijk vind je het om duidelijke en bruikbare feedback te krijgen over hoe goed je je werk doet? En in welke mate zou je idealiter op de hoogte willen zijn van het effect van je werk en van punten waarop je jezelf kunt verbeteren?"),
 ]
-
 
 # ==================== Build Function ====================
 def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None) -> None:
@@ -196,15 +194,24 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             )
             return
 
-        success = add_job_characteristics_to_excel(
-                excel_path, 
-                answers
+        result = write_phase_2_3_to_excel(
+            answers,
+            excel_path
         )
 
+        if not result:
+            messagebox.showerror(
+                "Fout bij opslaan",
+                "Er ging iets mis bij het opslaan van je antwoorden."
+            )
+            return
+        
         messagebox.showinfo(
             "Succes",
             f"Je antwoorden zijn opgeslagen"
         )
+
+
 
         # to homepage
         if navigate:

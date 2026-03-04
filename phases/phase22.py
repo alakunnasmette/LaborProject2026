@@ -53,6 +53,8 @@ GROUPS = [
 
 LIKERT = ["1", "2", "3", "4", "5"]
 
+
+# ---------- Helpers ----------
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
     wrap = tk.Frame(parent, bg=S["bg"])
     wrap.pack(fill="both", expand=True)
@@ -146,6 +148,10 @@ class Culture22Page(tk.Frame):
         h.pack(fill="x")
         tk.Label(h, text="Cultuur", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="w", padx=10)\
             .grid(row=0, column=0, sticky="w")
+
+
+        # tk.Label(h, text="Aspecten: stellingen", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
+        #     .grid(row=0, column=1, sticky="w")
 
         body = tk.Frame(left, bg=S["bg"])
         body.pack(fill="both", expand=True)
