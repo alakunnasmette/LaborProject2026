@@ -21,6 +21,7 @@ root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="#f0f0f0")
 root.state("zoomed")
+phase_history = []
 
 myappid = 'mycompany.myproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -47,9 +48,25 @@ SIDEBAR_WIDTH = 200
 sidebar = create_sidebar(root, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
 logo_label = add_logo_to_sidebar(sidebar, logo_path=os.path.join("images", "labor-logo.png"), use_pillow=_USE_PILLOW, bg=COLOR_PRIMARY)
 
+def go_back_phase():
+    if len(phase_history) > 1:
+        phase_history.pop()                 
+        navigate_phase(phase_history.pop()) 
+
+back_button = tk.Button(
+    sidebar,
+    text="← Terug",
+    command=go_back_phase,
+    bg=COLOR_PRIMARY,
+    fg="white",
+    relief="flat",
+    font=("Segoe UI", 10, "bold"),
+    cursor="hand2"
+)
+back_button.pack(pady=50, padx=50, anchor="w")
+
 # --------- Data Storage ---------
 clients_file = "clients.json"
-
 def load_clients():
     """Load clients from JSON file."""
     if os.path.exists(clients_file):
@@ -223,15 +240,19 @@ def open_phase11_assessment(client):
 
 def navigate_phase(phase_name):
     """Navigate to a specific phase."""
+    
+    if phase_name == "phase1.1":
+        top_frame.pack_forget()
+
     if phase_name not in PHASES:
         messagebox.showerror("Error", f"Unknown phase: {phase_name}")
         return
-    
+    phase_history.append(phase_name)
     build_func = PHASES[phase_name]
     build_func(content_frame, navigate_phase)
 
 def show_client_list(query=""):
-    """Display the client list view."""
+    top_frame.pack(fill="x", padx=20, pady=15)
     search_entry.delete(0, tk.END)
     refresh_client_list(query)
 
@@ -365,8 +386,6 @@ main_frame.pack(fill="both", expand=True)
 top_frame = tk.Frame(main_frame, bg=YELLOW_ACCENT, height=80)
 top_frame.pack(fill="x", padx=20, pady=15)
 top_frame.pack_propagate(False)
-if navigate_phase == "phase1.1":
-    visible = False
 
 tk.Label(
     top_frame,
