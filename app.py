@@ -204,11 +204,11 @@ def refresh_client_list(query=""):
     # Create listbox
     client_listbox = tk.Listbox(
         list_container,
-        font=("Segoe UI", 11),
+        font=("Segoe UI", 15),
         bg="white",
         fg=COLOR_TEXT,
         relief="flat",
-        bd=1,
+        bd=15,
         highlightthickness=0,
         activestyle="none",
         selectmode="single"
@@ -222,7 +222,7 @@ def refresh_client_list(query=""):
     
     # Add clients to listbox
     for i, client in enumerate(clients):
-        client_listbox.insert(tk.END, f"{client['name']} (ID: {client['id']})")
+        client_listbox.insert(tk.END, f"{client['name']}")
     
     # Bind click to open dashboard
     def on_select(event):
@@ -274,6 +274,33 @@ def open_client_dashboard(client):
     info_frame = tk.Frame(content_frame, bg=COLOR_BG)
     info_frame.pack(fill="x", padx=20, pady=(0, 20))
 
+        # Client info header
+    header_frame = tk.Frame(content_frame, bg=COLOR_PRIMARY)
+    header_frame.pack(fill="x", padx=20, pady=(10, 30))
+
+        # Back button
+    back_btn = tk.Button(
+        content_frame,
+        text="← Terug naar Klantenlijst",
+        command=show_client_list,
+        bg=COLOR_TEXT_LIGHT,
+        fg="white",
+        font=("Segoe UI", 10, "bold"),
+        padx=10,
+        pady=5,
+        relief="flat",
+        cursor="hand2"
+    )
+    back_btn.pack(anchor="w", padx=20, pady=10)
+    
+    tk.Label(
+        header_frame,
+        text=client["name"],
+        font=("Segoe UI", 24, "bold"),
+        bg=COLOR_PRIMARY,
+        fg="white"
+    ).pack(anchor="w")
+
     info_fields = [
         ("Geboortedatum", client.get("Date of Birth", "")),
         ("Email", client.get("email", "")),
@@ -290,33 +317,6 @@ def open_client_dashboard(client):
         font=("Segoe UI", 11),
         bg=COLOR_BG,
         fg=COLOR_TEXT
-    ).pack(anchor="w")
-    
-    # Back button
-    back_btn = tk.Button(
-        content_frame,
-        text="← Terug naar Klantenlijst",
-        command=show_client_list,
-        bg=COLOR_TEXT_LIGHT,
-        fg="white",
-        font=("Segoe UI", 10, "bold"),
-        padx=10,
-        pady=5,
-        relief="flat",
-        cursor="hand2"
-    )
-    back_btn.pack(anchor="w", padx=20, pady=10)
-    
-    # Client info header
-    header_frame = tk.Frame(content_frame, bg=COLOR_PRIMARY)
-    header_frame.pack(fill="x", padx=20, pady=(10, 30))
-    
-    tk.Label(
-        header_frame,
-        text=client["name"],
-        font=("Segoe UI", 24, "bold"),
-        bg=COLOR_PRIMARY,
-        fg="white"
     ).pack(anchor="w")
     
     tk.Label(
