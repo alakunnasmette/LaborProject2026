@@ -67,6 +67,7 @@ back_button.pack(pady=50, padx=50, anchor="w")
 
 # --------- Data Storage ---------
 clients_file = "clients.json"
+
 def load_clients():
     """Load clients from JSON file."""
     if os.path.exists(clients_file):
@@ -247,11 +248,16 @@ def navigate_phase(phase_name):
     if phase_name not in PHASES:
         messagebox.showerror("Error", f"Unknown phase: {phase_name}")
         return
+    
     phase_history.append(phase_name)
     build_func = PHASES[phase_name]
+    # Pass current_assessment_client to phase1.1 via parent_frame
+    if phase_name == "phase1.1":
+        content_frame.current_assessment_client = current_assessment_client
     build_func(content_frame, navigate_phase)
 
 def show_client_list(query=""):
+    """Display the client list view."""
     top_frame.pack(fill="x", padx=20, pady=15)
     search_entry.delete(0, tk.END)
     refresh_client_list(query)
@@ -386,6 +392,8 @@ main_frame.pack(fill="both", expand=True)
 top_frame = tk.Frame(main_frame, bg=YELLOW_ACCENT, height=80)
 top_frame.pack(fill="x", padx=20, pady=15)
 top_frame.pack_propagate(False)
+if navigate_phase == "phase1.1":
+    visible = False
 
 tk.Label(
     top_frame,

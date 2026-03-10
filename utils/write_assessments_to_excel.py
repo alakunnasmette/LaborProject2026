@@ -21,10 +21,8 @@ def create_or_update_assessment_file(
             return False
         
         folder = os.path.dirname(excel_path) or "."
-        filled_dir = os.path.join(folder, "results")
-        
-        # Ensure results directory exists
-        os.makedirs(filled_dir, exist_ok=True)
+        # Save directly in the client folder, no 'results' subfolder
+        filled_dir = folder
         
         if is_first_save:
             if timestamp is None:

@@ -296,11 +296,31 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
             )
             return
 
-        # Save results and generate Excel file
+        # Save results and generate Excel file in the current client's folder
         parent_frame.assessment_results = results
-        save_path = write_assessment_answers_to_excel(results)
+
+        # Get current_assessment_client from parent_frame (set in app.py)
+        current_assessment_client = getattr(parent_frame, "current_assessment_client", None)
+        TEMPLATE_PATH = os.path.join(os.getcwd(), "Loopbaan onderzoek 5.0 template.xlsx")
+        if current_assessment_client and "id" in current_assessment_client and "name" in current_assessment_client:
+            safe_name = "_".join(str(current_assessment_client["name"]).split())
+            folder_name = f"{current_assessment_client['id']}_{safe_name}"
+            client_dir = os.path.join(os.getcwd(), "clients", folder_name)
+            os.makedirs(client_dir, exist_ok=True)
+            # Compose a unique filename for the filled Excel file in the client folder
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            base_name = os.path.splitext(os.path.basename(TEMPLATE_PATH))[0]
+            new_name = f"{base_name} - filled {timestamp}.xlsx"
+            client_excel_path = os.path.join(client_dir, new_name)
+            # Copy template to client folder and fill it
+            import shutil
+            shutil.copy2(TEMPLATE_PATH, client_excel_path)
+            save_path = write_assessment_answers_to_excel(results, excel_path=client_excel_path)
+        else:
+            save_path = write_assessment_answers_to_excel(results, excel_path=TEMPLATE_PATH)
+
         if save_path:
-            # Store the Excel file path on parent_frame so subsequent phases can add to it
             parent_frame.excel_file_path = save_path
             messagebox.showinfo("Succes", f"Antwoorden opgeslagen naar:\n{save_path}")
         else:
