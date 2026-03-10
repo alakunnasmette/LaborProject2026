@@ -46,5 +46,41 @@
     "Country of origin": "madagascar 2",
     "assessments": [],
     "prognosis": []
+  },
+  {
+    "id": 6,
+    "name": "rex",
+    "Date of Birth": "69-69-2069",
+    "email": "no.email@trucks.com",
+    "phone number": "0098764543",
+    "address": "street 1",
+    "Qualifications": "F1 driver",
+    "Country of origin": "The moon",
+    "assessments": [],
+    "prognosis": []
+  },
+  {
+    "id": 7,
+    "name": "wack man",
+    "Date of Birth": "12-10-2003",
+    "email": "mail.package@gmail.com",
+    "phone number": "075295746",
+    "address": "round street 35",
+    "Qualifications": "doctor",
+    "Country of origin": "france",
+    "assessments": [],
+    "prognosis": []
+  },
+  {
+    "id": 8,
+    "name": "kkaas",
+    "Date of Birth": "1-1-1",
+    "email": "eee",
+    "phone number": "45366",
+    "address": "banaan",
+    "Qualifications": "geen",
+    "Country of origin": "frankrijk",
+    "assessments": [],
+    "prognosis": []
   }
 ]

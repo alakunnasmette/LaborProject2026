@@ -172,6 +172,16 @@ def show_create_client_form():
         clients.append(new_client)
         save_clients(clients)
 
+        # Create client folder and info.json
+        import os, json
+        safe_name = "_".join(name.split())
+        folder_name = f"{client_id}_{safe_name}"
+        client_dir = os.path.join("clients", folder_name)
+        os.makedirs(client_dir, exist_ok=True)
+        client_json_path = os.path.join(client_dir, "info.json")
+        with open(client_json_path, "w", encoding="utf-8") as f:
+            json.dump(new_client, f, indent=2, ensure_ascii=False)
+
         messagebox.showinfo("Succes", f"Client '{name}' aangemaakt!")
         show_client_list()
 
