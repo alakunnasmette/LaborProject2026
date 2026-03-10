@@ -377,7 +377,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         )
 
         # 4. Next phase
-        navigate_to("phase21")
+        navigate_to("phase2.1")
 
     btn_frame = tk.Frame(scroll_frame, bg=S["bg"])
     btn_frame.pack(fill="x", pady=(10, 30))

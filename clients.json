@@ -41,7 +41,7 @@
     "Date of Birth": "01-01-0001",
     "email": "OG.Gmail.com",
     "phone number": "12345678",
-    "address": "kaas",
+    "address": "appel",
     "Qualifications": "geen",
     "Country of origin": "madagascar 2",
     "assessments": [],
@@ -61,7 +61,7 @@
   },
   {
     "id": 7,
-    "name": "wack man",
+    "name": "jimbo",
     "Date of Birth": "12-10-2003",
     "email": "mail.package@gmail.com",
     "phone number": "075295746",
@@ -73,8 +73,8 @@
   },
   {
     "id": 8,
-    "name": "kkaas",
-    "Date of Birth": "1-1-1",
+    "name": "kaas",
+    "Date of Birth": "03-05-1995",
     "email": "eee",
     "phone number": "45366",
     "address": "banaan",

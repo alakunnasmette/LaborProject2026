@@ -57,9 +57,8 @@ def write_assessment_answers_to_excel(
             return False
 
         folder = os.path.dirname(template_path) or "."
-        filled_dir = os.path.join(folder, "results")
-        os.makedirs(filled_dir, exist_ok=True)
-        
+        filled_dir = folder  # Save directly in the client folder
+        # os.makedirs(filled_dir, exist_ok=True)  # Not needed, folder should exist
         base_name = os.path.splitext(os.path.basename(template_path))[0]
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         new_name = f"{base_name} - filled {timestamp}.xlsx"
@@ -279,8 +278,8 @@ def write_loopbaan_answers_to_excel(loopbaan_results: dict, excel_path: str = "L
     if not os.path.exists(excel_path):
         return False
     folder = os.path.dirname(excel_path) or "."
-    filled_dir = os.path.join(folder, "results")
-    os.makedirs(filled_dir, exist_ok=True)
+    filled_dir = folder  # Save directly in the client folder
+    # os.makedirs(filled_dir, exist_ok=True)  # Not needed, folder should exist
     base_name = os.path.splitext(os.path.basename(excel_path))[0]
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     new_name = f"{base_name} - filled {timestamp}.xlsx"

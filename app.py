@@ -264,6 +264,21 @@ def navigate_phase(phase_name):
     # Pass current_assessment_client to phase1.1 via parent_frame
     if phase_name == "phase1.1":
         content_frame.current_assessment_client = current_assessment_client
+    # Set results_excel_path for phase2.0 and phase2.1 if client context is available
+    if phase_name in ("phase2.0", "phase2.1") and hasattr(content_frame, "current_assessment_client"):
+        client = content_frame.current_assessment_client
+        safe_name = "_".join(client["name"].split())
+        folder_name = f"{client['id']}_{safe_name}"
+        client_dir = os.path.join("clients", folder_name)
+        excel_path = None
+        if os.path.exists(client_dir):
+            for fname in os.listdir(client_dir):
+                if fname.endswith(".xlsx"):
+                    excel_path = os.path.join(client_dir, fname)
+                    break
+        if not excel_path:
+            excel_path = "Loopbaan onderzoek 5.0 template.xlsx"
+        content_frame.results_excel_path = excel_path
     build_func(content_frame, navigate_phase)
 
 def show_client_list(query=""):
@@ -290,11 +305,11 @@ def open_client_dashboard(client):
     info_frame = tk.Frame(content_frame, bg=COLOR_BG)
     info_frame.pack(fill="x", padx=20, pady=(0, 20))
 
-        # Client info header
+    # Client info header
     header_frame = tk.Frame(content_frame, bg=COLOR_PRIMARY)
     header_frame.pack(fill="x", padx=20, pady=(10, 30))
 
-        # Back button
+    # Back button
     back_btn = tk.Button(
         content_frame,
         text="← Terug naar Klantenlijst",
@@ -308,14 +323,131 @@ def open_client_dashboard(client):
         cursor="hand2"
     )
     back_btn.pack(anchor="w", padx=20, pady=10)
-    
+
+    # --- Name and Edit Button Row ---
+    name_edit_frame = tk.Frame(header_frame, bg=COLOR_PRIMARY)
+    name_edit_frame.pack(anchor="w", fill="x")
+
     tk.Label(
-        header_frame,
+        name_edit_frame,
         text=client["name"],
         font=("Segoe UI", 24, "bold"),
         bg=COLOR_PRIMARY,
         fg="white"
-    ).pack(anchor="w")
+    ).pack(side="left", padx=(0, 10))
+
+    def open_edit_client_info():
+        clear_content_frame()
+        button_frame = tk.Frame(content_frame, bg=COLOR_BG)
+        button_frame.pack(fill="x", padx=20, pady=(0, 20))
+        tk.Button(
+            button_frame,
+            text="← Terug naar Dashboard",
+            command=lambda: open_client_dashboard(client),
+            bg=COLOR_TEXT_LIGHT,
+            fg="white",
+            font=("Segoe UI", 10, "bold"),
+            padx=10,
+            pady=5
+        ).pack(side="left")
+
+        form_frame = tk.Frame(content_frame, bg=COLOR_BG)
+        form_frame.pack(padx=40, pady=30, fill="x")
+
+        tk.Label(
+            form_frame,
+            text="Klantinformatie Bewerken",
+            font=("Segoe UI", 20, "bold"),
+            bg=COLOR_BG,
+            fg=COLOR_PRIMARY
+        ).pack(anchor="w", pady=(0, 20))
+
+        entries = {}
+        fields = [
+            ("Naam", "name"),
+            ("Geboortedatum", "Date of Birth"),
+            ("Email", "email"),
+            ("Telefoonnummer", "phone number"),
+            ("Adres", "address"),
+            ("Opleidingen", "Qualifications"),
+            ("Land van herkomst", "Country of origin")
+        ]
+        for label, key in fields:
+            row = tk.Frame(form_frame, bg=COLOR_BG)
+            row.pack(fill="x", pady=5)
+            tk.Label(
+                row,
+                text=label,
+                width=20,
+                anchor="w",
+                bg=COLOR_BG,
+                fg=COLOR_TEXT
+            ).pack(side="left")
+            entry = tk.Entry(row, font=("Segoe UI", 11))
+            entry.insert(0, client.get(key, ""))
+            entry.pack(side="left", fill="x", expand=True)
+            entries[key] = entry
+
+        def save_edited_client():
+            updated = False
+            old_name = client.get("name", "")
+            old_safe_name = "_".join(old_name.split())
+            old_folder_name = f"{client['id']}_{old_safe_name}"
+            old_client_dir = os.path.join("clients", old_folder_name)
+            for label, key in fields:
+                value = entries[key].get().strip()
+                if value != client.get(key, ""):
+                    client[key] = value
+                    updated = True
+            if updated:
+                # Save to clients.json
+                clients = load_clients()
+                for c in clients:
+                    if c["id"] == client["id"]:
+                        c.update(client)
+                save_clients(clients)
+                # Rename folder if name changed
+                new_safe_name = "_".join(client["name"].split())
+                new_folder_name = f"{client['id']}_{new_safe_name}"
+                new_client_dir = os.path.join("clients", new_folder_name)
+                if old_client_dir != new_client_dir and os.path.exists(old_client_dir):
+                    try:
+                        os.rename(old_client_dir, new_client_dir)
+                    except Exception as e:
+                        messagebox.showwarning("Waarschuwing", f"Kon map niet hernoemen: {e}")
+                else:
+                    os.makedirs(new_client_dir, exist_ok=True)
+                # Save to info.json
+                client_json_path = os.path.join(new_client_dir, "info.json")
+                with open(client_json_path, "w", encoding="utf-8") as f:
+                    json.dump(client, f, indent=2, ensure_ascii=False)
+                messagebox.showinfo("Succes", "Klantinformatie bijgewerkt!")
+            open_client_dashboard(client)
+
+        tk.Button(
+            form_frame,
+            text="Opslaan",
+            command=save_edited_client,
+            bg=COLOR_SUCCESS,
+            fg="white",
+            font=("Segoe UI", 12, "bold"),
+            padx=20,
+            pady=10
+        ).pack(pady=20)
+
+    edit_btn = tk.Button(
+        name_edit_frame,
+        text="✏️",
+        command=open_edit_client_info,
+        bg=COLOR_PRIMARY,
+        fg="white",
+        font=("Segoe UI", 12),
+        relief="flat",
+        cursor="hand2",
+        width=2,
+        height=1
+    )
+    edit_btn.pack(side="left", padx=(0, 5))
 
     info_fields = [
         ("Geboortedatum", client.get("Date of Birth", "")),
@@ -324,31 +456,31 @@ def open_client_dashboard(client):
         ("Adres", client.get("address", "")),
         ("Opleidingen", client.get("Qualifications", "")),
         ("Land", client.get("Country of origin", "")),
-]
+    ]
 
     for label, value in info_fields:
         tk.Label(
-        info_frame,
-        text=f"{label}: {value}",
-        font=("Segoe UI", 11),
-        bg=COLOR_BG,
-        fg=COLOR_TEXT
-    ).pack(anchor="w")
-    
+            info_frame,
+            text=f"{label}: {value}",
+            font=("Segoe UI", 11),
+            bg=COLOR_BG,
+            fg=COLOR_TEXT
+        ).pack(anchor="w")
+
     tk.Label(
         header_frame,
         font=("Segoe UI", 11),
         bg=COLOR_PRIMARY,
         fg=COLOR_LIGHT
     ).pack(anchor="w")
-    
+
     # Action buttons frame
     buttons_container = tk.Frame(content_frame, bg=COLOR_BG)
     buttons_container.pack(fill="both", expand=True, padx=20, pady=20)
-    
+
     buttons_frame = tk.Frame(buttons_container, bg=COLOR_BG)
     buttons_frame.pack(fill="x", expand=False)
-    
+
     # Assessment Button
     tk.Button(
         buttons_frame,
@@ -363,7 +495,7 @@ def open_client_dashboard(client):
         cursor="hand2",
         activebackground="#2980b9"
     ).pack(pady=10, fill="x")
-    
+
     # Prognosis Button
     tk.Button(
         buttons_frame,
@@ -378,7 +510,7 @@ def open_client_dashboard(client):
         cursor="hand2",
         activebackground="#c0392b"
     ).pack(pady=10, fill="x")
-    
+
     # View Results Button
     tk.Button(
         buttons_frame,
