@@ -21,7 +21,7 @@ root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="#f0f0f0")
 root.state("zoomed")
-phase_history = []
+navigation_stack = []
 
 myappid = 'mycompany.myproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -48,15 +48,16 @@ SIDEBAR_WIDTH = 200
 sidebar = create_sidebar(root, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
 logo_label = add_logo_to_sidebar(sidebar, logo_path=os.path.join("images", "labor-logo.png"), use_pillow=_USE_PILLOW, bg=COLOR_PRIMARY)
 
-def go_back_phase():
-    if len(phase_history) > 1:
-        phase_history.pop()                 
-        navigate_phase(phase_history.pop()) 
+def navigate(view_func, *args, **kwargs):
+    """Navigate to a new view and store it in history."""
+    navigation_stack.append((view_func, args, kwargs))
+    clear_content_frame()
+    view_func(*args, **kwargs)
 
 back_button = tk.Button(
     sidebar,
     text="← Terug",
-    command=go_back_phase,
+    command=lambda: navigate(show_client_list),
     bg=COLOR_PRIMARY,
     fg="white",
     relief="flat",
@@ -259,7 +260,6 @@ def navigate_phase(phase_name):
         messagebox.showerror("Error", f"Unknown phase: {phase_name}")
         return
     
-    phase_history.append(phase_name)
     build_func = PHASES[phase_name]
     # Pass current_assessment_client to phase1.1 via parent_frame
     if phase_name == "phase1.1":
@@ -308,21 +308,6 @@ def open_client_dashboard(client):
     # Client info header
     header_frame = tk.Frame(content_frame, bg=COLOR_PRIMARY)
     header_frame.pack(fill="x", padx=20, pady=(10, 30))
-
-    # Back button
-    back_btn = tk.Button(
-        content_frame,
-        text="← Terug naar Klantenlijst",
-        command=show_client_list,
-        bg=COLOR_TEXT_LIGHT,
-        fg="white",
-        font=("Segoe UI", 10, "bold"),
-        padx=10,
-        pady=5,
-        relief="flat",
-        cursor="hand2"
-    )
-    back_btn.pack(anchor="w", padx=20, pady=10)
 
     # --- Name and Edit Button Row ---
     name_edit_frame = tk.Frame(header_frame, bg=COLOR_PRIMARY)
