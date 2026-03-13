@@ -27,7 +27,7 @@ Conform de bovenstaande theorie bevindt jij je in de volgende loopbaanfase:
 # =======================================================
 
 PHASE1_1_SECTION_TITLE = """
-Fase 1 | Persoonlijkheidstest conform Big Five Dimensies 
+Fase 1.1 | Big Five Persoonlijkheidsdimensies
 """
 
 PHASE1_1_INTRO_TEXT = """
@@ -82,7 +82,7 @@ Hoogste score 1 :
 """
 
 PHASE2_0_HOOGSTE_SCORE_2_TITLE = """
-Hoogste score 1 :
+Hoogste score 2 :
 """
 
 # anchors | Score yourScore/totalScore Hoog
@@ -94,7 +94,7 @@ Hoogste score 1 :
 # =======================================================
 
 PHASE2_1_SECTION_TITLE = """
-Fase 2 | Carrière Clusters
+Fase 2.1 | Carrière Clusters
 """
 
 PHASE2_1_INTRO_TEXT = """
@@ -107,7 +107,7 @@ Hoogste score 1 :
 """
 
 PHASE2_1_HOOGSTE_SCORE_2_TITLE = """
-Hoogste score 1 : 
+Hoogste score 2 : 
 """
 
 # professional sector | Score yourScore/totalScore Hoog
@@ -135,7 +135,7 @@ Hoogste score 1 :
 """
 
 PHASE2_2_HOOGSTE_SCORE_2_TITLE = """
-Hoogste score 1 : 
+Hoogste score 2 : 
 """
 
 # culture | Score yourScore/totalScore Hoog

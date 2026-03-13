@@ -1,9 +1,11 @@
 # personality_texts.py
 
+
+# THESE ARE FOR PHASE 1.1 BIG FIVE PERSONALITY
+
 BIGFIVE_TEXTS = {
 
 # ----------------------------- EXTRAVERSIE -----------------------------
-
         "Extraversie": {
 
             "high": """
@@ -50,8 +52,9 @@ BIGFIVE_TEXTS = {
     """
     },
 
-# ----------------------------- ALTRUISME -----------------------------
 
+
+# ----------------------------- ALTRUISME -----------------------------
         "Altruisme": {
 
             "high": """
@@ -98,9 +101,8 @@ BIGFIVE_TEXTS = {
     },
 
 
+
 # ----------------------------- CONSCIENTIEUSHEID -----------------------------
-
-
         "Conscientieusheid": {
 
             "high": """
@@ -142,8 +144,9 @@ BIGFIVE_TEXTS = {
     """
     },
 
-# ----------------------------- NEUROTICISME -----------------------------
 
+
+# ----------------------------- NEUROTICISME -----------------------------
         "Neuroticisme": {
 
             "high": """
@@ -189,7 +192,6 @@ BIGFIVE_TEXTS = {
 
 
 # ----------------------------- OPENHEID -----------------------------
-
         "Openheid": {
 
             "high": """
