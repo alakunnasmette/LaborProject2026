@@ -4,43 +4,7 @@ import shutil
 from datetime import datetime
 
 
-def create_or_update_assessment_file(
-    excel_path: str = "Loopbaan onderzoek 5.0 template.xlsx",
-    is_first_save: bool = True,
-    timestamp: str = None,
-) -> str | bool:
-    """Create a new assessment file or return path to existing one.
-    
-    If is_first_save=True, creates a copy of the template with a timestamp.
-    If is_first_save=False, returns the path (file should already exist).
-    Returns the path to the assessment file, or False on error.
-    """
-    try:
-        if not os.path.exists(excel_path):
-            print(f"Error: Excel template not found at {excel_path}")
-            return False
-        
-        folder = os.path.dirname(excel_path) or "."
-        # Save directly in the client folder, no 'results' subfolder
-        filled_dir = folder
-        
-        if is_first_save:
-            if timestamp is None:
-                timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            base_name = os.path.splitext(os.path.basename(excel_path))[0]
-            new_name = f"{base_name} - filled {timestamp}.xlsx"
-            new_path = os.path.join(filled_dir, new_name)
-            shutil.copy2(excel_path, new_path)
-            return new_path
-        else:
-            # Just return path (caller will open/update existing file)
-            return True
-            
-    except Exception as e:
-        print(f"Error creating assessment file: {e}")
-        return False
-
-
+# Phase 1.1 --------------------------
 def write_assessment_answers_to_excel(
     assessment_results: dict,
     excel_path: str = "Loopbaan onderzoek 5.0 template.xlsx",
@@ -51,22 +15,20 @@ def write_assessment_answers_to_excel(
     Returns the path to the saved file on success, otherwise False.
     """
     try:
-        template_path = excel_path
-        if not os.path.exists(template_path):
-            print(f"Error: Excel file not found at {template_path}")
+        if not os.path.exists(excel_path):
+            print(f"Error: Excel file not found at {excel_path}")
             return False
 
-        folder = os.path.dirname(template_path) or "."
-        filled_dir = folder  # Save directly in the client folder
-        # os.makedirs(filled_dir, exist_ok=True)  # Not needed, folder should exist
-        base_name = os.path.splitext(os.path.basename(template_path))[0]
+        folder = os.path.dirname(excel_path) or "."
+        filled_dir = os.path.join(folder, "results")
+        base_name = os.path.splitext(os.path.basename(excel_path))[0]
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         new_name = f"{base_name} - filled {timestamp}.xlsx"
         new_path = os.path.join(filled_dir, new_name)
-        shutil.copy2(template_path, new_path)
+        shutil.copy2(excel_path, new_path)
 
         wb = openpyxl.load_workbook(new_path)
-        ws = wb.worksheets[1]  # Sheet: "Fase 1.1 | Big Five Dimensies"
+        ws = wb.worksheets[1]
 
         cols = [3, 4, 5, 6, 7]
         for item_num in sorted(assessment_results.keys()):
@@ -84,205 +46,218 @@ def write_assessment_answers_to_excel(
         print(f"Error writing to Excel: {e}")
         return False
 
+# continue the same Excel file --------------------------------------
 
-def add_career_anchors_to_excel(excel_file_path: str, career_results: dict) -> bool:
-    """Add career anchor scores to existing assessment Excel file.
-    
-    Args:
-        excel_file_path: Path to the filled assessment Excel file
-        career_results: Dict of {row_id: anchor_letter} where anchor_letter is V, W, X, Y, or Z
-    
-    Returns:
-        True on success, False on error.
+PHASE_SHEETS = {
+    "1.1": 1,
+    "2.0": 2,
+    "2.1": 3,
+    "2.2": 4,
+    "2.3": 5,
+}
+
+
+def open_existing_results_excel(excel_path: str, phase: str):
+    """
+    Open an existing results Excel file and return (workbook, worksheet)
+    for the given phase.
+    """
+    if not excel_path or not os.path.exists(excel_path):
+        print("Error: existing Excel file not found.")
+        return None, None
+
+    if phase not in PHASE_SHEETS:
+        print(f"Error: unknown phase '{phase}'.")
+        return None, None
+
+    wb = openpyxl.load_workbook(excel_path)
+    ws = wb.worksheets[PHASE_SHEETS[phase]]
+    return wb, ws
+
+
+# Helpers ----------------------------------------------
+
+def iter_block_rows(start_row: int, block_size: int, gap_size: int, repeats: int):
+    """Yield row numbers for repeated row blocks."""
+    row = start_row
+    for _ in range(repeats):
+        for i in range(block_size):
+            yield row + i
+        row += block_size + gap_size
+
+
+# Phase 2.0 --------------------------
+
+
+PHASE_2_0_MAPPING = {
+    i: {"row": r, "options": ["C", "D", "E", "F", "G"]}
+    for i, r in enumerate([
+        4, 7, 10, 15, 18, 21, 26, 30, 32, 35,
+        37, 39, 41, 43, 45, 48, 50, 53, 56, 60,
+        64, 68, 71, 75, 79, 82, 86, 88, 92, 96
+    ], start=1)
+}
+
+def write_phase_2_0(ws, answers: dict):
+    """
+    answers: {question_number: column_letter}
+    """
+    for q_num, col in answers.items():
+        if q_num not in PHASE_2_0_MAPPING:
+            continue
+        row = PHASE_2_0_MAPPING[q_num]["row"]
+        ws[f"{col}{row}"] = 1
+
+def write_career_anchors_to_excel(
+    answers: dict,
+    excel_path: str
+) -> str | bool:
+            """
+            write Phase 2.0 (Career Anchors) answers into an existing results Excel file.
+
+            answers: {question_number: column_letter}
+            excel_path: path returned from Phase 1.1
+            """
+
+            try:
+                wb, ws = open_existing_results_excel(excel_path, phase="2.0")
+                if not wb or not ws:
+                    return False
+
+                write_phase_2_0(ws, answers)
+
+                wb.save(excel_path)
+                return excel_path
+
+            except Exception as e:
+                print(f"Error writing Phase 2.0 to Excel: {e}")
+                return False
+
+
+
+# Phase 2.1 --------------------------------
+
+PHASE_2_1_MAPPING = {
+    "C": {"start_row": 4, "block_size": 7, "gap_size": 1, "repeats": 16},
+    "E": {"start_row": 4, "block_size": 5, "gap_size": 3, "repeats": 16},
+    "G": {"start_row": 4, "block_size": 5, "gap_size": 3, "repeats": 16},
+}
+
+
+def write_career_clusters_to_excel(answers: dict, excel_path: str) -> str | bool:
+    try:
+        wb, ws = open_existing_results_excel(excel_path, phase="2.1")
+        if not wb or not ws:
+            return False
+
+        cfg_c = PHASE_2_1_MAPPING["C"]
+        cfg_e = PHASE_2_1_MAPPING["E"]
+        cfg_g = PHASE_2_1_MAPPING["G"]
+
+        print("---- PHASE 2.1 DEBUG ----")
+        print("Length:", len(answers))
+
+        for (cluster_id, idx), (main, skill, interest) in answers.items():
+        
+        
+
+            # ---------- COLUMN C ----------
+            row_c = (
+                cfg_c["start_row"]
+                + (cluster_id - 1) * (cfg_c["block_size"] + cfg_c["gap_size"])
+                + (idx - 1)
+            )
+
+            ws[f"C{row_c}"] = main
+
+
+            # ---------- COLUMN E ----------
+            if idx <= cfg_e["block_size"]:  # only 5 rows per cluster
+                row_e = (
+                    cfg_e["start_row"]
+                    + (cluster_id - 1) * (cfg_e["block_size"] + cfg_e["gap_size"])
+                    + (idx - 1)
+                )
+                ws[f"E{row_e}"] = skill
+
+
+            # ---------- COLUMN G ----------
+            if idx <= cfg_g["block_size"]:  # only 5 rows per cluster
+                row_g = (
+                    cfg_g["start_row"]
+                    + (cluster_id - 1) * (cfg_g["block_size"] + cfg_g["gap_size"])
+                    + (idx - 1)
+                )
+                ws[f"G{row_g}"] = interest
+
+        wb.save(excel_path)
+        return excel_path
+
+    except Exception as e:
+        print(f"Error writing Phase 2.1 clusters to Excel: {e}")
+        return False
+
+
+# Alias for backward compatibility / existing calls
+def write_phase_2_1_to_excel(answers: dict, excel_path: str) -> str | bool:
+    return write_career_clusters_to_excel(answers, excel_path)
+
+
+# Phase 2.2 --------------------------------------
+
+PHASE_2_2_MAPPING = {
+    "C": {"start_row": 2, "block_size": 4, "gap_size": 1, "repeats": 4}
+}
+
+def write_phase_2_2_to_excel(answers: dict, excel_path: str) -> str | bool:
+    """
+    Expects answers as {(group_id, stmt_index): value, ...}
+    Writes them into Excel column C according to PHASE_2_2_MAPPING.
     """
     try:
-        if not os.path.exists(excel_file_path):
-            print(f"Error: Excel file not found at {excel_file_path}")
+        wb, ws = open_existing_results_excel(excel_path, "2.2")
+        if not wb or not ws:
             return False
-        
-        wb = openpyxl.load_workbook(excel_file_path)
-        
-        # Find the sheet "Fase 2.0 | Loopbaanankers"
-        sheet_name = "Fase 2.0 | Loopbaanankers"
-        if sheet_name not in wb.sheetnames:
-            print(f"Error: Sheet '{sheet_name}' not found in workbook")
-            return False
-        
-        ws = wb[sheet_name]
 
-        # Map each anchor letter to a column in the sheet
-        anchor_cols = {"V": 3, "W": 4, "X": 5, "Y": 6, "Z": 7}
+        cfg = PHASE_2_2_MAPPING["C"]
 
-        # Import the statement texts from phase20 to locate exact rows
-        try:
-            from phases.phase20 import CAREER_STATEMENTS
-        except Exception:
-            CAREER_STATEMENTS = None
+        for (gid, idx), val in answers.items():
+            row = cfg["start_row"] + (gid - 1) * (cfg["block_size"] + cfg["gap_size"]) + (idx - 1)
+            ws[f"C{row}"] = int(val)
 
-        for row_id, anchor_letter in career_results.items():
-            if anchor_letter not in anchor_cols:
-                continue
-            col = anchor_cols[anchor_letter]
+        wb.save(excel_path)
+        return excel_path
 
-            excel_row = None
-            # Try to locate the statement text in column B
-            if CAREER_STATEMENTS and 1 <= row_id <= len(CAREER_STATEMENTS):
-                _, _, stmt_text = CAREER_STATEMENTS[row_id - 1]
-                snippet = stmt_text.strip()[:40]
-                for r in range(4, ws.max_row + 1):
-                    cell = ws.cell(row=r, column=2).value
-                    if cell and snippet in str(cell):
-                        excel_row = r
-                        break
-
-            # Fallback: assume sequential rows starting at row 4
-            if excel_row is None:
-                excel_row = row_id + 3
-
-            ws.cell(row=excel_row, column=col, value=1)
-        
-        wb.save(excel_file_path)
-        return True
-        
     except Exception as e:
-        print(f"Error adding career anchors to Excel: {e}")
+        print(f"Error writing Phase 2.2 to Excel: {e}")
         return False
 
+# Phase 2.3 --------------------------------------
 
-def add_job_characteristics_to_excel(excel_file_path: str, jcm_answers: dict) -> bool:
-    """Add job characteristics model (JCM) text answers to existing assessment Excel file.
+def write_phase_2_3(ws, answers: dict):
+    for question_num, answer_text in answers.items():
+        row = question_num * 2
+        ws.cell(row=row, column=4, value=answer_text)
 
-    Args:
-        excel_file_path: Path to the filled assessment Excel file
-        jcm_answers: Dict of {question_num: answer_text}
-
-    Returns:
-        True on success, False on error.
-    """
+def write_phase_2_3_to_excel(answers: dict, excel_path: str) -> str | bool:
     try:
-        if not os.path.exists(excel_file_path):
-            print(f"Error: Excel file not found at {excel_file_path}")
+        wb, ws = open_existing_results_excel(excel_path, phase="2.3")
+        if not wb or not ws:
             return False
 
-        wb = openpyxl.load_workbook(excel_file_path)
+        write_phase_2_3(ws, answers)
 
-        sheet_name = "Fase 2.3 | J.C.M."
-        if sheet_name not in wb.sheetnames:
-            print(f"Error: Sheet '{sheet_name}' not found in workbook")
-            return False
-
-        ws = wb[sheet_name]
-
-        # Write answers to the correct rows
-
-        # Unmerge the A11:D11 range if it exists (to allow writing to D11)
-        merged_ranges_to_remove = []
-        for merged_range in ws.merged_cells.ranges:
-            if 'A11:D11' in str(merged_range) or (merged_range.min_row == 11 and merged_range.max_col == 4):
-                merged_ranges_to_remove.append(merged_range)
-
-        for merged_range in merged_ranges_to_remove:
-            ws.unmerge_cells(str(merged_range))
-
-        # Write answers to the correct rows
-        # Row structure: Question 1 → D2, Question 2 → D4, Question 3 → D6, etc.
-        # Column D (4) is "Toelichting"
-        for question_num in sorted(jcm_answers.keys()):
-            answer_text = jcm_answers[question_num]
-            row = question_num * 2  # Gives 2, 4, 6, 8, 10
-            col = 4  # Column D
-            ws.cell(row=row, column=col, value=answer_text)
-
-        wb.save(excel_file_path)
-        return True
+        wb.save(excel_path)
+        return excel_path
 
     except Exception as e:
-        print(f"Error adding job characteristics to Excel: {e}")
+        print(f"Error writing Phase 2.3 to Excel: {e}")
         return False
 
 
-def add_career_clusters_to_excel(excel_file_path: str, cluster_scores: dict) -> bool:
-    """Add career cluster scores to existing assessment Excel file.
-    
-    Args:
-        excel_file_path: Path to the filled assessment Excel file
-        cluster_scores: Dict of {cluster_id: {"act": int, "comp": int, "edu": int}}
-    
-    Returns:
-        True on success, False on error.
+# Alias for job characteristics (phase 2.3)
+def add_job_characteristics_to_excel(answers: dict, excel_path: str) -> str | bool:
     """
-    try:
-        if not os.path.exists(excel_file_path):
-            print(f"Error: Excel file not found at {excel_file_path}")
-            return False
-        
-        wb = openpyxl.load_workbook(excel_file_path)
-        
-        # Find the sheet "Fase 2.1 | Carriere Clusters"
-        sheet_name = "Fase 2.1 | Carriere Clusters"
-        if sheet_name not in wb.sheetnames:
-            print(f"Error: Sheet '{sheet_name}' not found in workbook")
-            return False
-        
-        ws = wb[sheet_name]
-
-        # Write cluster scores. The sheet layout groups each cluster in a block
-        # starting with the cluster id in column A; below that the activities/competences
-        # and then a totals row which contains formulas (we will replace those with values).
-        for cluster_id, scores in cluster_scores.items():
-            act_score = scores.get("act", 0)
-            comp_score = scores.get("comp", 0)
-            edu_score = scores.get("edu", 0)
-            total_score = act_score + comp_score + edu_score
-
-            # Find the cluster start row by searching column A for cluster_id
-            start_row = None
-            for r in range(4, ws.max_row + 1):
-                cell = ws.cell(row=r, column=1).value
-                if cell == cluster_id:
-                    start_row = r
-                    break
-
-            if start_row is None:
-                # Could not find cluster; skip
-                continue
-
-            # Look for the totals/formula row within the next 12 rows
-            total_row = None
-            for r in range(start_row, min(start_row + 15, ws.max_row + 1)):
-                cval = ws.cell(row=r, column=3).value
-                if isinstance(cval, str) and cval.strip().startswith('='):
-                    total_row = r
-                    break
-
-            # Fallback: assume totals row is start_row + 7
-            if total_row is None:
-                total_row = start_row + 7
-
-            # Write the aggregated scores into the totals cells (columns C, E, G)
-            ws.cell(row=total_row, column=3, value=act_score)
-            ws.cell(row=total_row, column=5, value=comp_score)
-            ws.cell(row=total_row, column=7, value=edu_score)
-        
-        wb.save(excel_file_path)
-        return True
-        
-    except Exception as e:
-        print(f"Error adding career clusters to Excel: {e}")
-        return False
-
-
-#could be removed
-def write_loopbaan_answers_to_excel(loopbaan_results: dict, excel_path: str = "Loopbaan onderzoek 5.0 template.xlsx") -> str | bool:
-    """Copy template into `resultaten` and return the path; caller may write cells."""
-    if not os.path.exists(excel_path):
-        return False
-    folder = os.path.dirname(excel_path) or "."
-    filled_dir = folder  # Save directly in the client folder
-    # os.makedirs(filled_dir, exist_ok=True)  # Not needed, folder should exist
-    base_name = os.path.splitext(os.path.basename(excel_path))[0]
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    new_name = f"{base_name} - filled {timestamp}.xlsx"
-    new_path = os.path.join(filled_dir, new_name)
-    shutil.copy2(excel_path, new_path)
-    return new_path
+    Alias for write_phase_2_3_to_excel, for job characteristics model answers.
+    """
+    return write_phase_2_3_to_excel(answers, excel_path)

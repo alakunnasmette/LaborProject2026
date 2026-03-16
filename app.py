@@ -67,19 +67,23 @@ back_button = tk.Button(
 back_button.pack(pady=50, padx=50, anchor="w")
 
 # --------- Data Storage ---------
-clients_file = "clients.json"
 
+# --- New client loading: scan clients/ directory ---
 def load_clients():
-    """Load clients from JSON file."""
-    if os.path.exists(clients_file):
-        with open(clients_file, "r") as f:
-            return json.load(f)
-    return []
-
-def save_clients(clients):
-    """Save clients to JSON file."""
-    with open(clients_file, "w") as f:
-        json.dump(clients, f, indent=2)
+    """Load clients by scanning the clients/ directory and reading info.json files."""
+    clients_dir = "clients"
+    clients = []
+    if os.path.exists(clients_dir):
+        for folder in os.listdir(clients_dir):
+            info_path = os.path.join(clients_dir, folder, "info.json")
+            if os.path.isfile(info_path):
+                try:
+                    with open(info_path, "r", encoding="utf-8") as f:
+                        client = json.load(f)
+                        clients.append(client)
+                except Exception as e:
+                    print(f"Error reading {info_path}: {e}")
+    return clients
 
 def search_clients(query):
     """Filter clients by name/ID."""
@@ -170,8 +174,7 @@ def show_create_client_form():
             "prognosis": []
         }
 
-        clients.append(new_client)
-        save_clients(clients)
+
 
         # Create client folder and info.json
         import os, json
@@ -252,7 +255,7 @@ def open_phase11_assessment(client):
 
 def navigate_phase(phase_name):
     """Navigate to a specific phase."""
-    
+
     if phase_name == "phase1.1":
         top_frame.pack_forget()
 
@@ -385,12 +388,6 @@ def open_client_dashboard(client):
                     client[key] = value
                     updated = True
             if updated:
-                # Save to clients.json
-                clients = load_clients()
-                for c in clients:
-                    if c["id"] == client["id"]:
-                        c.update(client)
-                save_clients(clients)
                 # Rename folder if name changed
                 new_safe_name = "_".join(client["name"].split())
                 new_folder_name = f"{client['id']}_{new_safe_name}"
@@ -517,7 +514,9 @@ main_frame.pack(fill="both", expand=True)
 
 # Top bar with search and new client button
 top_frame = tk.Frame(main_frame, bg=YELLOW_ACCENT, height=80)
+top_frame.pack_forget()
 top_frame.pack(fill="x", padx=20, pady=15)
+top_frame.lift()
 top_frame.pack_propagate(False)
 if navigate_phase == "phase1.1":
     visible = False
@@ -581,6 +580,11 @@ tk.Button(
 # Content frame - this swaps between list view and dashboard
 content_frame = tk.Frame(main_frame, bg=COLOR_BG)
 content_frame.pack(fill="both", expand=True)
+
+# DEBUG: show children of main_frame
+print("Children of main_frame:")
+for widget in main_frame.winfo_children():
+    print(widget)
 
 # Initialize the client list display
 show_client_list()
