@@ -10,9 +10,7 @@ BIGFIVE_TEXTS = {
 
             "high": """
     Hoge score op extraversie
-    Als je hoog scoort op extraversie, straal je energie en enthousiasme uit in sociale omgevingen.
-    Je zoekt graag gezelschap op, geniet van groepsactiviteiten en neemt vaak een leidende rol.
-    Je hebt een voorkeur voor actieve en uitdagende situaties, bent assertief en houdt van nieuwe ervaringen.
+    Als je hoog scoort op extraversie, straal je energie en enthousiasme uit in sociale omgevingen. Je zoekt graag gezelschap op, geniet van groepsactiviteiten en neemt vaak een leidende rol. Je hebt een voorkeur voor actieve en uitdagende situaties, bent assertief en houdt van nieuwe ervaringen.
     Dit zie je terug in de volgende eigenschappen:
 
     • Hartelijkheid: Je maakt makkelijk contact en bent oprecht geïnteresseerd in anderen.
@@ -25,8 +23,7 @@ BIGFIVE_TEXTS = {
 
             "neutral": """
     Neutrale score op extraversie
-    Met een gemiddelde score op extraversie laat je een gebalanceerde aanpak zien in sociale situaties.
-    Je kunt genieten van gezelschap, maar hebt ook momenten nodig om alleen te zijn.
+    Met een gemiddelde score op extraversie laat je een gebalanceerde aanpak zien in sociale situaties. Je kunt genieten van gezelschap, maar hebt ook momenten nodig om alleen te zijn.
     Dit komt tot uiting in:
 
     • Hartelijkheid: Je bent vriendelijk, maar niet altijd degene die het initiatief neemt in sociale interacties.
@@ -39,8 +36,7 @@ BIGFIVE_TEXTS = {
 
             "low": """
     Lage score op extraversie
-    Als je laag scoort op extraversie heb je een voorkeur voor rust en kleine sociale omgevingen.
-    Je voelt je vaak prettiger met jezelf of met een kleine groep vertrouwde mensen.
+    Als je laag scoort op extraversie heb je een voorkeur voor rust en kleine sociale omgevingen. Je voelt je vaak prettiger met jezelf of met een kleine groep vertrouwde mensen.
     Dit zie je terug in:
 
     • Hartelijkheid: Je bent gereserveerd en maakt niet snel contact met onbekenden.
@@ -59,10 +55,7 @@ BIGFIVE_TEXTS = {
 
             "high": """
     Hoge score op altruïsme
-    Als je hoog scoort op altruïsme, stel je het belang van anderen vaak boven je eigen belang. 
-    Je beleeft relaties vooral vanuit het perspectief van de ander en kunt je gemakkelijk in hen verplaatsen. 
-    Dit maakt je hulpvaardig, vriendelijk en gericht op samenwerking. 
-    Je bent van nature begaan met het welzijn van anderen en hebt een milde, begripvolle houding. 
+    Als je hoog scoort op altruïsme, stel je het belang van anderen vaak boven je eigen belang. Je beleeft relaties vooral vanuit het perspectief van de ander en kunt je gemakkelijk in hen verplaatsen. Dit maakt je hulpvaardig, vriendelijk en gericht op samenwerking. Je bent van nature begaan met het welzijn van anderen en hebt een milde, begripvolle houding. 
     Dit komt tot uiting in:
 
     • Vertrouwen: Je gelooft in de goede intenties van anderen.
