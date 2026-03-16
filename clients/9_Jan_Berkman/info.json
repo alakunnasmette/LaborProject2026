@@ -1,0 +1,14 @@
+{
+  "id": 9,
+  "name": "Jan Berkman",
+  "Date of Birth": "02-02-1980",
+  "email": "example@example.com",
+  "phone number": "+31 XXXXXXXXX",
+  "address": "Maria straat 4",
+  "Qualifications": "Bouw",
+  "Country of origin": "Nederland",
+  "Living situation": "Single",
+  "Empty text field": "Lorem Ipsum",
+  "assessments": [],
+  "prognosis": []
+}

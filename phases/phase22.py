@@ -1,10 +1,12 @@
 # corporate_culture_research.py
 from __future__ import annotations
 import tkinter as tk
+import os
 from tkinter import messagebox
 from dataclasses import dataclass
 from ui.ui_styles import S, FONTS, PRIMARY_BG
 from ui.ui_components import clear_frame, create_submit_button, show_incomplete_warning
+import utils.write_assessments_to_excel as write_assessments_to_excel
 
 # ---------- Data ----------
 @dataclass(frozen=True)
@@ -50,6 +52,7 @@ GROUPS = [
 ]
 
 LIKERT = ["1", "2", "3", "4", "5"]
+
 
 # ---------- Helpers ----------
 def scrollable(parent: tk.Widget) -> tuple[tk.Frame, tk.Canvas, tk.Frame]:
@@ -145,8 +148,10 @@ class Culture22Page(tk.Frame):
         h.pack(fill="x")
         tk.Label(h, text="Cultuur", bg=S["dark"], fg="white", font=S["f_b"], width=8, anchor="w", padx=10)\
             .grid(row=0, column=0, sticky="w")
-        tk.Label(h, text="Aspecten: stellingen", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
-            .grid(row=0, column=1, sticky="w")
+
+
+        # tk.Label(h, text="Aspecten: stellingen", bg=S["dark"], fg="white", font=S["f_b"], anchor="w", padx=10)\
+        #     .grid(row=0, column=1, sticky="w")
 
         body = tk.Frame(left, bg=S["bg"])
         body.pack(fill="both", expand=True)
@@ -225,19 +230,21 @@ class Culture22Page(tk.Frame):
         btn_row = tk.Frame(inner, bg=S["bg"])
         btn_row.pack(fill="x", padx=20, pady=(12, 20))
 
-        from ui.ui_components import add_nav_buttons
-        add_nav_buttons(
+        btn_submit = create_submit_button(
             btn_row,
-            submit_command=self.submit,
-            skip_command=(lambda: self.navigate("phase2.1")),
-            skip_text="Terug",
-            submit_text="Opslaan en verder",
-            skip_side="left",
-            submit_side="right",
-            padx=20
+            text="Opslaan en verder",
+            command=self.submit
         )
+        btn_submit.pack(side="right")
+
 
     def submit(self):
+        """
+        Collects Likert scale values for Phase 2.2 and writes them
+        to the Excel sheet according to PHASE_2_2_MAPPING.
+        """
+
+        # check for missing answers
         missing = [
             (gid, i)
             for gid in range(1, 5)
@@ -248,12 +255,44 @@ class Culture22Page(tk.Frame):
             show_incomplete_warning(len(missing), item_name="stellingen")
             return
 
-        # resultaten bewaren op het parent frame (voor later export)
-        self.cultuur_results = {k: v.get() for k, v in self.vars.items()}
+        # prepare answers dict {(group_id, stmt_index): value}
+        answers_to_excel = {k: v.get() for k, v in self.vars.items()}
+
+        # get existing Excel file
+        root = self.winfo_toplevel()
+        excel_path = getattr(root, "results_excel_path", None)
+        if not excel_path or not os.path.exists(excel_path):
+            messagebox.showerror(
+                "Geen Excel-bestand",
+                "Er is nog geen resultatenbestand aangemaakt (fase 1.1)."
+            )
+            return
+
+        # write to Excel
+        saved_path = write_assessments_to_excel.write_phase_2_2_to_excel(
+            answers=answers_to_excel,
+            excel_path=excel_path
+        )
+
+        if not saved_path:
+            messagebox.showerror(
+                "Fout",
+                "Kon de antwoorden niet opslaan in Excel."
+            )
+            return
+
+        # save path
+        root.results_excel_path = saved_path
+
+        # calculate totals per group
         self.cultuur_totals = {g.id: self.subtotal(g.id) for g in GROUPS}
 
-        # Ga door naar volgende stap (pas aan naar jouw router)
-        # Bijvoorbeeld: self.navigate("phase2.3")
+        messagebox.showinfo(
+            "Opgeslagen",
+            f"Antwoorden succesvol opgeslagen in:\n{saved_path}"
+        )
+
+        # next phase
         self.navigate("phase2.3")
 
 

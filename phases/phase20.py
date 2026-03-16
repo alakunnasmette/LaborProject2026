@@ -7,11 +7,7 @@ from ui.ui_styles import (
     TABLE_PADX, TABLE_PADY, BUTTON_PADX, BUTTON_PADY, BUTTON_CONTAINER_PADX
 )
 
-
-
 # ----------------------------- Phase 2.0 - Career anchors -----------------------------
-
-# --------- Fase 2.0 – Career anchors: fetch data from Excel ---------
 # Each entry: (question number, anchor letter, statement text)
 # Anchors: V = Moving upward, W = Feeling safe, X = Being free, Y = Finding balance, Z = Seeking challenge.
 
@@ -78,7 +74,7 @@ CAREER_STATEMENTS = [
     (30, "Z", "Z | Ik geef de voorkeur aan een werksituatie die opwindend is en mij stimuleert."),
 ]
 
-# Descriptions of the 5 career anchors
+
 CAREER_ANCHOR_DESCRIPTIONS = {
     "Omhoog komen": "Deze op opwaartse mobiliteit gerichte loopbaanoriëntatie wordt gewoonlijk geassocieerd met het vooruitkomen in een hiërarchische en/of statusgevoelige organisatie. Het verwerven van steeds meer invloed speelt in deze kaders een grote rol. Prestige en beloning nemen bij iedere opwaartse beweging toe.",
     "Veilig voelen": "Sommige personen hebben behoefte aan een veilige baan in een duidelijke organisatie die vooral gekenmerkt wordt door orde en rust. Zij geven de voorkeur aan een lang en vast dienstverband, erkenning en appreciatie door de werkgever. In ruil daarvoor bieden ze een loyale en toegewijde instelling en zijn ze niet bang om hard te werken. Onderling respect, wederkerigheid en loyaliteit karakteriseren de werkhouding.",
@@ -87,7 +83,7 @@ CAREER_ANCHOR_DESCRIPTIONS = {
     "Uitdaging zoeken": "Deze loopbaanoriëntatie wordt gekenmerkt door de behoefte aan opwinding en uitdaging en een sterke betrokkenheid bij het werk. Men is er op gericht dichtbij het centrum van actie, avontuur en creativiteit te zijn en heeft er zeer veel moeite mee zich aan het werk los te maken. Een bureaucratische organisatie wordt als bijzonder remmend ervaren. Autonomie is belangrijk maar het belangrijkste is opwindend en uitdagend werk.",
 }
 
-# --------- Career anchor → Excel column mapping ---------
+# --------------- career anchors -> Excel column mapping ---------------
 ANCHOR_TO_COLUMN = {
     "V": "C",
     "W": "D",
@@ -96,17 +92,18 @@ ANCHOR_TO_COLUMN = {
     "Z": "G",
 }
 
-
+ANCHORS = ["V", "W", "X", "Y", "Z"]
 
 def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     """Show Phase 2.0 – Career Anchors in the right panel with two statements per question."""
 
     clear_frame(parent_frame)
 
-    # =================== Scrollable container ===================
-    container = tk.Frame(parent_frame, bg="white")
-    container.pack(fill="both", expand=True)
+    # --------------- Scrollable container ---------------
 
+    container = tk.Frame(parent_frame, bg="white")
+
+    container.pack(fill="both", expand=True)
     canvas = tk.Canvas(container, bg="white", highlightthickness=0)
     scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
 
@@ -131,7 +128,8 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
 
     canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-    # =================== Headers ===================
+    # --------------- Headers ---------------
+
     title = tk.Label(
         scroll_frame,
         text="Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
@@ -160,7 +158,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     table = tk.Frame(scroll_frame, bg=S["bg"])
     table.pack(fill="both", expand=True, padx=TABLE_PADX, pady=TABLE_PADY)
 
-    # 7 columns
+    # columns
     for c in range(7):
         table.grid_columnconfigure(c, weight=0)
     table.grid_columnconfigure(1, weight=1)  # statement column stretches
@@ -188,7 +186,6 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         )
         lbl.grid(row=0, column=col, sticky="nsew")
 
-    ANCHORS = ["V", "W", "X", "Y", "Z"]
 
     # -------------------- Group statements per question --------------------
     from collections import defaultdict
@@ -196,6 +193,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     questions = defaultdict(list)
     for nummer, anker, tekst in CAREER_STATEMENTS:
         questions[nummer].append((anker, tekst))
+
 
     # -------------------- Prepare variables --------------------
     vraag_vars: dict[int, tk.StringVar] = {}
@@ -219,7 +217,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     for nummer, stmts in sorted(questions.items()):
         row_bg = S["odd"] if row_index % 2 == 1 else S["even"]
 
-        # Nummer (one yellow block per question)
+        # Number (yellow block)
         num_label = tk.Label(
             table,
             text=str(nummer),
@@ -231,7 +229,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         )
         num_label.grid(row=row_index, column=0, rowspan=len(stmts), padx=(10, 10), pady=(2, 2), sticky="nsw")
 
-        # Statement(s) stacked vertically
+        # Statements stacked vertically
         stmt_text = "\n".join([tekst for _, tekst in stmts])
         stmt_label = tk.Label(
             table,
@@ -285,10 +283,10 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     for qnum in vraag_vars.keys():
         update_row(qnum)
 
-    # Save choices on parent_frame (for later)
+    # save choices on parent_frame
     parent_frame.loopbaan_vars = vraag_vars
 
-    # =================== Descriptions ===================
+    # -------------------- Descriptions --------------------
     desc_frame = tk.Frame(scroll_frame, bg=S["bg"])
     desc_frame.pack(fill="x", padx=20, pady=(20, 20))
 
@@ -330,11 +328,11 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             pady=6,
         ).pack(side="left", fill="both", expand=True)
 
-    # =================== Save and continue ===================
+    # -------------------- Save and continue --------------------
     def on_submit_loopbaan():
         vraag_vars = parent_frame.loopbaan_vars
 
-        # 1. Validate
+        # validate answers
         missing = [q for q, var in vraag_vars.items() if not var.get()]
         if missing:
             messagebox.showwarning(
@@ -343,26 +341,29 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             )
             return
 
-        # 2. Map answers to Excel columns
+        # map to Excel columns
         excel_answers = {
             qnum: ANCHOR_TO_COLUMN[var.get()]
             for qnum, var in vraag_vars.items()
         }
 
-        # 3. Get Excel path
-        excel_path = getattr(parent_frame, "results_excel_path", None)
-        if not excel_path:
-            messagebox.showerror("Fout", "Excel pad niet ingesteld op parent_frame")
+        # write to Excel
+        root = parent_frame.winfo_toplevel()
+
+        if not hasattr(root, "results_excel_path"):
+            messagebox.showerror(
+                "Geen Excel-bestand",
+                "Er is nog geen resultatenbestand aangemaakt (fase 1.1)."
+            )
             return
 
-        # 4. Write to Excel (pass excel_path first, then excel_answers)
-        save_path = write_assessments_to_excel.add_career_anchors_to_excel(
-            excel_path,
-            excel_answers
+
+        excel_path = getattr(root, "results_excel_path", None)
+
+        save_path = write_assessments_to_excel.write_career_anchors_to_excel(
+            excel_answers,
+            excel_path
         )
-        
-        # 5. Save the path to the parent frame
-        parent_frame.results_excel_path = save_path
 
         if not save_path:
             messagebox.showerror(
@@ -371,17 +372,19 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             )
             return
 
+        # same excel file
+        root.results_excel_path = save_path
+
         messagebox.showinfo(
             "Opgeslagen",
             f"Antwoorden opgeslagen in:\n{save_path}"
         )
 
-        # 4. Next phase
+        # next phase
         navigate_to("phase2.1")
 
     btn_frame = tk.Frame(scroll_frame, bg=S["bg"])
     btn_frame.pack(fill="x", pady=(10, 30))
-
 
     from ui.ui_components import add_nav_buttons
     add_nav_buttons(
@@ -393,7 +396,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         skip_side="left",
         submit_side="right",
         padx=BUTTON_CONTAINER_PADX
-    )
+        )
 
 def show(parent_frame: tk.Frame):
     """Public function to display Phase 2.0 page."""

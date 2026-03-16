@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ui.ui_components import clear_frame, create_submit_button
-from utils.write_assessments_to_excel import add_job_characteristics_to_excel
+from utils.write_assessments_to_excel import write_phase_2_3_to_excel
 from ui.ui_styles import S, FONTS, PRIMARY_BG, CARD_LIGHT_BG
 
 # ==================== Job Characteristics Model Data ====================
@@ -167,7 +167,6 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
 
     def on_submit():
         """Validate and submit answers."""
-        # Check if all fields are filled
         missing = []
         for q_num, text_box in text_entries.items():
             answer = text_box.get("1.0", "end-1c").strip()
@@ -181,31 +180,46 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             )
             return
 
-        # Save answers to dictionary
+        # save answers to dictionary
         answers = {q_num: text_box.get("1.0", "end-1c").strip() for q_num, text_box in text_entries.items()}
         
-        # Save to Excel file if it exists
-        if hasattr(parent_frame, 'excel_file_path') and parent_frame.excel_file_path:
-            success = add_job_characteristics_to_excel(parent_frame.excel_file_path, answers)
-            if success:
-                messagebox.showinfo("Succes", "Je antwoorden zijn opgeslagen!")
-            else:
-                messagebox.showwarning("Waarschuwing", "Antwoorden konden niet naar Excel-bestand worden geschreven.")
-        else:
-            messagebox.showinfo("Succes", "Je antwoorden zijn opgeslagen!")
+        # save to Excel file
+        root = parent_frame.winfo_toplevel()
+        excel_path = getattr(root, "results_excel_path", None)
 
-        # Navigate to home or next section
+        if not excel_path or not os.path.exists(excel_path):
+            messagebox.showerror(
+                "Geen Excel-bestand",
+                "Er is nog geen resultatenbestand aangemaakt (fase 1.1)."
+            )
+            return
+
+        result = write_phase_2_3_to_excel(
+            answers,
+            excel_path
+        )
+
+        if not result:
+            messagebox.showerror(
+                "Fout bij opslaan",
+                "Er ging iets mis bij het opslaan van je antwoorden."
+            )
+            return
+        
+        messagebox.showinfo(
+            "Succes",
+            f"Je antwoorden zijn opgeslagen"
+        )
+
+
+
+        # to homepage
         if navigate:
-            navigate("home")
+            navigate("client_list")
 
-    from ui.ui_components import add_nav_buttons
-    add_nav_buttons(
+    btn_submit = create_submit_button(
         button_frame,
-        submit_command=on_submit,
-        skip_command=(lambda: navigate("home")) if navigate else None,
-        skip_text="Terug",
-        submit_text="Opslaan en verder",
-        skip_side="left",
-        submit_side="right",
-        padx=20
+        text="Opslaan en verder",
+        command=on_submit
     )
+    btn_submit.pack(side="right")
