@@ -20,7 +20,7 @@ from ui.ui_styles import (
     LIKERT_DEFAULT_BG,
 )
 
-# --------- Likert-schaal: 1 t/m 5 ---------
+# --------- Likert-scale: 1 t/m 5 ---------
 LIKERT_OPTIONS = [
     ("1", "Oneens"),
     ("2", "Deels oneens"),
@@ -83,9 +83,7 @@ BIG_FIVE_ITEMS = [
     (50, "Ik zit vol met ideeën."),
 ]
 
-
 # --- Table column headers ---
-
 
 def get_assessment_results(parent_frame: tk.Frame) -> dict[int, int | None]:
     """
@@ -108,10 +106,10 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     row = tk.Frame(parent, bg=LIGHT_GREY)
     row.pack(fill="x", pady=1)
 
-    # zorg dat kolom 2 (stelling) meerekt, zodat kolom 3 altijd rechts zit
+    # make sure that column 2 (position) stretches, so that column 3 is always on the right
     row.grid_columnconfigure(1, weight=1)
 
-    # Nummer (geel)
+    # Number (yellow)
     num_label = tk.Label(
         row,
         text=str(nummer),
@@ -123,7 +121,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     )
     num_label.grid(row=0, column=0, padx=(10, 10), sticky="w")
 
-    # Stelling
+    # Statement
     stmt_label = tk.Label(
         row,
         text=stelling,
@@ -136,7 +134,7 @@ def make_likert_row(parent: tk.Frame, nummer: int, stelling: str, var: tk.String
     )
     stmt_label.grid(row=0, column=1, sticky="w", padx=10, pady=8)
 
-    # Likert-knoppen (rechts)
+    # Likert buttons (right)
     likert_frame = tk.Frame(row, bg=LIGHT_GREY)
     likert_frame.grid(row=0, column=2, padx=20, pady=8, sticky="e")
 
@@ -181,7 +179,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     """
     clear_frame(parent_frame)
 
-    # ---------- scrollbare container ----------
+    # ---------- scrollable container ----------
     container = tk.Frame(parent_frame, bg="white")
     container.pack(fill="both", expand=True)
 
@@ -210,7 +208,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
 
     canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-    # ---------- titel & uitleg ----------
+    # ---------- title & explanation ----------
     title = tk.Label(
         scroll_frame,
         text="Fase 1.1 – Big Five persoonlijkheidsdimensies",
@@ -235,7 +233,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     )
     subtitle.pack(fill="x", padx=20, pady=(0, 15))
 
-    # ---------- kolomkoppen ----------
+    # ---------- column headings ----------
     header = tk.Frame(scroll_frame, bg=DARK_GREY)
     header.pack(fill="x")
 
@@ -270,7 +268,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         padx=40,
     ).grid(row=0, column=2, sticky="e")
 
-    # ---------- alle items ----------
+    # ---------- all items ----------
     parent_frame.assessment_vars = {}
 
     questions_container = tk.Frame(scroll_frame, bg="white")
@@ -284,7 +282,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     # spacer
     tk.Frame(scroll_frame, bg="white", height=10).pack(fill="x")
 
-    # ---------- Opslaan en verder-knop ----------
+    # ---------- Save and continue button ----------
     def on_submit():
         results = get_assessment_results(parent_frame)
 
@@ -296,44 +294,22 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
             )
             return
 
-        # Save results and generate Excel file in the current client's folder
+        # Save results and generate Excel file
         parent_frame.assessment_results = results
-
-        # Get current_assessment_client from parent_frame (set in app.py)
-        current_assessment_client = getattr(parent_frame, "current_assessment_client", None)
-        TEMPLATE_PATH = os.path.join(os.getcwd(), "Loopbaan onderzoek 5.0 template.xlsx")
-        if current_assessment_client and "id" in current_assessment_client and "name" in current_assessment_client:
-            safe_name = "_".join(str(current_assessment_client["name"]).split())
-            folder_name = f"{current_assessment_client['id']}_{safe_name}"
-            client_dir = os.path.join(os.getcwd(), "clients", folder_name)
-            os.makedirs(client_dir, exist_ok=True)
-            # Compose a unique filename for the filled Excel file in the client folder
-            from datetime import datetime
-            timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            base_name = os.path.splitext(os.path.basename(TEMPLATE_PATH))[0]
-            new_name = f"{base_name} - filled {timestamp}.xlsx"
-            client_excel_path = os.path.join(client_dir, new_name)
-            # Copy template to client folder and fill it
-            import shutil
-            shutil.copy2(TEMPLATE_PATH, client_excel_path)
-            save_path = write_assessment_answers_to_excel(results, excel_path=client_excel_path)
-        else:
-            save_path = write_assessment_answers_to_excel(results, excel_path=TEMPLATE_PATH)
-
+        save_path = write_assessment_answers_to_excel(results)
         if save_path:
-            parent_frame.excel_file_path = save_path
+            root = parent_frame.winfo_toplevel()
+            root.results_excel_path = save_path
             messagebox.showinfo("Succes", f"Antwoorden opgeslagen naar:\n{save_path}")
         else:
             messagebox.showwarning("Waarschuwing", "Antwoorden opgeslagen maar Excel-bestand kon niet worden gegenereerd.")
 
-        # -> ga naar Fase 2.0
+        # -> go to phase 2.0
         navigate("phase2.0")
 
     btn_frame = tk.Frame(scroll_frame, bg="white")
     btn_frame.pack(fill="x", pady=(5, 20))
 
-
-    from ui.ui_components import add_nav_buttons
     add_nav_buttons(
         btn_frame,
         submit_command=on_submit,
@@ -345,5 +321,5 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         padx=BUTTON_CONTAINER_PADX
     )
 
-    # extra ruimte onderaan
+    # extra space at the bottom
     tk.Frame(scroll_frame, bg="white", height=30).pack(fill="x")

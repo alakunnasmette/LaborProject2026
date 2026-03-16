@@ -56,6 +56,8 @@ PHASE_SHEETS = {
     "2.3": 5,
 }
 
+def add_job_characteristics_to_excel():
+    pass  # Placeholder for future implementation
 
 def open_existing_results_excel(excel_path: str, phase: str):
     """
@@ -253,11 +255,3 @@ def write_phase_2_3_to_excel(answers: dict, excel_path: str) -> str | bool:
     except Exception as e:
         print(f"Error writing Phase 2.3 to Excel: {e}")
         return False
-
-
-# Alias for job characteristics (phase 2.3)
-def add_job_characteristics_to_excel(answers: dict, excel_path: str) -> str | bool:
-    """
-    Alias for write_phase_2_3_to_excel, for job characteristics model answers.
-    """
-    return write_phase_2_3_to_excel(answers, excel_path)

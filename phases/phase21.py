@@ -1,11 +1,13 @@
 # corporate_culture_research.py
 from __future__ import annotations
 import tkinter as tk
+import os
 from tkinter import messagebox
 from dataclasses import dataclass
 from collections import defaultdict
 from ui.ui_styles import S
 from ui.ui_components import clear_frame
+import utils.write_assessments_to_excel as write_assessments_to_excel
 
 # ---------- Helpers ----------
 
@@ -44,20 +46,17 @@ def make_likert_buttons(parent: tk.Widget, var: tk.StringVar, bg: str) -> tk.Fra
         var.set(v)
         refresh()
 
-
-
 # ---------- Page ----------
 class Culture22Page(tk.Frame):
     def __init__(self, parent: tk.Widget, navigate):
         super().__init__(parent, bg=S["bg"])
         self.navigate = navigate
-        self.vars: dict[tuple[int, int], tuple[tk.IntVar, tk.IntVar, tk.IntVar]] = {}
         self.sub_lbl: dict[int, tk.Label] = {}
         self.build()
 
-    # subtotal and update_subtotal removed (no longer needed)
-
     def build(self):
+        self.vars = {}
+
         _, _, inner = scrollable(self)
 
 
@@ -646,7 +645,11 @@ class Culture22Page(tk.Frame):
                 main_var = tk.IntVar(value=0)
                 skill_var = tk.IntVar(value=0)
                 interest_var = tk.IntVar(value=0)
-                
+                question_id = f"{cluster_id}_{idx}"
+
+                # Use a tuple key (cluster_id, idx)
+                self.vars[(cluster_id, idx)] = (main_var, skill_var, interest_var)
+
                 # Only store variables if skill and interest statements exist
                 has_skill = 'skill_statement' in row and row.get('skill_statement')
                 has_interest = 'interest_statement' in row and row.get('interest_statement')
@@ -668,7 +671,7 @@ class Culture22Page(tk.Frame):
                     padx=8
                 ).grid(row=0, column=1, sticky="ew", pady=2)
 
-                # Only create skill checkbox if skill_statement exists
+            # Only create skill checkbox if skill_statement exists
                 if has_skill:
                     cb_skill = tk.Checkbutton(
                         r,
@@ -696,10 +699,6 @@ class Culture22Page(tk.Frame):
                     )
                     cb_interest.grid(row=0, column=3, sticky="w", padx=(0, 10), pady=2)
 
-            # subtotal row removed
-
-        # right descriptions removed
-
         # submit
         btn_row = tk.Frame(inner, bg=S["bg"])
         btn_row.pack(fill="x", padx=20, pady=(12, 20))
@@ -716,35 +715,73 @@ class Culture22Page(tk.Frame):
             btn_row,
             text="Opslaan en verder",
             command=self.submit
-        )
-        btn_submit.pack(side="right")
+        ).pack(side="right")
 
     def submit(self):
-        # Save checkbox results (0/1) only
-        self.cultuur_results = {}
-        for k, v in self.vars.items():
-            if isinstance(v, tuple) and len(v) == 2:
-                skill_var, interest_var = v
-                try:
-                    sval = int(skill_var.get())
-                except Exception:
-                    sval = 0
-                try:
-                    ival = int(interest_var.get())
-                except Exception:
-                    ival = 0
-                self.cultuur_results[k] = {"skill": sval, "interest": ival}
-            else:
-                try:
-                    self.cultuur_results[k] = int(v.get())
-                except Exception:
-                    self.cultuur_results[k] = v
-        # No cultuur_totals by group
+        """
+        Collects the main, skill, and interest checkbox values and writes them
+        to the Excel sheet for Phase 2.1.
+        """
 
-        # Proceed to next page
+        # prepare the answers dict for Excel
+        answers_to_excel = {}
+
+        for key, var_tuple in self.vars.items():
+            if not isinstance(var_tuple, tuple) or len(var_tuple) != 3:
+                # safety check
+                continue
+
+            main_var, skill_var, interest_var = var_tuple
+
+            try:
+                main_val = int(main_var.get())
+            except Exception:
+                main_val = 0
+
+            try:
+                skill_val = int(skill_var.get())
+            except Exception:
+                skill_val = 0
+
+            try:
+                interest_val = int(interest_var.get())
+            except Exception:
+                interest_val = 0
+
+            answers_to_excel[key] = (main_val, skill_val, interest_val)
+
+        # get existing Excel file
+        root = self.winfo_toplevel()
+        excel_path = getattr(root, "results_excel_path", None)
+
+        if not excel_path or not os.path.exists(excel_path):
+            messagebox.showerror(
+                "Geen Excel-bestand",
+                "Er is nog geen resultatenbestand aangemaakt (fase 1.1)."
+            )
+            return
+
+        # write to Excel
+        saved_path = write_assessments_to_excel.write_phase_2_1_to_excel(
+            answers=answers_to_excel,
+            excel_path=excel_path
+        )
+
+        if not saved_path:
+            messagebox.showerror(
+                "Fout",
+                "Kon de antwoorden niet opslaan in Excel."
+            )
+            return
+
+        root.results_excel_path = saved_path
+        messagebox.showinfo(
+            "Opgeslagen",
+            f"Antwoorden opgeslagen in:\n{saved_path}"
+        )
+
+        #  next phase
         self.navigate("phase2.2")
-
-
 
 # -------------------- BUILDER FUNCTION --------------------
 def build_carriereclusters_page(parent_frame: tk.Frame, navigate=None) -> None:

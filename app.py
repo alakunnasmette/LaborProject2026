@@ -94,20 +94,6 @@ def show_create_client_form():
     """Display form to create a new client with all fields."""
     clear_content_frame()
 
-    button_frame = tk.Frame(content_frame, bg=COLOR_BG)
-    button_frame.pack(fill="x", padx=20, pady=(0, 20))
-    text: str = "← Terug naar Klantenlijst"
-    tk.Button(
-        button_frame,
-        text=text,
-        command=show_client_list,
-        bg=COLOR_TEXT_LIGHT,
-        fg="white",
-        font=("Segoe UI", 10, "bold"),
-        padx=10,
-        pady=5
-    ).pack(side="left")
-
     form_frame = tk.Frame(content_frame, bg=COLOR_BG)
     form_frame.pack(padx=40, pady=30, fill="x")
 
@@ -129,7 +115,9 @@ def show_create_client_form():
         "Telefoonnummer",
         "Adres",
         "Opleidingen",
-        "Land van herkomst"
+        "Land van herkomst",
+        "Leef situatie",
+        "Toelichting (optioneel)"
     ]
 
     for field in fields:
@@ -170,6 +158,8 @@ def show_create_client_form():
             "address": entries["Adres"].get(),
             "Qualifications": entries["Opleidingen"].get(),
             "Country of origin": entries["Land van herkomst"].get(),
+            "Living situation": entries.get("Leef situatie", tk.Entry()).get(),
+            "Empty text field": entries.get("Toelichting (optioneel)", tk.Entry()).get(),
             "assessments": [],
             "prognosis": []
         }
@@ -256,9 +246,6 @@ def open_phase11_assessment(client):
 def navigate_phase(phase_name):
     """Navigate to a specific phase."""
 
-    if phase_name == "phase1.1":
-        top_frame.pack_forget()
-
     if phase_name not in PHASES:
         messagebox.showerror("Error", f"Unknown phase: {phase_name}")
         return
@@ -326,18 +313,6 @@ def open_client_dashboard(client):
 
     def open_edit_client_info():
         clear_content_frame()
-        button_frame = tk.Frame(content_frame, bg=COLOR_BG)
-        button_frame.pack(fill="x", padx=20, pady=(0, 20))
-        tk.Button(
-            button_frame,
-            text="← Terug naar Dashboard",
-            command=lambda: open_client_dashboard(client),
-            bg=COLOR_TEXT_LIGHT,
-            fg="white",
-            font=("Segoe UI", 10, "bold"),
-            padx=10,
-            pady=5
-        ).pack(side="left")
 
         form_frame = tk.Frame(content_frame, bg=COLOR_BG)
         form_frame.pack(padx=40, pady=30, fill="x")
@@ -358,7 +333,9 @@ def open_client_dashboard(client):
             ("Telefoonnummer", "phone number"),
             ("Adres", "address"),
             ("Opleidingen", "Qualifications"),
-            ("Land van herkomst", "Country of origin")
+            ("Land van herkomst", "Country of origin"),
+            ("Leef situatie", "Living situation"),
+            ("Toelichting (optioneel)", "Empty text field")
         ]
         for label, key in fields:
             row = tk.Frame(form_frame, bg=COLOR_BG)
@@ -438,6 +415,8 @@ def open_client_dashboard(client):
         ("Adres", client.get("address", "")),
         ("Opleidingen", client.get("Qualifications", "")),
         ("Land", client.get("Country of origin", "")),
+        ("Leef situatie", client.get("Living situation", "")),
+        ("Toelichting", client.get("Empty text field", ""))
     ]
 
     for label, value in info_fields:
@@ -589,15 +568,6 @@ for widget in main_frame.winfo_children():
 # Initialize the client list display
 show_client_list()
 
-root.mainloop()
-
-# Add to imports at the top of app.py:
-from phases.phase11 import build_assessments_page
-from phases.phase20 import build_career_anchors_page
-from phases.phase21 import build_carriereclusters_page
-from phases.phase22 import build_cultuur_page
-from phases.phase23 import build_job_characteristics_models_page
-
 # Global to track current client during questionnaire
 current_assessment_client = None
 
@@ -625,7 +595,4 @@ def open_phase11_assessment(client):
     current_assessment_client = client
     navigate_phase("phase1.1")
 
-try:
-    root.mainloop()
-except KeyboardInterrupt:
-    pass
+root.mainloop()
