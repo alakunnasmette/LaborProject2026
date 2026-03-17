@@ -178,6 +178,11 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     navigate is de router uit app.py, dus je kan: navigate("phase2.0") etc.
     """
     clear_frame(parent_frame)
+    # Ensure client context is present
+    client = getattr(parent_frame, "current_assessment_client", None)
+    if client is None:
+        messagebox.showerror("Fout", "Geen actieve client gevonden. Keer terug naar het dashboard en selecteer een client.")
+        return
 
     # ---------- scrollable container ----------
     container = tk.Frame(parent_frame, bg="white")
@@ -294,11 +299,21 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
             )
             return
 
-        # Save results and generate Excel file
+        # Save results and generate Excel file in client folder
         parent_frame.assessment_results = results
-        save_path = write_assessment_answers_to_excel(results)
+
+        root = parent_frame.winfo_toplevel()
+        client = getattr(parent_frame, "current_assessment_client", None)
+        if not client:
+            messagebox.showerror("Fout", "Geen actieve client gevonden. Keer terug naar het dashboard en selecteer een client.")
+            return
+        safe_name = "_".join(client["name"].split())
+        folder_name = f"{client['id']}_{safe_name}"
+        client_dir = os.path.join("clients", folder_name)
+        os.makedirs(client_dir, exist_ok=True)
+        excel_path = os.path.join(client_dir, "assessment_results.xlsx")
+        save_path = write_assessment_answers_to_excel(results, excel_path=excel_path)
         if save_path:
-            root = parent_frame.winfo_toplevel()
             root.results_excel_path = save_path
             messagebox.showinfo("Succes", f"Antwoorden opgeslagen naar:\n{save_path}")
         else:

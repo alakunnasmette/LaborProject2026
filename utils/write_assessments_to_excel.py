@@ -15,19 +15,15 @@ def write_assessment_answers_to_excel(
     Returns the path to the saved file on success, otherwise False.
     """
     try:
+        template_path = "Loopbaan onderzoek 5.0 template.xlsx"
+        # If the target file does not exist, copy the template
         if not os.path.exists(excel_path):
-            print(f"Error: Excel file not found at {excel_path}")
-            return False
+            if not os.path.exists(template_path):
+                print(f"Error: Excel template not found at {template_path}")
+                return False
+            shutil.copy2(template_path, excel_path)
 
-        folder = os.path.dirname(excel_path) or "."
-        filled_dir = os.path.join(folder, "results")
-        base_name = os.path.splitext(os.path.basename(excel_path))[0]
-        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        new_name = f"{base_name} - filled {timestamp}.xlsx"
-        new_path = os.path.join(filled_dir, new_name)
-        shutil.copy2(excel_path, new_path)
-
-        wb = openpyxl.load_workbook(new_path)
+        wb = openpyxl.load_workbook(excel_path)
         ws = wb.worksheets[1]
 
         cols = [3, 4, 5, 6, 7]
@@ -39,8 +35,8 @@ def write_assessment_answers_to_excel(
             row = 4 + cycle * 5 + pos
             ws.cell(row=row, column=col, value=val)
 
-        wb.save(new_path)
-        return new_path
+        wb.save(excel_path)
+        return excel_path
 
     except Exception as e:
         print(f"Error writing to Excel: {e}")

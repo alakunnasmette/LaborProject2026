@@ -254,6 +254,10 @@ def navigate_phase(phase_name):
     # Pass current_assessment_client to phase1.1 via parent_frame
     if phase_name == "phase1.1":
         content_frame.current_assessment_client = current_assessment_client
+        if current_assessment_client:
+            print(f"[DEBUG] Passing client to phase1.1: {current_assessment_client.get('name', 'UNKNOWN')} (ID: {current_assessment_client.get('id', 'UNKNOWN')})")
+        else:
+            print("[DEBUG] No active client to pass to phase1.1!")
     # Set results_excel_path for phase2.0 and phase2.1 if client context is available
     if phase_name in ("phase2.0", "phase2.1") and hasattr(content_frame, "current_assessment_client"):
         client = content_frame.current_assessment_client
@@ -279,6 +283,13 @@ def show_client_list(query=""):
 
 def run_assessment(client):
     """Launch assessment questionnaire for the client."""
+    global current_assessment_client
+    current_assessment_client = client
+    # Also set on content_frame if available
+    try:
+        content_frame.current_assessment_client = client
+    except Exception:
+        pass
     open_phase11_assessment(client)
 
 def run_prognosis(client):
@@ -291,6 +302,9 @@ def view_client_results(client):
 
 def open_client_dashboard(client):
     """Open the dashboard for this client with assessment and prognosis buttons."""
+    global current_assessment_client
+    current_assessment_client = client
+    print(f"[DEBUG] Active client set: {client.get('name', 'UNKNOWN')} (ID: {client.get('id', 'UNKNOWN')})")
     clear_content_frame()
     info_frame = tk.Frame(content_frame, bg=COLOR_BG)
     info_frame.pack(fill="x", padx=20, pady=(0, 20))
@@ -593,6 +607,11 @@ def open_phase11_assessment(client):
     """Start the assessment questionnaire for a client."""
     global current_assessment_client
     current_assessment_client = client
+    # Always set on content_frame as well
+    try:
+        content_frame.current_assessment_client = client
+    except Exception:
+        pass
     navigate_phase("phase1.1")
 
 root.mainloop()
