@@ -95,43 +95,18 @@ ANCHOR_TO_COLUMN = {
 ANCHORS = ["V", "W", "X", "Y", "Z"]
 
 def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
-    """Show Phase 2.0 – Career Anchors in the right panel with two statements per question."""
+    """Show Phase 2.0 – Career Anchors with sticky header."""
 
     clear_frame(parent_frame)
 
-    # --------------- Scrollable container ---------------
-
-    container = tk.Frame(parent_frame, bg="white")
-
-    container.pack(fill="both", expand=True)
-    canvas = tk.Canvas(container, bg="white", highlightthickness=0)
-    scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
-
-    canvas.pack(side="left", fill="both", expand=True)
-    scrollbar.pack(side="right", fill="y")
-
-    scroll_frame = tk.Frame(canvas, bg="white")
-    window_id = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
-    canvas.configure(yscrollcommand=scrollbar.set)
-
-    def on_frame_configure(event=None):
-        canvas.configure(scrollregion=canvas.bbox("all"))
-
-    def on_canvas_resize(event):
-        canvas.itemconfig(window_id, width=event.width)
-
-    scroll_frame.bind("<Configure>", on_frame_configure)
-    canvas.bind("<Configure>", on_canvas_resize)
-
-    def on_mousewheel(event):
-        canvas.yview_scroll(-int(event.delta / 120), "units")
-
-    canvas.bind_all("<MouseWheel>", on_mousewheel)
-
-    # --------------- Headers ---------------
+    # =========================================================
+    # 🔹 1. STICKY HEADER (OUTSIDE SCROLLABLE AREA)
+    # =========================================================
+    header_frame = tk.Frame(parent_frame, bg=S["bg"])
+    header_frame.pack(fill="x")
 
     title = tk.Label(
-        scroll_frame,
+        header_frame,
         text="Fase 2.0 | Wat wil de cliënt? | Identificatie van de loopbaanwaarden",
         bg=S["bg"],
         fg="black",
@@ -141,7 +116,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     title.pack(fill="x", padx=20, pady=(20, 2))
 
     subtitle = tk.Label(
-        scroll_frame,
+        header_frame,
         text=(
             "Beoordeling van stelling a.h.v. onderstaande criteria:\n"
             "Met welke stelling kan cliënt zich het sterkst identificeren?"
@@ -152,16 +127,21 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         anchor="w",
         justify="left",
     )
-    subtitle.pack(fill="x", padx=20, pady=(0, 15))
+    subtitle.pack(fill="x", padx=20, pady=(0, 10))
 
-    # =================== Table headers and rows ===================
-    table = tk.Frame(scroll_frame, bg=S["bg"])
-    table.pack(fill="both", expand=True, padx=TABLE_PADX, pady=TABLE_PADY)
+    # 🔹 Header table (ONLY the header row lives here)
+    header_table = tk.Frame(header_frame, bg=S["bg"])
+    header_table.pack(fill="x", padx=TABLE_PADX)
 
-    # columns
+    # IMPORTANT: identical column config as main table
     for c in range(7):
-        table.grid_columnconfigure(c, weight=0)
-    table.grid_columnconfigure(1, weight=1)  # statement column stretches
+        header_table.grid_columnconfigure(c, weight=0)
+    header_table.grid_columnconfigure(1, weight=1)
+
+    # Optional: enforce consistent widths (helps alignment)
+    header_table.grid_columnconfigure(0, minsize=60)
+    for i in range(2, 7):
+        header_table.grid_columnconfigure(i, minsize=80)
 
     header_bg = S["header"]
     headers = [
@@ -175,27 +155,76 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     ]
 
     for text, col in headers:
+        cell = tk.Frame(header_table, bg=header_bg, bd=1, relief="solid")
+        cell.grid(row=0, column=col, sticky="nsew", padx=3, pady=2)
+
         lbl = tk.Label(
-            table,
+            cell,
             text=text,
             bg=header_bg,
             fg="white",
             font=S["f_b"],
-            padx=10,
             anchor="w" if col <= 1 else "center",
         )
-        lbl.grid(row=0, column=col, sticky="nsew")
+        lbl.pack(fill="both", expand=True)
 
+    # =========================================================
+    # 🔹 2. SCROLLABLE AREA (ONLY CONTENT)
+    # =========================================================
+    container = tk.Frame(parent_frame, bg="white")
+    container.pack(fill="both", expand=True)
 
-    # -------------------- Group statements per question --------------------
+    canvas = tk.Canvas(container, bg="white", highlightthickness=0)
+    scrollbar = tk.Scrollbar(container, orient="vertical", command=canvas.yview)
+
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+
+    scroll_frame = tk.Frame(canvas, bg="white")
+    window_id = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    def on_frame_configure(event=None):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    def on_canvas_resize(event):
+        # 🔹 This keeps scroll_frame same width as canvas
+        canvas.itemconfig(window_id, width=event.width)
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+    canvas.bind("<Configure>", on_canvas_resize)
+
+    def on_mousewheel(event):
+        canvas.yview_scroll(-int(event.delta / 120), "units")
+
+    canvas.bind_all("<MouseWheel>", on_mousewheel)
+
+    # =========================================================
+    # 🔹 3. MAIN TABLE (NO HEADER ROW HERE)
+    # =========================================================
+    table = tk.Frame(scroll_frame, bg=S["bg"])
+    table.pack(fill="both", expand=True, padx=TABLE_PADX, pady=TABLE_PADY)
+
+    # SAME column config as header_table → THIS FIXES ALIGNMENT
+    for c in range(7):
+        table.grid_columnconfigure(c, weight=0)
+    table.grid_columnconfigure(1, weight=1)
+
+    # SAME min sizes → keeps columns perfectly aligned
+    table.grid_columnconfigure(0, minsize=60)
+    for i in range(2, 7):
+        table.grid_columnconfigure(i, minsize=80)
+
+    # =========================================================
+    # 🔹 4. DATA (UNCHANGED LOGIC)
+    # =========================================================
     from collections import defaultdict
 
     questions = defaultdict(list)
     for nummer, anker, tekst in CAREER_STATEMENTS:
         questions[nummer].append((anker, tekst))
 
-
-    # -------------------- Prepare variables --------------------
     vraag_vars: dict[int, tk.StringVar] = {}
     vraag_buttons: dict[int, list[tuple[str, tk.Radiobutton]]] = {}
 
@@ -204,7 +233,6 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         vraag_buttons[nummer] = []
 
     def update_row(question_number: int) -> None:
-        """Show only a '1' in the selected box for this question."""
         current = vraag_vars[question_number].get()
         for code, btn in vraag_buttons[question_number]:
             if code == current:
@@ -212,12 +240,12 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             else:
                 btn.config(text="", font=FONTS["medium"])
 
-    # -------------------- Build rows --------------------
-    row_index = 1
-    for nummer, stmts in sorted(questions.items()):
-        row_bg = S["odd"] if row_index % 2 == 1 else S["even"]
+    # 🔹 IMPORTANT: start at row 0 now (header is gone)
+    row_index = 0
 
-        # Number (yellow block)
+    for nummer, stmts in sorted(questions.items()):
+        row_bg = S["odd"] if row_index % 2 == 0 else S["even"]
+
         num_label = tk.Label(
             table,
             text=str(nummer),
@@ -229,7 +257,6 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         )
         num_label.grid(row=row_index, column=0, rowspan=len(stmts), padx=(10, 10), pady=(2, 2), sticky="nsw")
 
-        # Statements stacked vertically
         stmt_text = "\n".join([tekst for _, tekst in stmts])
         stmt_label = tk.Label(
             table,
@@ -249,7 +276,6 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
 
         stmt_label.bind("<Configure>", update_wrap)
 
-        # 5 anchor boxes (Radiobuttons)
         var = vraag_vars[nummer]
         for offset, code in enumerate(ANCHORS):
             col = 2 + offset
@@ -279,14 +305,14 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
 
         row_index += len(stmts)
 
-    # init: all empty
     for qnum in vraag_vars.keys():
         update_row(qnum)
 
-    # save choices on parent_frame
     parent_frame.loopbaan_vars = vraag_vars
 
-    # -------------------- Descriptions --------------------
+    # =========================================================
+    # 🔹 5. REST (UNCHANGED)
+    # =========================================================
     desc_frame = tk.Frame(scroll_frame, bg=S["bg"])
     desc_frame.pack(fill="x", padx=20, pady=(20, 20))
 
@@ -327,6 +353,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             padx=8,
             pady=6,
         ).pack(side="left", fill="both", expand=True)
+
 
     # -------------------- Save and continue --------------------
     def on_submit_loopbaan():
