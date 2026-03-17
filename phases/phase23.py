@@ -166,7 +166,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
     button_frame.pack(fill="x", padx=20, pady=20)
 
     def on_submit():
-        """Validate and submit answers."""
+        """Validate, submit answers, and generate report."""
         missing = []
         for q_num, text_box in text_entries.items():
             answer = text_box.get("1.0", "end-1c").strip()
@@ -182,8 +182,8 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
 
         # save answers to dictionary
         answers = {q_num: text_box.get("1.0", "end-1c").strip() for q_num, text_box in text_entries.items()}
-        
-        # save to Excel file
+
+        # get Excel path
         root = parent_frame.winfo_toplevel()
         excel_path = getattr(root, "results_excel_path", None)
 
@@ -194,10 +194,8 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             )
             return
 
-        result = write_phase_2_3_to_excel(
-            answers,
-            excel_path
-        )
+        # save answers
+        result = write_phase_2_3_to_excel(answers, excel_path)
 
         if not result:
             messagebox.showerror(
@@ -205,15 +203,24 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
                 "Er ging iets mis bij het opslaan van je antwoorden."
             )
             return
-        
-        messagebox.showinfo(
-            "Succes",
-            f"Je antwoorden zijn opgeslagen"
-        )
 
+        # generate Word report
+        from utils.report_helper import generate_report_from_excel
 
+        try:
+            report_path = generate_report_from_excel(excel_path, age=30)  # dummy age
+            messagebox.showinfo(
+                "Succes",
+                f"Je antwoorden zijn opgeslagen.\n\nHet rapport is gegenereerd:\n{report_path}"
+            )
+        except Exception as e:
+            messagebox.showerror(
+                "Fout bij rapportgeneratie",
+                f"Er ging iets mis bij het genereren van het rapport.\n\n{e}"
+            )
+            return
 
-        # to homepage
+        # navigate home
         if navigate:
             navigate("home")
 

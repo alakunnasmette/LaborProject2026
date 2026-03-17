@@ -144,7 +144,7 @@ Deze loopbanen richten zich op het leveren van technologische oplossingen die es
 
 """
 
-CARRIER_CLUSTERS_PUBLIEKE = """
+CARRIER_CLUSTERS_VEILIGHEID = """
 Publieke veiligheid en zekerheid | 
 Publieke veiligheid en zekerheid omvat:
 
@@ -180,7 +180,7 @@ Samen zorgen deze drie elementen ervoor dat bedrijven hun producten effectief op
 
 """
 
-CARRIER_CLUSTERS_WETENSCHAP = """
+CARRIER_CLUSTERS_STEM = """
 Wetenschap, technologie, engineering en mathematica | 
 Wetenschap, technologie, engineering en wiskunde (STEM) omvat:
 
