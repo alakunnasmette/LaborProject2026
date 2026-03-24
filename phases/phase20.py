@@ -99,9 +99,8 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
 
     clear_frame(parent_frame)
 
-    # =========================================================
-    # 🔹 1. STICKY HEADER (OUTSIDE SCROLLABLE AREA)
-    # =========================================================
+    # ---------- Sticky header ----------
+
     header_frame = tk.Frame(parent_frame, bg=S["bg"])
     header_frame.pack(fill="x")
 
@@ -129,16 +128,16 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     )
     subtitle.pack(fill="x", padx=20, pady=(0, 10))
 
-    # 🔹 Header table (ONLY the header row lives here)
+    # header table
     header_table = tk.Frame(header_frame, bg=S["bg"])
     header_table.pack(fill="x", padx=TABLE_PADX)
 
-    # IMPORTANT: identical column config as main table
+    # identical column config as main table to keep them aligned
     for c in range(7):
         header_table.grid_columnconfigure(c, weight=0)
     header_table.grid_columnconfigure(1, weight=1)
 
-    # Optional: enforce consistent widths (helps alignment)
+
     header_table.grid_columnconfigure(0, minsize=60)
     for i in range(2, 7):
         header_table.grid_columnconfigure(i, minsize=80)
@@ -168,9 +167,8 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         )
         lbl.pack(fill="both", expand=True)
 
-    # =========================================================
-    # 🔹 2. SCROLLABLE AREA (ONLY CONTENT)
-    # =========================================================
+    # ---------- Scrollable area ----------
+
     container = tk.Frame(parent_frame, bg="white")
     container.pack(fill="both", expand=True)
 
@@ -189,7 +187,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         canvas.configure(scrollregion=canvas.bbox("all"))
 
     def on_canvas_resize(event):
-        # 🔹 This keeps scroll_frame same width as canvas
+        # keeps scroll_frame same width as canvas
         canvas.itemconfig(window_id, width=event.width)
 
     scroll_frame.bind("<Configure>", on_frame_configure)
@@ -200,25 +198,21 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
 
     canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-    # =========================================================
-    # 🔹 3. MAIN TABLE (NO HEADER ROW HERE)
-    # =========================================================
+
+    # ---------- Main table ----------
+
     table = tk.Frame(scroll_frame, bg=S["bg"])
     table.pack(fill="both", expand=True, padx=TABLE_PADX, pady=TABLE_PADY)
 
-    # SAME column config as header_table → THIS FIXES ALIGNMENT
     for c in range(7):
         table.grid_columnconfigure(c, weight=0)
     table.grid_columnconfigure(1, weight=1)
 
-    # SAME min sizes → keeps columns perfectly aligned
     table.grid_columnconfigure(0, minsize=60)
     for i in range(2, 7):
         table.grid_columnconfigure(i, minsize=80)
 
-    # =========================================================
-    # 🔹 4. DATA (UNCHANGED LOGIC)
-    # =========================================================
+    # data
     from collections import defaultdict
 
     questions = defaultdict(list)
@@ -240,7 +234,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             else:
                 btn.config(text="", font=FONTS["medium"])
 
-    # 🔹 IMPORTANT: start at row 0 now (header is gone)
+
     row_index = 0
 
     for nummer, stmts in sorted(questions.items()):
@@ -310,9 +304,6 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
 
     parent_frame.loopbaan_vars = vraag_vars
 
-    # =========================================================
-    # 🔹 5. REST (UNCHANGED)
-    # =========================================================
     desc_frame = tk.Frame(scroll_frame, bg=S["bg"])
     desc_frame.pack(fill="x", padx=20, pady=(20, 20))
 
@@ -367,7 +358,7 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
                 f"Er zijn nog {len(missing)} vragen niet ingevuld."
             )
             return
-
+        
         # map to Excel columns
         excel_answers = {
             qnum: ANCHOR_TO_COLUMN[var.get()]
@@ -377,6 +368,9 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
         # write to Excel
         root = parent_frame.winfo_toplevel()
 
+         # ---- Save in central dictionary for report ----
+        root.all_answers["phase2.0"] = {qnum: var.get() for qnum, var in vraag_vars.items()}
+        
         if not hasattr(root, "results_excel_path"):
             messagebox.showerror(
                 "Geen Excel-bestand",

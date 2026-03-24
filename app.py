@@ -17,6 +17,7 @@ import prognosis_model # prognosis_model.py
  
 # --------- Start screen ---------
 root = tk.Tk()
+root.all_answers = {}  # central store for all answers
 root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="white")

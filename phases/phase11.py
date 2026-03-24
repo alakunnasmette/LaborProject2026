@@ -293,6 +293,9 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
                 f"Er zijn nog {len(missing)} stellingen niet ingevuld."
             )
             return
+        
+         # ---- Save in central dictionary for report ----
+        parent_frame.winfo_toplevel().all_answers["phase1.1"] = results
 
         # Save results and generate Excel file
         parent_frame.assessment_results = results

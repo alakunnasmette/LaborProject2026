@@ -11,7 +11,6 @@ from text_library import (
     cultuuranalyse_texts
 )
 
-
 # -------------------- CONFIGURATION --------------------
 
 JCM_MAPPING = {
@@ -90,7 +89,7 @@ def generate_report(user_data, filename):
     doc.save(filename)
 
 
-# -------------------- LOOPBAANFASE --------------------
+# -------------------- 1.0 LOOPBAANFASE --------------------
 
 def add_loopbaanfase_section(doc, user_data):
 
@@ -115,7 +114,7 @@ def add_loopbaanfase_section(doc, user_data):
     doc.add_paragraph(body)
 
 
-# -------------------- BIG FIVE --------------------
+# -------------------- 1.1 BIG FIVE --------------------
 
 def add_bigfive_section(doc, user_data):
 
@@ -144,7 +143,7 @@ def add_bigfive_section(doc, user_data):
             add_paragraph_conditional_indent(doc, line)
 
 
-# -------------------- LOOPBAANANKERS --------------------
+# -------------------- 2.0 LOOPBAANANKERS --------------------
 
 def add_loopbaanankers_section(doc, user_data):
 
@@ -169,7 +168,7 @@ def add_loopbaanankers_section(doc, user_data):
         doc.add_paragraph(body)
 
 
-# -------------------- CARRIERE CLUSTERS --------------------
+# -------------------- 2.1 CARRIERE CLUSTERS --------------------
 
 def add_carriereclusters_section(doc, user_data):
 
@@ -195,7 +194,7 @@ def add_carriereclusters_section(doc, user_data):
             add_paragraph_conditional_indent(doc, line)
 
 
-# -------------------- CULTUUR ANALYSE --------------------
+# -------------------- 2.2 CULTUUR ANALYSE --------------------
 
 def add_cultuur_section(doc, user_data):
 
@@ -221,7 +220,7 @@ def add_cultuur_section(doc, user_data):
             add_paragraph_conditional_indent(doc, line)
 
 
-# -------------------- JCM --------------------
+# -------------------- 2.3 JCM --------------------
 
 def add_jcm_section(doc, user_data):
 

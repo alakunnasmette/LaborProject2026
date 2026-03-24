@@ -6,6 +6,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ui.ui_components import clear_frame, create_submit_button
 from utils.write_assessments_to_excel import write_phase_2_3_to_excel
 from ui.ui_styles import S, FONTS, PRIMARY_BG, CARD_LIGHT_BG
+from utils import score_calculations
+from utils.report_helper import generate_report_from_answers
 
 # ==================== Job Characteristics Model Data ====================
 JOB_CHARACTERISTICS_MODEL = [
@@ -166,7 +168,10 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
     button_frame.pack(fill="x", padx=20, pady=20)
 
     def on_submit():
-        """Validate, submit answers, and generate report."""
+        """
+        Validate, submit answers, save to Excel, and generate Word report.
+        """
+        # ------------------ 1️⃣ Validation ------------------
         missing = []
         for q_num, text_box in text_entries.items():
             answer = text_box.get("1.0", "end-1c").strip()
@@ -180,13 +185,17 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             )
             return
 
-        # save answers to dictionary
-        answers = {q_num: text_box.get("1.0", "end-1c").strip() for q_num, text_box in text_entries.items()}
+        # Collect answers
+        answers_to_excel = {q_num: text_box.get("1.0", "end-1c").strip() for q_num, text_box in text_entries.items()}
 
-        # get Excel path
+        # Save to central all_answers
         root = parent_frame.winfo_toplevel()
-        excel_path = getattr(root, "results_excel_path", None)
+        if not hasattr(root, "all_answers"):
+            root.all_answers = {}  # safety check
+        root.all_answers["phase2.3"] = answers_to_excel
 
+        # save answers to Excel
+        excel_path = getattr(root, "results_excel_path", None)
         if not excel_path or not os.path.exists(excel_path):
             messagebox.showerror(
                 "Geen Excel-bestand",
@@ -194,21 +203,23 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             )
             return
 
-        # save answers
-        result = write_phase_2_3_to_excel(answers, excel_path)
-
+        result = write_phase_2_3_to_excel(answers_to_excel, excel_path)
         if not result:
             messagebox.showerror(
                 "Fout bij opslaan",
                 "Er ging iets mis bij het opslaan van je antwoorden."
             )
             return
+        
+        print(root.all_answers["phase2.0"])
 
-        # generate Word report
-        from utils.report_helper import generate_report_from_excel
-
+        # ------------------ Generate Word report ------------------
         try:
-            report_path = generate_report_from_excel(excel_path, age=30)  # dummy age
+            report_path = generate_report_from_answers(
+                root.all_answers,
+                filename="results_report.docx"
+                )
+
             messagebox.showinfo(
                 "Succes",
                 f"Je antwoorden zijn opgeslagen.\n\nHet rapport is gegenereerd:\n{report_path}"
