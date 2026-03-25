@@ -221,7 +221,6 @@ def add_cultuur_section(doc, user_data):
 
 
 # -------------------- 2.3 JCM --------------------
-
 def add_jcm_section(doc, user_data):
 
     doc.add_heading(static_texts.PHASE2_3_SECTION_TITLE.strip(), level=1)
@@ -229,7 +228,8 @@ def add_jcm_section(doc, user_data):
 
     jcm_data = user_data.get("jcm", {})
 
-    # Definitions
+
+    # ================= STATIC EXPLANATIONS =================
     for attr, (title_var, text_var) in JCM_MAPPING.items():
 
         title = getattr(static_texts, f"PHASE2_3_{title_var}")
@@ -238,8 +238,12 @@ def add_jcm_section(doc, user_data):
         add_bold_paragraph(doc, title.strip())
         doc.add_paragraph(explanation.strip())
 
-    # User answers
-    for attr, answer in jcm_data.items():
 
-        add_bold_paragraph(doc, attr)
-        doc.add_paragraph((answer or "").strip())
+    # ================= USER ANSWERS =================
+    for idx, (attr, (title_var, _)) in enumerate(JCM_MAPPING.items(), start=1):
+
+        title = getattr(static_texts, f"PHASE2_3_{title_var}")
+        user_answer = jcm_data.get(str(idx), "")
+
+        add_bold_paragraph(doc, title.strip())
+        doc.add_paragraph((user_answer or "").strip())

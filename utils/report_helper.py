@@ -1,6 +1,8 @@
 from utils.score_calculations import calculate_scores
 from report_generator import generate_report
 from text_library import static_texts, personality_texts, carriereclusters_texts, cultuuranalyse_texts, loopbaanankers_texts
+import os
+
 
 def generate_report_from_answers(all_answers, age=30, filename="results_report.docx"):
     """
@@ -64,5 +66,13 @@ def generate_report_from_answers(all_answers, age=30, filename="results_report.d
 
     # Generate Word report ----------------------------------------
 
-    generate_report(user_data, filename)
-    return filename
+    # Ensure results folder exists
+    results_folder = os.path.join(os.path.dirname(__file__), "..", "results")
+    os.makedirs(results_folder, exist_ok=True)
+
+    # Full save path
+    filepath = os.path.join(results_folder, filename)
+
+    generate_report(user_data, filepath)
+
+    return filepath
