@@ -243,41 +243,9 @@ def open_phase11_assessment(client):
     current_assessment_client = client
     navigate_phase("phase1.1")
 
-def navigate_phase(phase_name):
-    """Navigate to a specific phase."""
-
-    if phase_name not in PHASES:
-        messagebox.showerror("Error", f"Unknown phase: {phase_name}")
-        return
-    
-    build_func = PHASES[phase_name]
-    # Pass current_assessment_client to phase1.1 via parent_frame
-    if phase_name == "phase1.1":
-        content_frame.current_assessment_client = current_assessment_client
-        if current_assessment_client:
-            print(f"[DEBUG] Passing client to phase1.1: {current_assessment_client.get('name', 'UNKNOWN')} (ID: {current_assessment_client.get('id', 'UNKNOWN')})")
-        else:
-            print("[DEBUG] No active client to pass to phase1.1!")
-    # Set results_excel_path for phase2.0 and phase2.1 if client context is available
-    if phase_name in ("phase2.0", "phase2.1") and hasattr(content_frame, "current_assessment_client"):
-        client = content_frame.current_assessment_client
-        safe_name = "_".join(client["name"].split())
-        folder_name = f"{client['id']}_{safe_name}"
-        client_dir = os.path.join("clients", folder_name)
-        excel_path = None
-        if os.path.exists(client_dir):
-            for fname in os.listdir(client_dir):
-                if fname.endswith(".xlsx"):
-                    excel_path = os.path.join(client_dir, fname)
-                    break
-        if not excel_path:
-            excel_path = "Loopbaan onderzoek 5.0 template.xlsx"
-        content_frame.results_excel_path = excel_path
-    build_func(content_frame, navigate_phase)
-
 def show_client_list(query=""):
     """Display the client list view."""
-    top_frame.pack(fill="x", padx=20, pady=15)
+    top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
     search_entry.delete(0, tk.END)
     refresh_client_list(query)
 
@@ -507,12 +475,8 @@ main_frame.pack(fill="both", expand=True)
 
 # Top bar with search and new client button
 top_frame = tk.Frame(main_frame, bg=YELLOW_ACCENT, height=80)
-top_frame.pack_forget()
-top_frame.pack(fill="x", padx=20, pady=15)
-top_frame.lift()
+top_frame.pack(side="top", fill="x", padx=20, pady=15)
 top_frame.pack_propagate(False)
-if navigate_phase == "phase1.1":
-    visible = False
 
 tk.Label(
     top_frame,
@@ -572,7 +536,7 @@ tk.Button(
 
 # Content frame - this swaps between list view and dashboard
 content_frame = tk.Frame(main_frame, bg=COLOR_BG)
-content_frame.pack(fill="both", expand=True)
+content_frame.pack(side="top", fill="both", expand=True)
 
 # DEBUG: show children of main_frame
 print("Children of main_frame:")
@@ -596,11 +560,55 @@ PHASES = {
 
 def navigate_phase(phase_name):
     """Navigate to a specific phase."""
+    global current_assessment_client
+    
+    # Handle special navigation cases
+    if phase_name == "client_dashboard":
+        # Return to the client dashboard and show header
+        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
+        if current_assessment_client:
+            open_client_dashboard(current_assessment_client)
+        return
+    
+    if phase_name == "client_list":
+        # Return to client list and show header
+        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
+        show_client_list()
+        return
+    
     if phase_name not in PHASES:
         messagebox.showerror("Error", f"Unknown phase: {phase_name}")
         return
     
+    # Hide header when entering a phase
+    top_frame.pack_forget()
+    
     build_func = PHASES[phase_name]
+    
+    # Set up phase context (excel path, etc.)
+    if phase_name == "phase1.1":
+        content_frame.current_assessment_client = current_assessment_client
+        if current_assessment_client:
+            print(f"[DEBUG] Passing client to phase1.1: {current_assessment_client.get('name', 'UNKNOWN')} (ID: {current_assessment_client.get('id', 'UNKNOWN')})")
+        else:
+            print("[DEBUG] No active client to pass to phase1.1!")
+    
+    # Set results_excel_path for phase2.x if client context is available
+    if phase_name in ("phase2.0", "phase2.1", "phase2.2", "phase2.3") and hasattr(content_frame, "current_assessment_client"):
+        client = content_frame.current_assessment_client
+        safe_name = "_".join(client["name"].split())
+        folder_name = f"{client['id']}_{safe_name}"
+        client_dir = os.path.join("clients", folder_name)
+        excel_path = None
+        if os.path.exists(client_dir):
+            for fname in os.listdir(client_dir):
+                if fname.endswith(".xlsx"):
+                    excel_path = os.path.join(client_dir, fname)
+                    break
+        if not excel_path:
+            excel_path = "Loopbaan onderzoek 5.0 template.xlsx"
+        content_frame.results_excel_path = excel_path
+    
     build_func(content_frame, navigate_phase)
 
 def open_phase11_assessment(client):

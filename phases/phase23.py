@@ -211,11 +211,9 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             f"Je antwoorden zijn opgeslagen"
         )
 
-
-
-        # to homepage
+        # Navigate back to client dashboard
         if navigate:
-            navigate("client_list")
+            navigate("client_dashboard")
 
     btn_submit = create_submit_button(
         button_frame,
