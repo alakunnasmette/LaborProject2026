@@ -211,9 +211,9 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             f"Je antwoorden zijn opgeslagen"
         )
 
-        # Navigate back using the back button/history
+        # Navigate directly to client dashboard after completing all phases
         if navigate:
-            navigate("go_back")
+            navigate("client_dashboard")
 
     btn_submit = create_submit_button(
         button_frame,

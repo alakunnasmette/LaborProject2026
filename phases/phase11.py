@@ -311,7 +311,7 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
         folder_name = f"{client['id']}_{safe_name}"
         client_dir = os.path.join("clients", folder_name)
         os.makedirs(client_dir, exist_ok=True)
-        excel_path = os.path.join(client_dir, "assessment_results.xlsx")
+        excel_path = os.path.join(client_dir, f"{safe_name}_assessment_results.xlsx")
         save_path = write_assessment_answers_to_excel(results, excel_path=excel_path)
         if save_path:
             root.results_excel_path = save_path

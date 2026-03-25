@@ -615,6 +615,14 @@ def navigate_phase(phase_name, push_to_history=True):
         go_back()
         return
     
+    # Handle direct return to client dashboard (used after final phases)
+    if phase_name == "client_dashboard":
+        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
+        if current_assessment_client:
+            # Don't push to history - this closes out the phase chain
+            open_client_dashboard(current_assessment_client, push_to_history=False)
+        return
+    
     if phase_name not in PHASES:
         messagebox.showerror("Error", f"Unknown phase: {phase_name}")
         return

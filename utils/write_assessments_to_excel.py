@@ -3,7 +3,6 @@ import os
 import shutil
 from datetime import datetime
 
-
 # Phase 1.1 --------------------------
 def write_assessment_answers_to_excel(
     assessment_results: dict,
