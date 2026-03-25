@@ -21,7 +21,7 @@ root.title("LABOR - Applicatie")
 root.geometry("1000x600")
 root.configure(bg="#f0f0f0")
 root.state("zoomed")
-navigation_stack = []
+navigation_history = []  # Stack of (page_type, page_data) tuples
 
 myappid = 'mycompany.myproduct.version'
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -48,16 +48,58 @@ SIDEBAR_WIDTH = 200
 sidebar = create_sidebar(root, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
 logo_label = add_logo_to_sidebar(sidebar, logo_path=os.path.join("images", "labor-logo.png"), use_pillow=_USE_PILLOW, bg=COLOR_PRIMARY)
 
-def navigate(view_func, *args, **kwargs):
-    """Navigate to a new view and store it in history."""
-    navigation_stack.append((view_func, args, kwargs))
-    clear_content_frame()
-    view_func(*args, **kwargs)
+def push_history(page_type, page_data):
+    """Push a page to the navigation history."""
+    navigation_history.append((page_type, page_data))
+    print(f"[DEBUG] Pushed to history: {page_type}, Stack size: {len(navigation_history)}")
+
+def go_back():
+    """Go back to the previous page. If no history, return to home (client list)."""
+    global current_assessment_client
+    
+    if len(navigation_history) == 0:
+        # Empty history, go to home
+        push_history("client_list", {})
+        show_client_list(push_to_history=False)
+        return
+    
+    if len(navigation_history) == 1:
+        # Only one page in history, just reload it
+        page_type, page_data = navigation_history[0]
+        if page_type == "client_list":
+            show_client_list(push_to_history=False)
+        else:
+            # Go to home as default
+            show_client_list(push_to_history=False)
+        return
+    
+    # Pop current page
+    navigation_history.pop()
+    print(f"[DEBUG] Popped from history, Stack size: {len(navigation_history)}")
+    
+    # Load previous page from history
+    page_type, page_data = navigation_history[-1]
+    
+    if page_type == "client_list":
+        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
+        clear_content_frame()
+        refresh_client_list()
+    elif page_type == "client_dashboard":
+        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
+        open_client_dashboard(page_data.get("client"), push_to_history=False)
+    elif page_type == "phase":
+        phase_name = page_data.get("phase_name")
+        navigate_phase(phase_name, push_to_history=False)
+    elif page_type == "create_client":
+        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
+        show_create_client_form(push_to_history=False)
+    else:
+        show_client_list(push_to_history=False)
 
 back_button = tk.Button(
     sidebar,
     text="← Terug",
-    command=lambda: navigate(show_client_list),
+    command=go_back,
     bg=COLOR_PRIMARY,
     fg="white",
     relief="flat",
@@ -90,8 +132,10 @@ def search_clients(query):
     clients = load_clients()
     return [c for c in clients if query.lower() in c.get("name", "").lower()]
 
-def show_create_client_form():
+def show_create_client_form(push_to_history=True):
     """Display form to create a new client with all fields."""
+    if push_to_history:
+        push_history("create_client", {})
     clear_content_frame()
 
     form_frame = tk.Frame(content_frame, bg=COLOR_BG)
@@ -243,8 +287,10 @@ def open_phase11_assessment(client):
     current_assessment_client = client
     navigate_phase("phase1.1")
 
-def show_client_list(query=""):
+def show_client_list(query="", push_to_history=True):
     """Display the client list view."""
+    if push_to_history:
+        push_history("client_list", {})
     top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
     search_entry.delete(0, tk.END)
     refresh_client_list(query)
@@ -268,10 +314,12 @@ def view_client_results(client):
     """View results for this client."""
     # TODO: Show results
 
-def open_client_dashboard(client):
+def open_client_dashboard(client, push_to_history=True):
     """Open the dashboard for this client with assessment and prognosis buttons."""
     global current_assessment_client
     current_assessment_client = client
+    if push_to_history:
+        push_history("client_dashboard", {"client": client})
     print(f"[DEBUG] Active client set: {client.get('name', 'UNKNOWN')} (ID: {client.get('id', 'UNKNOWN')})")
     clear_content_frame()
     info_frame = tk.Frame(content_frame, bg=COLOR_BG)
@@ -558,27 +606,22 @@ PHASES = {
     "phase2.3": build_job_characteristics_models_page,
 }
 
-def navigate_phase(phase_name):
-    """Navigate to a specific phase."""
+def navigate_phase(phase_name, push_to_history=True):
+    """Navigate to a specific phase or handle special navigation."""
     global current_assessment_client
     
-    # Handle special navigation cases
-    if phase_name == "client_dashboard":
-        # Return to the client dashboard and show header
-        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
-        if current_assessment_client:
-            open_client_dashboard(current_assessment_client)
-        return
-    
-    if phase_name == "client_list":
-        # Return to client list and show header
-        top_frame.pack(side="top", fill="x", padx=20, pady=15, before=content_frame)
-        show_client_list()
+    # Handle special navigation
+    if phase_name == "go_back":
+        go_back()
         return
     
     if phase_name not in PHASES:
         messagebox.showerror("Error", f"Unknown phase: {phase_name}")
         return
+    
+    # Push to history
+    if push_to_history:
+        push_history("phase", {"phase_name": phase_name})
     
     # Hide header when entering a phase
     top_frame.pack_forget()
