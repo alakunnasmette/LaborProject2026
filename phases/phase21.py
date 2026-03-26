@@ -749,17 +749,12 @@ class Culture22Page(tk.Frame):
 
             answers_to_excel[key] = (main_val, skill_val, interest_val)
 
-        # ---- FIX: Save in central dictionary on root ----
+        # ---- save in central dictionary on root ----
         root = self.winfo_toplevel()  # top-level window
         if not hasattr(root, "all_answers"):
             root.all_answers = {}  # create if missing
 
         root.all_answers["phase2.1"] = answers_to_excel
-
-        # ---- DEBUG: print collected answers ----
-        print("\n--- DEBUG: Phase 2.1 answers ---")
-        for k, v in root.all_answers["phase2.1"].items():
-            print(f"{k}: {v}")
 
         # get existing Excel file
         excel_path = getattr(root, "results_excel_path", None)

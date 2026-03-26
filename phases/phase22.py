@@ -244,7 +244,7 @@ class Culture22Page(tk.Frame):
         to the Excel sheet according to PHASE_2_2_MAPPING.
         """
 
-        # 1️⃣ Check for missing answers
+        # check for missing answers
         missing = [
             (gid, i)
             for gid in range(1, 5)
@@ -255,22 +255,18 @@ class Culture22Page(tk.Frame):
             show_incomplete_warning(len(missing), item_name="stellingen")
             return
 
-        # 2️⃣ Prepare answers dict {(group_id, stmt_index): value}
+        # prepare answers dict {(group_id, stmt_index): value}
         answers_to_excel = {k: v.get() for k, v in self.vars.items()}
 
-        # ---- FIX: Save in central dictionary on root ----
+        # save in central dictionary on root ----
         root = self.winfo_toplevel()
         if not hasattr(root, "all_answers"):
             root.all_answers = {}  # create if missing
 
         root.all_answers["phase2.2"] = answers_to_excel
 
-        # ---- DEBUG: print collected answers ----
-        print("\n--- DEBUG: Phase 2.2 answers ---")
-        for k, v in root.all_answers["phase2.2"].items():
-            print(f"{k}: {v}")
 
-        # 3️⃣ Get existing Excel file
+        # get existing Excel file
         excel_path = getattr(root, "results_excel_path", None)
         if not excel_path or not os.path.exists(excel_path):
             messagebox.showerror(
@@ -279,7 +275,7 @@ class Culture22Page(tk.Frame):
             )
             return
 
-        # 4️⃣ Write to Excel
+        # write to Excel
         saved_path = write_assessments_to_excel.write_phase_2_2_to_excel(
             answers=answers_to_excel,
             excel_path=excel_path
@@ -292,10 +288,10 @@ class Culture22Page(tk.Frame):
             )
             return
 
-        # 5️⃣ Save path
+        # save path
         root.results_excel_path = saved_path
 
-        # 6️⃣ Calculate totals per group
+        # calculate totals per group
         self.cultuur_totals = {g.id: self.subtotal(g.id) for g in GROUPS}
 
         messagebox.showinfo(

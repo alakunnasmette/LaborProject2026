@@ -171,7 +171,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         """
         Validate, submit answers, save to Excel, and generate Word report.
         """
-        # ------------------ 1️⃣ Validation ------------------
+        # ------------------ validation ------------------
         missing = []
         for q_num, text_box in text_entries.items():
             answer = text_box.get("1.0", "end-1c").strip()
@@ -185,10 +185,10 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             )
             return
 
-        # Collect answers
+        # collect answers
         answers_to_excel = {q_num: text_box.get("1.0", "end-1c").strip() for q_num, text_box in text_entries.items()}
 
-        # Save to central all_answers
+        # save to central all_answers
         root = parent_frame.winfo_toplevel()
         if not hasattr(root, "all_answers"):
             root.all_answers = {}  # safety check
@@ -233,7 +233,7 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
 
         # navigate home
         if navigate:
-            navigate("home")
+            navigate("client_dashboard")
 
     btn_submit = create_submit_button(
         button_frame,
