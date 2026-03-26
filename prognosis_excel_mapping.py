@@ -1,3 +1,20 @@
+# explanation i guess:
+# a few questions have different outcomes based on genders
+# so question 1, if youre a man, the answer row is 3, if youre a woman, the answer row is 20
+# all the others work this way:
+# "q3": {"row": 37, "options": 3}, means question 3 is on row 37 and has 3 options, meaning column D, E, and F
+# different question have different amount of options, but they all start at column D
+# the most amount is 12, i think?
+# drop down menu for the answers is on column Q
+# basically the logic is that in the questionnaire, all the choices connect to a specific cell. option 1 = D, option 2 = E etc.
+# the program will read what percentage is in the cell for that answer, so like D3 in the excel is 33.33%
+# it will then take that number and write it down on to the answer cell, which would be Q3.
+# the number in the cells might change in the future, since its based on statistics, so the python script should NOT have any percentages.
+# it just reads the cell itself.
+# it's not as complicated as it sounds, it's just tedious and annoying, but you'll survive.
+# Good luck with the project!
+# ❤ Mette
+
 """
 Excel mapping for Prognosis Model
 --------------------------------
@@ -14,8 +31,6 @@ C = question text
 D–P = percentage options
 Q = dropdown selection output
 """
-
-
 
 """
 Column logic example:
@@ -108,6 +123,30 @@ PROGNOSIS_MAPPING = {
     "q27": {"row": 122, "options": 3},
 
     "q28": {"row": 125, "options": 6},
+
+    "q29": {"row": 127, "options": 3},
+
+    "q30": {"row": 129, "options": 3},
+
+    "q31": {"row": 131, "options": 3},
+
+    "q32": {"row": 133, "options": 3},
+
+    "q33": {"row": 135, "options": 3},
+
+    "q34": {"row": 137, "options": 3},
+
+    "q35": {"row": 140, "options": 4},
+
+    "q36": {"row": 143, "options": 4},
+
+    "q37": {"row": 146, "options": 2},
+
+    "q38": {"row": 148, "options": 2},
+
+    "q39": {"row": 150, "options": 2},
+
+    "q40": {"row": 152, "options": 4},
 
 }
 
