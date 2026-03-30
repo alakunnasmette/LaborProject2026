@@ -4,6 +4,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.write_assessments_to_excel import write_assessment_answers_to_excel
+from utils.session_manager import save_session, load_session, mark_session_complete
 from ui.ui_components import clear_frame, add_nav_buttons
 from ui.ui_styles import (
     DARK_GREY,
@@ -279,9 +280,36 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     questions_container = tk.Frame(scroll_frame, bg="white")
     questions_container.pack(fill="both", expand=True)
 
+    # Load saved session if it exists
+    client = getattr(parent_frame, "current_assessment_client", None)
+    saved_session = load_session(str(client["id"]), client["name"], "phase1.1")
+    saved_answers = saved_session.get("answers", {}) if saved_session else {}
+
+    # Helper function to auto-save answers
+    def auto_save_answers():
+        """Save current answers to session file."""
+        results = get_assessment_results(parent_frame)
+        # Convert keys to strings for JSON serialization
+        answers_to_save = {str(k): v for k, v in results.items()}
+        save_session(
+            str(client["id"]),
+            client["name"],
+            "phase1.1",
+            0,
+            answers_to_save,
+            len(BIG_FIVE_ITEMS)
+        )
+
     for nummer, tekst in BIG_FIVE_ITEMS:
         var = tk.StringVar(value="")
+        # Pre-populate with saved answer if it exists
+        if str(nummer) in saved_answers:
+            saved_value = saved_answers[str(nummer)]
+            if saved_value:
+                var.set(str(saved_value))
         parent_frame.assessment_vars[nummer] = var
+        # Add trace callback to auto-save on any change
+        var.trace_add("write", lambda *args: auto_save_answers())
         make_likert_row(questions_container, nummer, tekst, var)
 
     # spacer
@@ -318,6 +346,9 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
             messagebox.showinfo("Succes", f"Antwoorden opgeslagen naar:\n{save_path}")
         else:
             messagebox.showwarning("Waarschuwing", "Antwoorden opgeslagen maar Excel-bestand kon niet worden gegenereerd.")
+
+        # Mark session as complete
+        mark_session_complete(str(client["id"]), client["name"], "phase1.1")
 
         # -> go to phase 2.0
         navigate("phase2.0")

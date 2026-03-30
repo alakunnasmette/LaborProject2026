@@ -15,6 +15,7 @@ from phases.phase20 import build_career_anchors_page
 from phases.phase21 import build_carriereclusters_page
 from phases.phase22 import build_cultuur_page
 from phases.phase23 import build_job_characteristics_models_page
+from utils.session_manager import has_incomplete_session, get_incomplete_phases, load_session
 
 root = tk.Tk()
 root.title("LABOR - Applicatie")
@@ -304,6 +305,36 @@ def run_assessment(client):
         content_frame.current_assessment_client = client
     except Exception:
         pass
+    
+    # Check for incomplete sessions
+    incomplete_phases = get_incomplete_phases(str(client["id"]), client["name"])
+    
+    if incomplete_phases:
+        # Sort phases in logical order
+        phase_order = ["phase1.1", "phase2.0", "phase2.1", "phase2.2", "phase2.3"]
+        incomplete_phases_sorted = [p for p in phase_order if p in incomplete_phases]
+        
+        if incomplete_phases_sorted:
+            # Get the last incomplete phase (most recent progress)
+            last_incomplete_phase = incomplete_phases_sorted[-1]
+            
+            phase_labels = {
+                "phase1.1": "Fase 1.1 - Big Five",
+                "phase2.0": "Fase 2.0 - Loopbaanwaarden",
+                "phase2.1": "Fase 2.1 - Loopbaanclustars",
+                "phase2.2": "Fase 2.2 - Cultuur",
+                "phase2.3": "Fase 2.3 - Taakkenmerken"
+            }
+            response = messagebox.askyesno(
+                "Vragenlijst hervatten",
+                f"Er is nog een onvoltooide vragenlijst:\n\n{phase_labels.get(last_incomplete_phase, last_incomplete_phase)}\n\nWil je deze hervatten?"
+            )
+            if response:
+                # Navigate directly to the last incomplete phase
+                navigate_phase(last_incomplete_phase)
+            return
+    
+    # No incomplete sessions, start fresh
     open_phase11_assessment(client)
 
 def run_prognosis(client):
@@ -636,16 +667,19 @@ def navigate_phase(phase_name, push_to_history=True):
     
     build_func = PHASES[phase_name]
     
-    # Set up phase context (excel path, etc.)
-    if phase_name == "phase1.1":
+    # Set up phase context (excel path, client, etc.)
+    # Make sure client is always available to phases
+    if current_assessment_client:
         content_frame.current_assessment_client = current_assessment_client
+    
+    if phase_name == "phase1.1":
         if current_assessment_client:
             print(f"[DEBUG] Passing client to phase1.1: {current_assessment_client.get('name', 'UNKNOWN')} (ID: {current_assessment_client.get('id', 'UNKNOWN')})")
         else:
             print("[DEBUG] No active client to pass to phase1.1!")
     
-    # Set results_excel_path for phase2.x if client context is available
-    if phase_name in ("phase2.0", "phase2.1", "phase2.2", "phase2.3") and hasattr(content_frame, "current_assessment_client"):
+    # Set results_excel_path for all phases if client context is available
+    if hasattr(content_frame, "current_assessment_client"):
         client = content_frame.current_assessment_client
         safe_name = "_".join(client["name"].split())
         folder_name = f"{client['id']}_{safe_name}"
@@ -658,7 +692,9 @@ def navigate_phase(phase_name, push_to_history=True):
                     break
         if not excel_path:
             excel_path = "Loopbaan onderzoek 5.0 template.xlsx"
+        # Set on both content_frame and root so all phases can access it
         content_frame.results_excel_path = excel_path
+        root.results_excel_path = excel_path
     
     build_func(content_frame, navigate_phase)
 

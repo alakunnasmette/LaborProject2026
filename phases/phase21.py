@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from collections import defaultdict
 from ui.ui_styles import S
 from ui.ui_components import clear_frame
+from utils.session_manager import save_session, load_session, mark_session_complete
 import utils.write_assessments_to_excel as write_assessments_to_excel
 
 # ---------- Helpers ----------
@@ -52,13 +53,24 @@ class Culture22Page(tk.Frame):
         super().__init__(parent, bg=S["bg"])
         self.navigate = navigate
         self.sub_lbl: dict[int, tk.Label] = {}
+        
+        # Get client context from parent frame
+        self.parent_frame = parent
+        self.client = getattr(parent, "current_assessment_client", None)
+        
         self.build()
 
     def build(self):
         self.vars = {}
+        
+        # Load saved session if it exists
+        if self.client:
+            saved_session = load_session(str(self.client["id"]), self.client["name"], "phase2.1")
+            self.saved_answers = saved_session.get("answers", {}) if saved_session else {}
+        else:
+            self.saved_answers = {}
 
         _, _, inner = scrollable(self)
-
 
         tk.Label(inner, text="Fase 2.1 – Carrierrèclusters",
                  bg=S["bg"], font=S["f_title"], anchor="w").pack(fill="x", padx=20, pady=(15, 5))
@@ -647,8 +659,22 @@ class Culture22Page(tk.Frame):
                 interest_var = tk.IntVar(value=0)
                 question_id = f"{cluster_id}_{idx}"
 
+                # Try to restore saved values
+                saved_key = str((cluster_id, idx))
+                if saved_key in self.saved_answers:
+                    saved_values = self.saved_answers[saved_key]
+                    if isinstance(saved_values, (list, tuple)) and len(saved_values) >= 3:
+                        main_var.set(saved_values[0])
+                        skill_var.set(saved_values[1])
+                        interest_var.set(saved_values[2])
+
                 # Use a tuple key (cluster_id, idx)
                 self.vars[(cluster_id, idx)] = (main_var, skill_var, interest_var)
+
+                # Add trace callback for auto-save
+                main_var.trace_add("write", lambda *args: self.auto_save())
+                skill_var.trace_add("write", lambda *args: self.auto_save())
+                interest_var.trace_add("write", lambda *args: self.auto_save())
 
                 # Only store variables if skill and interest statements exist
                 has_skill = 'skill_statement' in row and row.get('skill_statement')
@@ -780,8 +806,41 @@ class Culture22Page(tk.Frame):
             f"Antwoorden opgeslagen in:\n{saved_path}"
         )
 
+        # Mark session as complete
+        if self.client:
+            mark_session_complete(str(self.client["id"]), self.client["name"], "phase2.1")
+
         #  next phase
         self.navigate("phase2.2")
+
+    def auto_save(self):
+        """Auto-save current answers to session file."""
+        if not self.client:
+            return
+        
+        # Collect current answers
+        answers_to_save = {}
+        for key, var_tuple in self.vars.items():
+            if isinstance(var_tuple, tuple) and len(var_tuple) == 3:
+                main_var, skill_var, interest_var = var_tuple
+                try:
+                    answers_to_save[str(key)] = [
+                        int(main_var.get()),
+                        int(skill_var.get()),
+                        int(interest_var.get())
+                    ]
+                except Exception:
+                    pass
+        
+        # Save to session
+        save_session(
+            str(self.client["id"]),
+            self.client["name"],
+            "phase2.1",
+            0,
+            answers_to_save,
+            len(self.vars)
+        )
 
 # -------------------- BUILDER FUNCTION --------------------
 def build_carriereclusters_page(parent_frame: tk.Frame, navigate=None) -> None:

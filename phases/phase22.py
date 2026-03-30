@@ -6,6 +6,7 @@ from tkinter import messagebox
 from dataclasses import dataclass
 from ui.ui_styles import S, FONTS, PRIMARY_BG
 from ui.ui_components import clear_frame, create_submit_button, show_incomplete_warning
+from utils.session_manager import save_session, load_session, mark_session_complete
 import utils.write_assessments_to_excel as write_assessments_to_excel
 
 # ---------- Data ----------
@@ -114,6 +115,11 @@ class Culture22Page(tk.Frame):
         self.navigate = navigate
         self.vars: dict[tuple[int, int], tk.StringVar] = {}
         self.sub_lbl: dict[int, tk.Label] = {}
+        
+        # Get client context from parent frame
+        self.parent_frame = parent
+        self.client = getattr(parent, "current_assessment_client", None)
+        
         self.build()
 
     def subtotal(self, gid: int) -> int:
@@ -128,6 +134,13 @@ class Culture22Page(tk.Frame):
         self.sub_lbl[gid].config(text=str(self.subtotal(gid)))
 
     def build(self):
+        # Load saved session if it exists
+        if self.client:
+            saved_session = load_session(str(self.client["id"]), self.client["name"], "phase2.2")
+            self.saved_answers = saved_session.get("answers", {}) if saved_session else {}
+        else:
+            self.saved_answers = {}
+
         _, _, inner = scrollable(self)
 
         tk.Label(inner, text="Fase 2.2 – Cultuur | Beoordeling van stellingen (1–4)",
@@ -186,8 +199,17 @@ class Culture22Page(tk.Frame):
                 ).grid(row=0, column=1, sticky="w")
 
                 v = tk.StringVar(value="")
+                
+                # Try to restore saved value
+                saved_key = str((g.id, i))
+                if saved_key in self.saved_answers:
+                    saved_value = self.saved_answers[saved_key]
+                    if saved_value:
+                        v.set(saved_value)
+                
                 self.vars[(g.id, i)] = v
                 v.trace_add("write", lambda *_a, gid=g.id: self.update_subtotal(gid))
+                v.trace_add("write", lambda *_a: self.auto_save())
 
                 make_likert_buttons(r, v, bg).grid(row=0, column=2, sticky="e", padx=(10, 25))
                 tk.Label(r, text="", bg=bg, width=8).grid(row=0, column=3, sticky="e")
@@ -292,8 +314,37 @@ class Culture22Page(tk.Frame):
             f"Antwoorden succesvol opgeslagen in:\n{saved_path}"
         )
 
+        # Mark session as complete
+        if self.client:
+            mark_session_complete(str(self.client["id"]), self.client["name"], "phase2.2")
+
         # next phase
         self.navigate("phase2.3")
+
+    def auto_save(self):
+        """Auto-save current answers to session file."""
+        if not self.client:
+            return
+        
+        # Collect current answers
+        answers_to_save = {}
+        for (gid, i), var in self.vars.items():
+            try:
+                value = var.get().strip()
+                if value:
+                    answers_to_save[str((gid, i))] = value
+            except Exception:
+                pass
+        
+        # Save to session
+        save_session(
+            str(self.client["id"]),
+            self.client["name"],
+            "phase2.2",
+            0,
+            answers_to_save,
+            16  # 4 groups × 4 statements each
+        )
 
 
 # -------------------- BUILDER FUNCTION --------------------

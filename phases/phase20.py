@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from utils import write_assessments_to_excel
+from utils.session_manager import save_session, load_session, mark_session_complete
 from ui.ui_components import clear_frame, create_back_button, create_submit_button
 from ui.ui_styles import (
     S, FONTS, PRIMARY_BG, SECONDARY_BG, CARD_LIGHT_BG,
@@ -199,8 +200,34 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     vraag_vars: dict[int, tk.StringVar] = {}
     vraag_buttons: dict[int, list[tuple[str, tk.Radiobutton]]] = {}
 
+    # Load saved session if it exists
+    client = getattr(parent_frame, "current_assessment_client", None)
+    saved_session = load_session(str(client["id"]), client["name"], "phase2.0")
+    saved_answers = saved_session.get("answers", {}) if saved_session else {}
+
+    # Helper function to auto-save answers
+    def auto_save_loopbaan():
+        """Save current answers to session file."""
+        answers_to_save = {str(k): v.get() for k, v in vraag_vars.items()}
+        save_session(
+            str(client["id"]),
+            client["name"],
+            "phase2.0",
+            0,
+            answers_to_save,
+            len(questions)
+        )
+
     for nummer in questions.keys():
-        vraag_vars[nummer] = tk.StringVar(value="")
+        var = tk.StringVar(value="")
+        # Pre-populate with saved answer if it exists
+        if str(nummer) in saved_answers:
+            saved_value = saved_answers[str(nummer)]
+            if saved_value:
+                var.set(saved_value)
+        vraag_vars[nummer] = var
+        # Add trace callback to auto-save on any change
+        var.trace_add("write", lambda *args: auto_save_loopbaan())
         vraag_buttons[nummer] = []
 
     def update_row(question_number: int) -> None:
@@ -379,6 +406,10 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
             "Opgeslagen",
             f"Antwoorden opgeslagen in:\n{save_path}"
         )
+
+        # Mark session as complete
+        client = getattr(parent_frame, "current_assessment_client", None)
+        mark_session_complete(str(client["id"]), client["name"], "phase2.0")
 
         # next phase
         navigate_to("phase2.1")

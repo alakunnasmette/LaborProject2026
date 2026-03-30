@@ -5,6 +5,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ui.ui_components import clear_frame, create_submit_button
 from utils.write_assessments_to_excel import write_phase_2_3_to_excel
+from utils.session_manager import save_session, load_session, mark_session_complete
 from ui.ui_styles import S, FONTS, PRIMARY_BG, CARD_LIGHT_BG
 
 # ==================== Job Characteristics Model Data ====================
@@ -35,6 +36,14 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
     """Build the Job Characteristics Models page with text input fields."""
     
     clear_frame(parent_frame)
+    
+    # Get client context and load session
+    client = getattr(parent_frame, "current_assessment_client", None)
+    if client:
+        saved_session = load_session(str(client["id"]), client["name"], "phase2.3")
+        saved_answers = saved_session.get("answers", {}) if saved_session else {}
+    else:
+        saved_answers = {}
     
     # =================== Scrollable container ===================
     container = tk.Frame(parent_frame, bg=S["bg"])
@@ -158,6 +167,36 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
         )
         text_box.pack(fill="x", padx=12, pady=(0, 12))
         
+        # Restore saved answer if it exists
+        if str(q_num) in saved_answers:
+            saved_value = saved_answers[str(q_num)]
+            if saved_value:
+                text_box.insert("1.0", saved_value)
+        
+        # Add callback for auto-save
+        def make_auto_save(q_num):
+            def auto_save_on_change(*args):
+                if client:
+                    # Collect all current answers
+                    answers_to_save = {}
+                    for qn, tb in text_entries.items():
+                        answer = tb.get("1.0", "end-1c").strip()
+                        if answer:
+                            answers_to_save[str(qn)] = answer
+                    
+                    # Save to session
+                    save_session(
+                        str(client["id"]),
+                        client["name"],
+                        "phase2.3",
+                        0,
+                        answers_to_save,
+                        len(JOB_CHARACTERISTICS_MODEL)
+                    )
+            return auto_save_on_change
+        
+        text_box.bind("<KeyRelease>", make_auto_save(q_num))
+        
         # Store reference to text box
         text_entries[q_num] = text_box
 
@@ -210,6 +249,10 @@ def build_job_characteristics_models_page(parent_frame: tk.Frame, navigate=None)
             "Succes",
             f"Je antwoorden zijn opgeslagen"
         )
+
+        # Mark session as complete
+        if client:
+            mark_session_complete(str(client["id"]), client["name"], "phase2.3")
 
         # Navigate directly to client dashboard after completing all phases
         if navigate:
