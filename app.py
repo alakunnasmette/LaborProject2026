@@ -345,6 +345,23 @@ def view_client_results(client):
     """View results for this client."""
     # TODO: Show results
 
+def delete_client(client):
+    """Delete a client and their data folder."""
+    response = messagebox.askyesno("Klant verwijderen", f"Weet je zeker dat je {client['name']} wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.")
+    if response:
+        # Delete client folder
+        safe_name = "_".join(client["name"].split())
+        folder_name = f"{client['id']}_{safe_name}"
+        client_dir = os.path.join("clients", folder_name)
+        try:
+            if os.path.exists(client_dir):
+                import shutil
+                shutil.rmtree(client_dir)
+            messagebox.showinfo("Verwijderd", f"Klant '{client['name']}' is verwijderd.")
+            show_client_list()
+        except Exception as e:
+            messagebox.showerror("Fout", f"Kon klant niet verwijderen: {e}")
+
 def open_client_dashboard(client, push_to_history=True):
     """Open the dashboard for this client with assessment and prognosis buttons."""
     global current_assessment_client
@@ -457,17 +474,31 @@ def open_client_dashboard(client, push_to_history=True):
 
     edit_btn = tk.Button(
         name_edit_frame,
-        text="✏️",
+        text="✏️Bewerken",
         command=open_edit_client_info,
         bg=COLOR_PRIMARY,
         fg="white",
         font=("Segoe UI", 12),
         relief="flat",
         cursor="hand2",
-        width=2,
+        width=16,
         height=1
     )
     edit_btn.pack(side="left", padx=(0, 5))
+
+    delete_btn = tk.Button(
+        name_edit_frame,
+        text="🗑️Verwijderen",
+        command=lambda: delete_client(client),
+        bg=COLOR_ACCENT,
+        fg="white",
+        font=("Segoe UI", 12),
+        relief="flat",
+        cursor="hand2",
+        width=16,
+        height=1
+    )
+    delete_btn.pack(side="left", padx=(5, 0))
 
     info_fields = [
         ("Geboortedatum", client.get("Date of Birth", "")),
