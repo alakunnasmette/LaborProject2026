@@ -357,6 +357,10 @@ def delete_client(client):
             if os.path.exists(client_dir):
                 import shutil
                 shutil.rmtree(client_dir)
+            
+            # Clear navigation history to prevent returning to deleted client
+            navigation_history.clear()
+            
             messagebox.showinfo("Verwijderd", f"Klant '{client['name']}' is verwijderd.")
             show_client_list()
         except Exception as e:
