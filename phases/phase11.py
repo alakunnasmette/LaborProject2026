@@ -359,8 +359,6 @@ def build_assessments_page(parent_frame: tk.Frame, navigate) -> None:
     add_nav_buttons(
         btn_frame,
         submit_command=on_submit,
-        skip_command=lambda: navigate("phase2.0"),
-        skip_text="Overslaan",
         submit_text="Opslaan en verder",
         skip_side="left",
         submit_side="right",

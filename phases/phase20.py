@@ -421,8 +421,6 @@ def build_career_anchors_page(parent_frame: tk.Frame, navigate_to) -> None:
     add_nav_buttons(
         btn_frame,
         submit_command=on_submit_loopbaan,
-        skip_command=(lambda: navigate_to("phase2.1")),
-        skip_text="Overslaan",
         submit_text="Opslaan en verder",
         skip_side="left",
         submit_side="right",
