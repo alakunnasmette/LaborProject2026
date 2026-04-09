@@ -17,11 +17,9 @@ from phases.phase20 import build_career_anchors_page
 from phases.phase21 import build_carriereclusters_page
 from phases.phase22 import build_cultuur_page
 from phases.phase23 import build_job_characteristics_models_page
-<<<<<<< Updated upstream
 from utils.session_manager import has_incomplete_session, get_incomplete_phases, load_session
-=======
 from prognosis_model import build_prognosis_page
->>>>>>> Stashed changes
+
 
 root = tk.Tk()
 root.title("LABOR - Applicatie")
@@ -411,8 +409,7 @@ def open_client_dashboard(client, push_to_history=True):
     header_frame = tk.Frame(content_frame, bg=COLOR_PRIMARY)
     header_frame.pack(fill="x", padx=20, pady=(10, 30))
 
-<<<<<<< Updated upstream
-=======
+
     # Back button (Terug button)
     back_btn = tk.Button(
         content_frame,
@@ -428,7 +425,7 @@ def open_client_dashboard(client, push_to_history=True):
     )
     back_btn.pack(anchor="w", padx=20, pady=10)
 
->>>>>>> Stashed changes
+
     # --- Name and Edit Button Row ---
     name_edit_frame = tk.Frame(header_frame, bg=COLOR_PRIMARY)
     name_edit_frame.pack(anchor="w", fill="x")
