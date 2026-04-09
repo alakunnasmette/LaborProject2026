@@ -12,6 +12,10 @@ import shutil
 import os
 from openpyxl import load_workbook
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # ─────────────────────────────────────────────
 # INSTELLINGEN — pas dit aan naar jouw project
 # ─────────────────────────────────────────────
@@ -19,6 +23,10 @@ from openpyxl import load_workbook
 TEMPLATE_PATH = "Integratie_Prognose_Model_5_0__2_.xlsx"  # het originele template
 OUTPUT_FOLDER = "client_results"                           # map waar klant-excels komen
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # ─────────────────────────────────────────────
 # MAPPING
 # (Mette - niet aanpassen)
@@ -84,6 +92,10 @@ PROGNOSIS_MAPPING = {
     "q45":       {"row": 162, "options": 2},
 }
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # ─────────────────────────────────────────────
 # STAP 1: COPY TEMPLATE
 # ─────────────────────────────────────────────
@@ -92,6 +104,10 @@ def copy_template(output_path: str):
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     shutil.copy2(TEMPLATE_PATH, output_path)
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # ─────────────────────────────────────────────
 # STAP 2 & 3: MAP ANSWERS + WRITE TO EXCEL
 # ─────────────────────────────────────────────
@@ -125,6 +141,10 @@ def fill_excel(file_path: str, answers: dict):
 
     wb.save(file_path)
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # ─────────────────────────────────────────────
 # GECOMBINEERDE FUNCTIE - gebruik deze vanuit de app
 # ─────────────────────────────────────────────
@@ -162,6 +182,10 @@ def process_submission(client_id: str, answers: dict) -> str:
     fill_excel(output_path, answers)
     return output_path
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # ─────────────────────────────────────────────
 # STAP 4: TESTING
 # ─────────────────────────────────────────────
@@ -261,9 +285,17 @@ def test_mapping():
     print(f"\n  {'GESLAAGD' if fouten == 0 else f'MISLUKT  --  {fouten} onverwacht lege cellen'}")
     print(f"  Opgeslagen als: {output}\n")
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # ─────────────────────────────────────────────
 # START
 # ─────────────────────────────────────────────
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     test_mapping()
+=======
+    test_mapping()
+>>>>>>> Stashed changes

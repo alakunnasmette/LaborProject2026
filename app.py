@@ -5,6 +5,8 @@ import json
 import os
 import ctypes
 from xmlrpc import client
+
+from flask import app
 import phases.phase11
 from PIL import Image, ImageTk
 _USE_PILLOW = True
@@ -15,7 +17,11 @@ from phases.phase20 import build_career_anchors_page
 from phases.phase21 import build_carriereclusters_page
 from phases.phase22 import build_cultuur_page
 from phases.phase23 import build_job_characteristics_models_page
+<<<<<<< Updated upstream
 from utils.session_manager import has_incomplete_session, get_incomplete_phases, load_session
+=======
+from prognosis_model import build_prognosis_page
+>>>>>>> Stashed changes
 
 root = tk.Tk()
 root.title("LABOR - Applicatie")
@@ -108,6 +114,34 @@ back_button = tk.Button(
     cursor="hand2"
 )
 back_button.pack(pady=50, padx=50, anchor="w")
+
+
+
+# ========= prognosis button ding ==========================================================
+def run_prognosis(client):
+    print(f"run_prognosis aangeroepen met client={client}")  # debug
+
+    def go_back_to_dashboard(c=None):
+        print("go_back_to_dashboard aangeroepen")
+        for w in content_frame.winfo_children():
+            w.destroy()
+        top_frame.pack_forget()
+        content_frame.pack_forget()
+        top_frame.pack(fill="x", padx=20, pady=15)
+        content_frame.pack(fill="both", expand=True)
+        open_client_dashboard(c)
+
+    top_frame.pack_forget()
+    for w in content_frame.winfo_children():
+        w.destroy()
+
+    print(f"go_back_to_dashboard functie: {go_back_to_dashboard}")  # debug
+    build_prognosis_page(
+        content_frame,
+        client=client,
+        go_back=go_back_to_dashboard
+    )
+# ==============================================================================================
 
 # --------- Data Storage ---------
 
@@ -337,10 +371,6 @@ def run_assessment(client):
     # No incomplete sessions, start fresh
     open_phase11_assessment(client)
 
-def run_prognosis(client):
-    """Launch prognosis questionnaire for the client."""
-    # TODO: Launch prognosis questionnaire
-
 def view_client_results(client):
     """View results for this client."""
     # TODO: Show results
@@ -381,6 +411,24 @@ def open_client_dashboard(client, push_to_history=True):
     header_frame = tk.Frame(content_frame, bg=COLOR_PRIMARY)
     header_frame.pack(fill="x", padx=20, pady=(10, 30))
 
+<<<<<<< Updated upstream
+=======
+    # Back button (Terug button)
+    back_btn = tk.Button(
+        content_frame,
+        text="← Terug naar Klantenlijst",
+        command=show_client_list,
+        bg=COLOR_TEXT_LIGHT,
+        fg="white",
+        font=("Segoe UI", 10, "bold"),
+        padx=10,
+        pady=5,
+        relief="flat",
+        cursor="hand2"
+    )
+    back_btn.pack(anchor="w", padx=20, pady=10)
+
+>>>>>>> Stashed changes
     # --- Name and Edit Button Row ---
     name_edit_frame = tk.Frame(header_frame, bg=COLOR_PRIMARY)
     name_edit_frame.pack(anchor="w", fill="x")
