@@ -8,7 +8,6 @@ from ui.ui_components import add_nav_buttons, create_sidebar, add_logo_to_sideba
 from ui.ui_styles import COLOR_PRIMARY
 
 _USE_PILLOW = True
-
 EXCEL_PATH = "Integratie_Prognose_Model_5.0(1).xlsx"
 
 ROW_BG_1 = "#EEEEEE"
@@ -20,41 +19,20 @@ def build_prognosis_page(parent, client=None, go_back=None):
     print(f"build_prognosis_page aangeroepen: parent={parent}, client={client}, go_back={go_back}")
     parent.configure(bg="white")
 
-# --------- Container frame voor sidebar + content ---------
-    container = tk.Frame(parent, bg="white")
-    container.pack(fill="both", expand=True)
+    # --------- Hoofd frame ---------
+    page = tk.Frame(parent, bg="white")
+    page.pack(fill="both", expand=True)
 
     # --------- Sidebar ---------
-    SIDEBAR_WIDTH = 200
-    sidebar = create_sidebar(container, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
-    sidebar.pack(side="left", fill="y")
-    
-    logo_label = add_logo_to_sidebar(sidebar, logo_path=os.path.join("images", "labor-logo.png"), use_pillow=_USE_PILLOW, bg=COLOR_PRIMARY)
 
-
+    # --------- Terugknop --------
     def handle_back():
         print("KNOP GEKLIKT")  # debug
         print(f"handle_back aangeroepen, go_back={go_back}, client={client}")
         if go_back:
             for w in parent.winfo_children():
                 w.destroy()
-            go_back(client)
-
-    back_button = tk.Button(
-        sidebar,
-        text="← Terug",
-        command=handle_back,
-        bg=COLOR_PRIMARY,
-        fg="white",
-        relief="flat",
-        font=("Segoe UI", 10, "bold"),
-        cursor="hand2"
-    )
-    back_button.pack(pady=50, padx=50, anchor="w")
-
-    # --------- Hoofd frame (rechts van sidebar) ---------
-    page = tk.Frame(container, bg="white")
-    page.pack(side="left", fill="both", expand=True)         
+            go_back(client)            
 
 
     # --------- Page header ---------
@@ -245,7 +223,7 @@ def build_prognosis_page(parent, client=None, go_back=None):
     make_section_header("7. Persoonlijke Situatie")
     make_column_header()
     all_vars.append(make_question_row(content, 26, "Beschrijf uw huidige leefsituatie.", ["Alleenstaand", "Samenwonend/gehuwd zonder kind(eren)", "Samenwonend/gehuwd met kind(eren) <9 jaar", "Samenwonend/gehuwd met kind(eren) >9 jaar"]))
-    all_vars.append(make_question_row(content, 27, "Wat is de hoogte van uw reguliere jaarinkomen?", ["Laagste inkomenklasse"]))
+    all_vars.append(make_question_row(content, 27, "Wat is de hoogte van uw reguliere jaarinkomen?", ["Laagste inkomenklasse", "Laag midden inkomensklasse", "Midden inkomensklasse","Hoog midden inkomensklasse", "Hoogste inkomenklasse"]))
     all_vars.append(make_question_row(content, 28, "Wat is uw hoogst behaalde onderwijsniveau?", ["Laag onderwijsniveau(LBO)", "Middelbaar onderwijsniveau (MBO)", "Hoger onderwijsniveau (HBO/WO)"]))
     all_vars.append(make_question_row(content, 29, "Hoelang bevindt u zich reeds in het naturalisatieproces?", ["1-3 jaar", "4 jaar", "5 jaar", "6 jaar", "7 jaar", "8-10 jaar"]))
     all_vars.append(make_question_row(content, 30, "Hoe groot is de omvang van uw netwerk? Beschikt u over LinkedIn? Indien, beschrijf de frequentie en de intensiteit van uw gebruik.", ["Klein (< 25 pers.)", "Gemiddeld (25-50 pers.)", "Groot (> 50 pers.)"]))
