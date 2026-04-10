@@ -3,9 +3,9 @@ import openpyxl
 import os
 import tkinter as tk
 from tkinter import ttk
-from ui.ui_components import add_nav_buttons, create_sidebar, add_logo_to_sidebar
-
-EXCEL_PATH = "Integratie_Prognose_Model_5.0 (1).xlsx"
+from prognosis_excel_mapping import process_submission
+from ui.ui_components import add_nav_buttons
+EXCEL_PATH = "Integratie_Prognose_Model_5.0(1).xlsx"
 
 ROW_BG_1 = "#EEEEEE"
 ROW_BG_2 = "#E0E0E0"
@@ -249,15 +249,28 @@ def build_prognosis_page(parent, client=None, go_back=None):
     # Excel opslaan
     # =========================================================================
     def on_submit():
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.append(["Vraag", "Antwoord"])
-        for i, vars_dict in enumerate(all_vars, start=1):
-            geselecteerd = [opt for opt, var in vars_dict.items() if var.get()]
-            antwoord = ", ".join(geselecteerd) if geselecteerd else ""
-            ws.append([f"Vraag {i}", antwoord])
-        wb.save(EXCEL_PATH)
-        print(f"Opgeslagen in {EXCEL_PATH}")
+        answers = {}
+
+        for i, vars_dict in enumerate(all_vars):
+            options = list(vars_dict.keys())
+
+        for j, opt in enumerate(options):
+            if vars_dict[opt].get():
+                q_key = f"q{i+1}"
+                answers[q_key] = j
+                break
+
+    # 👇 NU BINNEN DE FUNCTIE
+        if client:
+            client_id = f"{client['id']}_{client['name'].replace(' ', '_')}"
+        else:
+            client_id = "onbekend"
+
+    # 👇 HIER gebeurt alles
+        output_path = process_submission(client_id, answers)
+
+        print(f"Prognose opgeslagen: {output_path}")
+
         if go_back:
             for w in parent.winfo_children():
                 w.destroy()

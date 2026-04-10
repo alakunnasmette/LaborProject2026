@@ -17,7 +17,7 @@ from openpyxl import load_workbook
 # INSTELLINGEN — pas dit aan naar jouw project
 # ─────────────────────────────────────────────
 
-TEMPLATE_PATH = "Integratie_Prognose_Model_5_0__2_.xlsx"  # het originele template
+TEMPLATE_PATH = "Integratie_Prognose_Model_5.0(1).xlsx"  # het originele template
 OUTPUT_FOLDER = "client_results"                           # map waar klant-excels komen
 
 # ─────────────────────────────────────────────
@@ -107,7 +107,7 @@ def fill_excel(file_path: str, answers: dict):
     }
     """
     wb = load_workbook(file_path)
-    ws = wb["Integratie Prognose Model"]
+    ws = wb["Sheet"]
 
     gender = "man" if answers.get("q1", 0) == 0 else "woman"
 
