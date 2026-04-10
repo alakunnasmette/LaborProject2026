@@ -4,7 +4,11 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from prognosis_excel_mapping import process_submission
-from ui.ui_components import add_nav_buttons
+from ui.ui_components import add_nav_buttons, create_sidebar, add_logo_to_sidebar
+from ui.ui_styles import COLOR_PRIMARY
+
+_USE_PILLOW = True
+
 EXCEL_PATH = "Integratie_Prognose_Model_5.0(1).xlsx"
 
 ROW_BG_1 = "#EEEEEE"
@@ -16,21 +20,41 @@ def build_prognosis_page(parent, client=None, go_back=None):
     print(f"build_prognosis_page aangeroepen: parent={parent}, client={client}, go_back={go_back}")
     parent.configure(bg="white")
 
-    # --------- Hoofd frame ---------
-    page = tk.Frame(parent, bg="white")
-    page.pack(fill="both", expand=True)
+# --------- Container frame voor sidebar + content ---------
+    container = tk.Frame(parent, bg="white")
+    container.pack(fill="both", expand=True)
 
     # --------- Sidebar ---------
+    SIDEBAR_WIDTH = 200
+    sidebar = create_sidebar(container, bg=COLOR_PRIMARY, width=SIDEBAR_WIDTH)
+    sidebar.pack(side="left", fill="y")
+    
+    logo_label = add_logo_to_sidebar(sidebar, logo_path=os.path.join("images", "labor-logo.png"), use_pillow=_USE_PILLOW, bg=COLOR_PRIMARY)
 
 
-    # --------- Terugknop --------
     def handle_back():
         print("KNOP GEKLIKT")  # debug
         print(f"handle_back aangeroepen, go_back={go_back}, client={client}")
         if go_back:
             for w in parent.winfo_children():
                 w.destroy()
-            go_back(client)            
+            go_back(client)
+
+    back_button = tk.Button(
+        sidebar,
+        text="← Terug",
+        command=handle_back,
+        bg=COLOR_PRIMARY,
+        fg="white",
+        relief="flat",
+        font=("Segoe UI", 10, "bold"),
+        cursor="hand2"
+    )
+    back_button.pack(pady=50, padx=50, anchor="w")
+
+    # --------- Hoofd frame (rechts van sidebar) ---------
+    page = tk.Frame(container, bg="white")
+    page.pack(side="left", fill="both", expand=True)         
 
 
     # --------- Page header ---------
