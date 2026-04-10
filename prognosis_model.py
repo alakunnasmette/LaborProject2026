@@ -8,7 +8,7 @@ from ui.ui_components import add_nav_buttons, create_sidebar, add_logo_to_sideba
 from ui.ui_styles import COLOR_PRIMARY
 
 _USE_PILLOW = True
-EXCEL_PATH = "Integratie_Prognose_Model_5.0(1).xlsx"
+EXCEL_PATH = "Integratie_Prognose_Model_5.0(2).xlsx"
 
 ROW_BG_1 = "#EEEEEE"
 ROW_BG_2 = "#E0E0E0"

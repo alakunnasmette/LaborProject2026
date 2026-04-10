@@ -17,7 +17,7 @@ from openpyxl import load_workbook
 # INSTELLINGEN — pas dit aan naar jouw project
 # ─────────────────────────────────────────────
 
-TEMPLATE_PATH = "Integratie_Prognose_Model_5.0(1).xlsx"  # het originele template
+TEMPLATE_PATH = "Integratie_Prognose_Model_5.0(2).xlsx"  # het originele template
 OUTPUT_FOLDER = "client_results"                           # map waar klant-excels komen
 
 # ─────────────────────────────────────────────
