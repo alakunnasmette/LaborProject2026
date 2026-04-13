@@ -14,15 +14,15 @@ from openpyxl import load_workbook
 
 
 # ─────────────────────────────────────────────
-# INSTELLINGEN — pas dit aan naar jouw project
+# INSTELLINGEN 
 # ─────────────────────────────────────────────
 
 TEMPLATE_PATH = "Integratie_Prognose_Model_5.0(2).xlsx"  # het originele template
-OUTPUT_FOLDER = "client_results"                           # map waar klant-excels komen
+OUTPUT_FOLDER = "clients"                           # map waar klant-excels komen
 
 # ─────────────────────────────────────────────
 # MAPPING
-# (Mette - niet aanpassen)
+# (indeling gemaakt door Mette - niet aanpassen)
 # ─────────────────────────────────────────────
 
 PROGNOSIS_MAPPING = {
@@ -154,16 +154,15 @@ def process_submission(client_id: str, answers: dict) -> str:
             client_id = client.id,
             answers   = form.answers
         )
-        # -> "client_results/klant_042_prognose.xlsx"
+        # -> "clients/klant_042/prognose.xlsx"
 
     Geeft terug:
         Pad naar het opgeslagen Excel-bestand (str)
     """
-    output_path = os.path.join(OUTPUT_FOLDER, f"{client_id}_prognose.xlsx")
+    output_path = os.path.join(OUTPUT_FOLDER, client_id, "prognose.xlsx")
     copy_template(output_path)
     fill_excel(output_path, answers)
     return output_path
-
 
 # ─────────────────────────────────────────────
 # STAP 4: TESTING
