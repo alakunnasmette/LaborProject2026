@@ -18,7 +18,7 @@ from openpyxl import load_workbook
 # INSTELLINGEN 
 # ─────────────────────────────────────────────
 
-TEMPLATE_PATH = "Integratie_Prognose_Model_5.0(2).xlsx"  # het originele template
+TEMPLATE_PATH = "Integratie_Prognose_Model_5.0_(2).xlsx"  # het originele template
 OUTPUT_FOLDER = "clients"                           # map waar klant-excels komen
 
 # ─────────────────────────────────────────────
@@ -162,6 +162,9 @@ def process_submission(client_id: str, answers: dict) -> str:
     Geeft terug:
         Pad naar het opgeslagen Excel-bestand (str)
     """
+    if not os.path.exists(TEMPLATE_PATH):
+        raise FileNotFoundError(f"Template niet gevonden: {TEMPLATE_PATH}. Zorg dat het bestand in dezelfde map staat als het script.")
+    
     client_folder = os.path.join(OUTPUT_FOLDER, client_id)
     os.makedirs(client_folder, exist_ok=True)
     output_path = os.path.join(client_folder, "prognose.xlsx")
@@ -175,7 +178,6 @@ def process_submission(client_id: str, answers: dict) -> str:
         json.dump(answers, f, indent=4, ensure_ascii=False)
     
     return output_path
-
 # ─────────────────────────────────────────────
 # STAP 4: TESTING
 # ─────────────────────────────────────────────
