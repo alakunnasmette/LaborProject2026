@@ -8,6 +8,7 @@ Stappen:
 4. Testing
 """
 
+import json
 import shutil
 import os
 from openpyxl import load_workbook
@@ -97,6 +98,7 @@ def copy_template(output_path: str):
 # STAP 2 & 3: MAP ANSWERS + WRITE TO EXCEL
 # ─────────────────────────────────────────────
 
+
 def fill_excel(file_path: str, answers: dict):
     """
     answers = {
@@ -107,7 +109,7 @@ def fill_excel(file_path: str, answers: dict):
     }
     """
     wb = load_workbook(file_path)
-    ws = wb["Sheet"]
+    ws = wb["Integratie Prognose Model"]  # Corrected sheet name
 
     gender = "man" if answers.get("q1", 0) == 0 else "woman"
 
@@ -138,7 +140,8 @@ def process_submission(client_id: str, answers: dict) -> str:
     Wat het doet:
         1. Maakt een kopie van het template voor deze klant
         2. Schrijft de antwoorden naar die kopie
-        3. Geeft het bestandspad terug zodat de site het kan opslaan/tonen
+        3. Slaat de antwoorden op als JSON voor archivering
+        4. Geeft het bestandspad terug zodat de site het kan opslaan/tonen
 
     Parameters:
         client_id  -- unieke ID van de klant vanuit het klantaccount
@@ -159,9 +162,18 @@ def process_submission(client_id: str, answers: dict) -> str:
     Geeft terug:
         Pad naar het opgeslagen Excel-bestand (str)
     """
-    output_path = os.path.join(OUTPUT_FOLDER, client_id, "prognose.xlsx")
+    client_folder = os.path.join(OUTPUT_FOLDER, client_id)
+    os.makedirs(client_folder, exist_ok=True)
+    output_path = os.path.join(client_folder, "prognose.xlsx")
+    answers_path = os.path.join(client_folder, "answers.json")
+    
     copy_template(output_path)
     fill_excel(output_path, answers)
+    
+    # Save answers as JSON for record-keeping
+    with open(answers_path, 'w', encoding='utf-8') as f:
+        json.dump(answers, f, indent=4, ensure_ascii=False)
+    
     return output_path
 
 # ─────────────────────────────────────────────
